@@ -29,3 +29,6 @@ claude/tasks/
 node_modules/
 __pycache__/
 *.pyc
+
+# Other
+claude/telemetry/**

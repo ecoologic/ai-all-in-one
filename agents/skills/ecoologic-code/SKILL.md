@@ -53,10 +53,11 @@ Do not duplicate patterns already covered by those skills.
 
 ## Readability
 
-- NEVER implement without explicit user agreement on the plan
 - Name length matches scope: global = specific (`calculateShippingCost`), local = short (`cost`)
 - One word in English, one word in code: `separateEachWord`, NEVER `jamwordstogether`
 - Use the domain's exact terms. If the business says "Shipment", code `Shipment`, not `Delivery`
+- Avoid hungarian notation like `userArray`, prefer common language, domain oriented, like `users`
+- Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`
 
 <example>
 // Good: domain terms, clear scope
@@ -101,16 +102,16 @@ class Money {
   readonly amount: number
   readonly currency: Currency
 
-  constructor(amount: number, currency: Currency) {
-    if (amount < 0) throw new InvalidAmount();
-    this.amount = amount;
-    this.currency = currency;
-  }
+constructor(amount: number, currency: Currency) {
+if (amount < 0) throw new InvalidAmount();
+this.amount = amount;
+this.currency = currency;
+}
 
-  add(other: Money): Money {
-    if (this.currency !== other.currency) throw new CurrencyMismatch();
-    return new Money(this.amount + other.amount, this.currency);
-  }
+add(other: Money): Money {
+if (this.currency !== other.currency) throw new CurrencyMismatch();
+return new Money(this.amount + other.amount, this.currency);
+}
 }
 
 // For branded/opaque types and runtime validation, see typescript-best-practices
@@ -130,18 +131,18 @@ class Money {
 class Order {
   static create(customerId: CustomerId): Order { ... }
 
-  addItem(productId: ProductId, quantity: Quantity, price: Money): void {
-    // Invariant enforced here, not in a service
-    if (this.items.length >= MAX_LINE_ITEMS) throw new OrderTooLarge();
-    this.items.push(new OrderItem(productId, quantity, price));
-  }
+addItem(productId: ProductId, quantity: Quantity, price: Money): void {
+// Invariant enforced here, not in a service
+if (this.items.length >= MAX_LINE_ITEMS) throw new OrderTooLarge();
+this.items.push(new OrderItem(productId, quantity, price));
+}
 
-  // Domain event, not a direct call to InventoryService
-  confirm(): OrderConfirmed {
-    if (this.items.length === 0) throw new EmptyOrder();
-    this.status = 'confirmed';
-    return new OrderConfirmed(this.id, this.items);
-  }
+// Domain event, not a direct call to InventoryService
+confirm(): OrderConfirmed {
+if (this.items.length === 0) throw new EmptyOrder();
+this.status = 'confirmed';
+return new OrderConfirmed(this.id, this.items);
+}
 }
 </example>
 
@@ -166,12 +167,13 @@ features/
     policy.ts
 
 # Bad: organized by layer
+
 controllers/
-  order-controller.ts
+order-controller.ts
 services/
-  order-service.ts
+order-service.ts
 repositories/
-  order-repository.ts
+order-repository.ts
 </example>
 
 ## Domain Layer Independence
@@ -203,54 +205,54 @@ When building user-facing interfaces, apply these principles from Laws of UX. Th
 
 ### Cognitive Load & Complexity
 
-| Law | Rule |
-|-----|------|
-| **Miller's Law** | Keep groups to 7±2 items. Chunk information into digestible clusters |
-| **Hick's Law** | Fewer choices = faster decisions. Reduce options at each step |
-| **Cognitive Load** | Minimize mental effort. One primary action per screen |
-| **Tesler's Law** | Complexity cannot be destroyed, only moved. Push it to the system, not the user |
-| **Chunking** | Group related information into meaningful units (nav items, form sections, settings) |
+| Law                | Rule                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **Miller's Law**   | Keep groups to 7±2 items. Chunk information into digestible clusters                 |
+| **Hick's Law**     | Fewer choices = faster decisions. Reduce options at each step                        |
+| **Cognitive Load** | Minimize mental effort. One primary action per screen                                |
+| **Tesler's Law**   | Complexity cannot be destroyed, only moved. Push it to the system, not the user      |
+| **Chunking**       | Group related information into meaningful units (nav items, form sections, settings) |
 
 ### Perception & Attention
 
-| Law | Rule |
-|-----|------|
-| **Law of Prägnanz** | People interpret complex shapes as the simplest form possible. Keep UI clean and unambiguous |
-| **Law of Proximity** | Place related elements close together. Whitespace creates grouping |
-| **Law of Similarity** | Visually similar elements are perceived as related. Consistent styling = clear relationships |
-| **Law of Common Region** | Elements in a shared boundary (card, box, section) feel grouped |
-| **Law of Uniform Connectedness** | Lines or shared background connect elements more strongly than proximity alone |
-| **Von Restorff Effect** | The distinctive item gets remembered. Use contrast for CTAs and key information |
-| **Selective Attention** | Users focus on what's relevant to their goal. Don't compete for attention with decoration |
+| Law                              | Rule                                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Law of Prägnanz**              | People interpret complex shapes as the simplest form possible. Keep UI clean and unambiguous |
+| **Law of Proximity**             | Place related elements close together. Whitespace creates grouping                           |
+| **Law of Similarity**            | Visually similar elements are perceived as related. Consistent styling = clear relationships |
+| **Law of Common Region**         | Elements in a shared boundary (card, box, section) feel grouped                              |
+| **Law of Uniform Connectedness** | Lines or shared background connect elements more strongly than proximity alone               |
+| **Von Restorff Effect**          | The distinctive item gets remembered. Use contrast for CTAs and key information              |
+| **Selective Attention**          | Users focus on what's relevant to their goal. Don't compete for attention with decoration    |
 
 ### Behavior & Memory
 
-| Law | Rule |
-|-----|------|
-| **Serial Position Effect** | Users remember first and last items best. Put critical actions at the start or end |
-| **Peak-End Rule** | Experiences are judged by their peak moment and their ending. Nail the happy path and completion state |
-| **Zeigarnik Effect** | Incomplete tasks stick in memory. Use progress indicators to leverage this (and reduce anxiety) |
-| **Goal-Gradient Effect** | Motivation increases near the goal. Show progress, especially in multi-step flows |
+| Law                        | Rule                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Serial Position Effect** | Users remember first and last items best. Put critical actions at the start or end                     |
+| **Peak-End Rule**          | Experiences are judged by their peak moment and their ending. Nail the happy path and completion state |
+| **Zeigarnik Effect**       | Incomplete tasks stick in memory. Use progress indicators to leverage this (and reduce anxiety)        |
+| **Goal-Gradient Effect**   | Motivation increases near the goal. Show progress, especially in multi-step flows                      |
 
 ### Interaction & Performance
 
-| Law | Rule |
-|-----|------|
-| **Fitts's Law** | Bigger + closer targets = faster clicks. Make primary actions large and reachable |
-| **Doherty Threshold** | Response times under 400ms feel instant. Anything slower needs a loading indicator |
-| **Flow** | Don't interrupt the user's flow with unnecessary modals, confirmations, or redirects |
-| **Paradox of the Active User** | Users don't read instructions — they act immediately. Make the UI self-explanatory |
+| Law                            | Rule                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| **Fitts's Law**                | Bigger + closer targets = faster clicks. Make primary actions large and reachable    |
+| **Doherty Threshold**          | Response times under 400ms feel instant. Anything slower needs a loading indicator   |
+| **Flow**                       | Don't interrupt the user's flow with unnecessary modals, confirmations, or redirects |
+| **Paradox of the Active User** | Users don't read instructions — they act immediately. Make the UI self-explanatory   |
 
 ### Trust & Familiarity
 
-| Law | Rule |
-|-----|------|
-| **Jakob's Law** | Users expect your site to work like the sites they already know. Follow platform conventions |
-| **Aesthetic-Usability Effect** | Beautiful design is perceived as more usable. Visual polish builds trust |
-| **Postel's Law** | Be liberal in what you accept from users, strict in what you output. Tolerate input variations |
-| **Mental Model** | Match the UI to how users think the system works, not how it actually works |
-| **Occam's Razor** | Among solutions that work equally well, pick the simplest one |
-| **Pareto Principle** | 80% of users use 20% of features. Optimize for the common paths |
+| Law                            | Rule                                                                                           |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| **Jakob's Law**                | Users expect your site to work like the sites they already know. Follow platform conventions   |
+| **Aesthetic-Usability Effect** | Beautiful design is perceived as more usable. Visual polish builds trust                       |
+| **Postel's Law**               | Be liberal in what you accept from users, strict in what you output. Tolerate input variations |
+| **Mental Model**               | Match the UI to how users think the system works, not how it actually works                    |
+| **Occam's Razor**              | Among solutions that work equally well, pick the simplest one                                  |
+| **Pareto Principle**           | 80% of users use 20% of features. Optimize for the common paths                                |
 
 <example>
 // Good: Hick's Law — progressive disclosure, one decision at a time
@@ -260,6 +262,7 @@ When building user-facing interfaces, apply these principles from Laws of UX. Th
 </WizardStep>
 
 // Bad: all options dumped at once
+
 <Form>
   <PlanSelector /><BillingFields /><TeamSettings /><IntegrationConfig />
 </Form>
@@ -290,15 +293,24 @@ When building user-facing interfaces, apply these principles from Laws of UX. Th
 
 Before writing code, answer:
 
-| Question | If no... |
-|----------|----------|
-| Does the project already have a convention for this? | Follow it. Stop here |
-| Am I using the domain's exact terms? | Rename to match ubiquitous language |
-| Does this need identity tracking? | Make it a value object, not an entity |
-| Does this cross an aggregate boundary? | Use a domain event or ID reference |
-| Is this organized by feature? | Move to a vertical slice (unless framework dictates otherwise) |
-| Am I building something not yet needed? | Delete it (YAGNI) |
-| Can this be shipped independently? | Break it into a smaller change |
-| Does the UI minimize cognitive load? | Apply Hick's, Miller's, and chunking |
-| Are primary actions obvious and reachable? | Apply Fitts's Law and Von Restorff |
-| Does this match user expectations? | Apply Jakob's Law and mental models |
+| Question                                             | If no...                                                       |
+| ---------------------------------------------------- | -------------------------------------------------------------- |
+| Does the project already have a convention for this? | Follow it. Stop here                                           |
+| Am I using the domain's exact terms?                 | Rename to match ubiquitous language                            |
+| Does this need identity tracking?                    | Make it a value object, not an entity                          |
+| Does this cross an aggregate boundary?               | Use a domain event or ID reference                             |
+| Is this organized by feature?                        | Move to a vertical slice (unless framework dictates otherwise) |
+| Am I building something not yet needed?              | Delete it (YAGNI)                                              |
+| Can this be shipped independently?                   | Break it into a smaller change                                 |
+| Does the UI minimize cognitive load?                 | Apply Hick's, Miller's, and chunking                           |
+| Are primary actions obvious and reachable?           | Apply Fitts's Law and Von Restorff                             |
+| Does this match user expectations?                   | Apply Jakob's Law and mental models                            |
+
+## TypeScript
+
+- Use `as const` when appropriate
+- Prefer maps over `switch` statements
+
+## Style
+
+- Prefer declarative style over imperative

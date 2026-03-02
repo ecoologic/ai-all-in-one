@@ -4,11 +4,13 @@ argument-hint: <file-path-or-epic-description>
 allowed-tools: [Read, Glob, Grep, Write, Edit, TaskCreate, TaskUpdate, TaskList]
 ---
 
-# Stories
+# Epic command
 
-You are breaking down a broad epic into actionable, FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Codebase investigation can be done to understand what is already there, but it shouldn't pollute the stories themselves.
+You are breaking down a broad epic into actionable, FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Coding and codebase investigation is completely _forbidden_ for this command.
 
-No code at all must be changed until we move on to implementation. We only update the documentation. Implementation of the user stories will be done in a separate step. This command ends with the creation of the user stories markdown file. Each user story will be implemented as a separate command.
+The purpose of this command is to describe in a structured format how a feature is used and for what purpose, it's NOT to produce any code. Only documentation. This command ends with the creation of the user stories document. Each user story will be implemented individually as a separate command.
+
+This command is part of a process, `/epic -> /story -> task`.
 
 ## What is a _user story_
 
@@ -22,6 +24,14 @@ No code at all must be changed until we move on to implementation. We only updat
 
 > A user story is not a technical task or implementation detail. "As a developer, I want to create a DB table" is not a user story — it describes work for the builder, not value for the user. Items like "set up an API endpoint," "refactor the auth module," or "add a database index" are technical tasks (subtasks of a story or separate backlog items), not stories. Slicing stories by technology layer (frontend, backend) instead of vertical user-facing slices is an anti-pattern. A user story is also not a detailed spec — overloading it with implementation details defeats its purpose. Not everything in a backlog needs to be a user story; purely technical work should use a different format.
 
+## Scope of a user story
+
+<!-- TODO: formatting, examples -->
+
+Stories should be small. For example, each of the CRUD operations should be _at most_ one story.
+
+Work that has _low cohesion_ must be treated as a different story. For example, uploading a picture in your profile, is technically different from regular properties, so it should be treated as a separate story.
+
 ## Step 1: Resolve epic input
 
 Determine the epic source from `$ARGUMENTS`:
@@ -34,43 +44,23 @@ Output:
 Epic: <one-line summary>
 ```
 
-## Step 2: Explore the codebase
+## Step 2: Derive epic slug
 
-BEFORE writing any stories, understand what exists in relation to the goal. Use Glob, Grep, and Read.
-
-Output a brief (5-10 line) summary of the existing features and pages relevant to this epic.
-
-## Step 3: Derive epic slug
-
-From the epic content, derive a slugified `<epic>` name (lowercase, hyphens, no special chars).
+From the epic content, derive a slugified `<epic-slug>` (lowercase, hyphens, no special chars).
 Example: "user authentication system" → `user-auth`
 
 NOTE: _epic_, _feature_, _delivery_ and the like are not good pre/suffixes.
 
-## Step 4: Break into user stories
+## Step 3: Break into user stories
 
 Keeping in mind what a user story is and what is not (above), split the work into user stories. For each:
 - Canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
 - User Context section (role, goals, use case)
-- Acceptance criteria in Given/When/Then format as markdown checkboxes `- [ ]`
+- Acceptance criteria in _Given_/_When_/_Then_ format as markdown checkboxes `- [ ]`
 - Requirements where relevant (performance, security, accessibility)
-- Brief technical notes referencing actual files/modules from Step 2
 - Assess prerequisites: does this depend on another story or missing infrastructure?
 
-**Limit: write at most 6 stories.** If the epic contains more work, add a 7th placeholder story:
-
-```md
-## Story 7: Break down remaining work
-
-Further decomposition needed. The following areas were identified but not yet broken into stories:
-- <area 1>
-- <area 2>
-- ...
-```
-
-No need for extra investigation, just dump findings that might be later deeper evaluated.
-
-## Step 5: Classify and evaluate
+## Step 4: Classify and evaluate
 
 Separate into two groups:
 1. **Actionable** — no prerequisites, can start now given current codebase
@@ -108,26 +98,10 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 ### Requirements
 - (only if relevant)
 
-### Technical Notes
-- references to actual files/modules
-
-### Start Here?
-**Pros:** ...
-**Cons:** ...
-
+### UX considerations
+- (only if relevant)
 ---
 ```
-
-## Step 7: Write `docs/<epic-name>/other-stories.md` (conditional)
-
-Only if blocked or under-defined stories exist. Same story format but replace "Start Here?" with:
-```
-### Blocked By
-- Story X (reason)
-- Missing infrastructure (detail)
-```
-
-Skip this file entirely if all stories are actionable.
 
 ## Step 8: Summary
 

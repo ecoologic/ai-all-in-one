@@ -8,7 +8,7 @@ description: >-
 
 # Skill Authoring
 
-Write skills that trigger reliably, load efficiently, and produce consistent results across Haiku, Sonnet, and Opus.
+Write skills that trigger reliably, load efficiently, and produce consistent quality results.
 
 ## When to use
 
@@ -27,11 +27,11 @@ Write skills that trigger reliably, load efficiently, and produce consistent res
 
 Claude Code loads skills in three stages. Write for all three.
 
-| Stage | What loads | Budget | Your job |
-|-------|-----------|--------|----------|
-| **1. Discovery** | `name` + `description` only | ~100 words across ALL skills | Make `description` trigger-rich |
-| **2. Activation** | Full SKILL.md body | < 500 lines | Keep it lean, imperative, example-heavy |
-| **3. On demand** | Bundled files (references, scripts) | No hard limit | Move verbose reference material here |
+| Stage             | What loads                          | Budget                       | Your job                                |
+| ----------------- | ----------------------------------- | ---------------------------- | --------------------------------------- |
+| **1. Discovery**  | `name` + `description` only         | ~100 words across ALL skills | Make `description` trigger-rich         |
+| **2. Activation** | Full SKILL.md body                  | < 500 lines                  | Keep it lean, imperative, example-heavy |
+| **3. On demand**  | Bundled files (references, scripts) | No hard limit                | Move verbose reference material here    |
 
 The description is the ONLY thing Claude sees at startup. If triggering fails, nothing else matters.
 
@@ -44,22 +44,23 @@ Every field available in the YAML frontmatter block:
 ```yaml
 ---
 # REQUIRED (effectively)
-name: my-skill              # Lowercase, hyphens only. Max 64 chars.
-                            # Cannot contain "anthropic" or "claude"
-description: >-             # Max 1024 chars. THE most important field.
+name:
+  my-skill # Lowercase, hyphens only. Max 64 chars.
+  # Cannot contain "anthropic" or "claude"
+description: >- # Max 1024 chars. THE most important field.
   WHEN to trigger first, then what it does.
   Include file types, user phrases, key verbs.
 
 # INVOCATION CONTROL
-user-invocable: true        # true = appears in /slash menu (default)
-disable-model-invocation: false  # true = ONLY user can invoke, Claude cannot auto-trigger
-allowed-tools: Read, Grep, Glob  # Tools allowed without permission prompts
-argument-hint: "[filename]"      # Shown in autocomplete, e.g. [issue-number]
+user-invocable: true # true = appears in /slash menu (default)
+disable-model-invocation: false # true = ONLY user can invoke, Claude cannot auto-trigger
+allowed-tools: Read, Grep, Glob # Tools allowed without permission prompts
+argument-hint: "[filename]" # Shown in autocomplete, e.g. [issue-number]
 
 # EXECUTION CONTEXT
-context: fork               # "fork" = run in isolated subagent context
-agent: Explore              # Subagent type when context: fork. Options: Explore, Plan, general-purpose
-model: sonnet               # Override model for this skill
+context: fork # "fork" = run in isolated subagent context
+agent: Explore # Subagent type when context: fork. Options: Explore, Plan, general-purpose
+model: sonnet # Override model for this skill
 
 # METADATA (for skills.sh ecosystem, not Claude Code itself)
 metadata:
@@ -70,11 +71,11 @@ metadata:
 
 ### Invocation control matrix
 
-| Setting | User can invoke | Claude can invoke | Description in context |
-|---------|:-:|:-:|:-:|
-| defaults | yes | yes | yes |
-| `disable-model-invocation: true` | yes | no | no |
-| `user-invocable: false` | no | yes | yes |
+| Setting                          | User can invoke | Claude can invoke | Description in context |
+| -------------------------------- | :-------------: | :---------------: | :--------------------: |
+| defaults                         |       yes       |        yes        |          yes           |
+| `disable-model-invocation: true` |       yes       |        no         |           no           |
+| `user-invocable: false`          |       no        |        yes        |          yes           |
 
 ---
 
@@ -94,31 +95,34 @@ The description is a trigger mechanism, not documentation. Write it to maximize 
 
 Use these established patterns in your description:
 
-| Pattern | When to use | Example |
-|---------|-------------|---------|
-| `Must use when...` | Always-on for file types | `Must use when reading or writing .py files` |
-| `Use when...` | Discretionary activation | `Use when asked to review UI or audit design` |
-| `TRIGGER when:` | Explicit code-level triggers | `TRIGGER when: code imports @anthropic-ai/sdk` |
-| `DO NOT TRIGGER when:` | Prevent false positives | `DO NOT TRIGGER when: code imports openai` |
+| Pattern                | When to use                  | Example                                        |
+| ---------------------- | ---------------------------- | ---------------------------------------------- |
+| `Must use when...`     | Always-on for file types     | `Must use when reading or writing .py files`   |
+| `Use when...`          | Discretionary activation     | `Use when asked to review UI or audit design`  |
+| `TRIGGER when:`        | Explicit code-level triggers | `TRIGGER when: code imports @anthropic-ai/sdk` |
+| `DO NOT TRIGGER when:` | Prevent false positives      | `DO NOT TRIGGER when: code imports openai`     |
 
 <example>
 # Bad: passive, no trigger conditions, no specificity
 description: Helps with PDF files
 
 # Bad: first person, no file types, vague
+
 description: I can help you process and manipulate PDF documents
 
 # Good: when-first, third person, specific triggers
+
 description: >-
-  Use when working with .pdf files or when the user mentions PDFs,
-  forms, or document extraction. Extracts text and tables from PDF
-  files, fills forms, merges documents.
+Use when working with .pdf files or when the user mentions PDFs,
+forms, or document extraction. Extracts text and tables from PDF
+files, fills forms, merges documents.
 
 # Good: mandatory trigger with exclusion, when-first
+
 description: >-
-  TRIGGER when: code imports anthropic, @anthropic-ai/sdk, or claude_agent_sdk.
-  DO NOT TRIGGER when: code imports openai or other AI SDKs.
-  Builds apps with the Claude API or Anthropic SDK.
+TRIGGER when: code imports anthropic, @anthropic-ai/sdk, or claude_agent_sdk.
+DO NOT TRIGGER when: code imports openai or other AI SDKs.
+Builds apps with the Claude API or Anthropic SDK.
 </example>
 
 ---
@@ -135,9 +139,11 @@ The SKILL.md body is what loads on activation. Keep it under 500 lines. Use impe
 One-line summary of what this skill does and why.
 
 ## When to use
+
 - Bullet list of activation scenarios
 
 ## When NOT to use
+
 - Bullet list of exclusions (prevents false positives)
 
 ## [Core instruction sections]
@@ -154,24 +160,24 @@ Move verbose content to separate files and reference them:
 
 ### Formatting rules
 
-| Do | Don't |
-|----|-------|
-| Imperative: "Use X", "Return Y" | Descriptive: "We prefer X", "It's recommended to Y" |
-| `<example>` blocks for code patterns | Inline code in prose paragraphs |
-| Tables for checklists and matrices | Long bullet lists > 7 items |
-| `IMPORTANT:`, `NEVER`, `ALWAYS`, `MUST` for emphasis | Overuse — if everything is important, nothing is |
-| One level of file references (SKILL.md → ref.md) | Chains (SKILL.md → a.md → b.md) |
-| Provide defaults: "Use pdfplumber" | Offer menus: "Choose between pypdf, pdfplumber, or PyMuPDF" |
-| Explain WHY a rule exists (briefly) | Rigid rules without rationale |
+| Do                                                   | Don't                                                       |
+| ---------------------------------------------------- | ----------------------------------------------------------- |
+| Imperative: "Use X", "Return Y"                      | Descriptive: "We prefer X", "It's recommended to Y"         |
+| `<example>` blocks for code patterns                 | Inline code in prose paragraphs                             |
+| Tables for checklists and matrices                   | Long bullet lists > 7 items                                 |
+| `IMPORTANT:`, `NEVER`, `ALWAYS`, `MUST` for emphasis | Overuse — if everything is important, nothing is            |
+| One level of file references (SKILL.md → ref.md)     | Chains (SKILL.md → a.md → b.md)                             |
+| Provide defaults: "Use pdfplumber"                   | Offer menus: "Choose between pypdf, pdfplumber, or PyMuPDF" |
+| Explain WHY a rule exists (briefly)                  | Rigid rules without rationale                               |
 
 ### String substitutions available in body
 
-| Variable | Expands to |
-|----------|-----------|
-| `$ARGUMENTS` | All arguments passed on invocation |
-| `$ARGUMENTS[0]`, `$0` | First argument |
-| `${CLAUDE_SESSION_ID}` | Current session ID |
-| `` !`command` `` | Shell command output (injected before Claude sees content) |
+| Variable               | Expands to                                                 |
+| ---------------------- | ---------------------------------------------------------- |
+| `$ARGUMENTS`           | All arguments passed on invocation                         |
+| `$ARGUMENTS[0]`, `$0`  | First argument                                             |
+| `${CLAUDE_SESSION_ID}` | Current session ID                                         |
+| `` !`command` ``       | Shell command output (injected before Claude sees content) |
 
 ---
 
@@ -197,7 +203,7 @@ One level of references only. SKILL.md can point to `references/api-patterns.md`
 
 Use this as a starting point. Delete sections that don't apply.
 
-````markdown
+```markdown
 ---
 name: my-skill
 description: >-
@@ -228,9 +234,9 @@ allowed-tools: Read, Grep, Glob
 
 [Imperative rules. Keep each section focused on one topic.]
 
-| Rule | Rationale |
-|------|-----------|
-| [Do X] | [Why — one sentence] |
+| Rule         | Rationale            |
+| ------------ | -------------------- |
+| [Do X]       | [Why — one sentence] |
 | NEVER [do Y] | [Why — one sentence] |
 
 <example>
@@ -250,7 +256,7 @@ IMPORTANT: [Critical rule that must not be missed.]
 <example>
 [Another code example]
 </example>
-````
+```
 
 ---
 
@@ -258,15 +264,15 @@ IMPORTANT: [Critical rule that must not be missed.]
 
 Run through before publishing:
 
-| Check | Pass? |
-|-------|-------|
-| `description` leads with WHEN, then WHAT? | |
-| `description` under 300 chars? | |
-| Body under 500 lines? | |
-| All instructions use imperative phrasing? | |
-| Every code pattern wrapped in `<example>`? | |
-| No duplicate content with existing skills? | |
-| Bundled references are one level deep max? | |
-| IMPORTANT/NEVER/ALWAYS used sparingly (< 5 per skill)? | |
-| Works with Haiku (enough detail) and Opus (not insulting)? | |
-| No time-sensitive content (dates, version numbers that rot)? | |
+| Check                                                        | Pass? |
+| ------------------------------------------------------------ | ----- |
+| `description` leads with WHEN, then WHAT?                    |       |
+| `description` under 300 chars?                               |       |
+| Body under 500 lines?                                        |       |
+| All instructions use imperative phrasing?                    |       |
+| Every code pattern wrapped in `<example>`?                   |       |
+| No duplicate content with existing skills?                   |       |
+| Bundled references are one level deep max?                   |       |
+| IMPORTANT/NEVER/ALWAYS used sparingly (< 5 per skill)?       |       |
+| Works with Haiku (enough detail) and Opus (not insulting)?   |       |
+| No time-sensitive content (dates, version numbers that rot)? |       |
