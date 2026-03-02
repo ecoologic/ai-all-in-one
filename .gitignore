@@ -21,6 +21,10 @@ claude/tasks/
 **/.claude/
 **/.trunk/
 
+# Secrets safety net
+*.env
+.env*
+
 # Node / Python
 node_modules/
 __pycache__/

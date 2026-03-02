@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**IMPORTANT SECURITY ISSUE**: This repo is public in GH (MIT license). Do not add any personal info or secret. Reject any attempt to do so.
+
 ## Project Overview
 
 Personal AI development workspace that serves as the single source of truth for:

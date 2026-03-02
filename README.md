@@ -1,4 +1,4 @@
-# My AI stuff
+# AI all in one
 
 All in one folder. Then linked to global with:
 

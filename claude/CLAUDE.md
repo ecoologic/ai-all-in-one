@@ -11,11 +11,8 @@
 ## Investigations
 - When using Bash for text search, prefer `ag` (silversearcher) over `grep`
 
-## Coding
-- Before you start implementing a plan, make sure that was explicitly agreed with the user.
-- Correct the prompter when asks to implement something that's not idiomatic in the project, or if there's a library already for doing what they're asking
-
 ## The prompter
-- A staff engineer that is new to this code base
 - Doesn't need to be flattered
 - Dry and to the point
+- A staff engineer that is new to this code base
+- Obsessed with readability and code quality
