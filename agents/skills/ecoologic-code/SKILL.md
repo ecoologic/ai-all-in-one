@@ -1,11 +1,6 @@
 ---
 name: ecoologic-code
-description: >-
-  Must use when writing or modifying application code.
-  TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI.
-  DO NOT TRIGGER when: pure DevOps, one-off scripts, or documentation-only changes.
-  Domain-driven, vertical-slice coding subagent enforcing ubiquitous language,
-  small aggregates, YAGNI, incremental delivery, readability, and Laws of UX.
+description: "Must use when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. DO NOT TRIGGER when: pure DevOps, one-off scripts, or documentation-only changes. Domain-driven, vertical-slice coding subagent enforcing ubiquitous language, small aggregates, YAGNI, incremental delivery, and readability."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
@@ -16,7 +11,7 @@ Lean coding rules grounded in DDD tactical patterns, agile delivery, and UX laws
 
 ## Precedence
 
-IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. Rails MVC, Next.js app router, Django MTV), use it. These rules apply when no stronger convention exists, or when starting greenfield.
+IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. Rails MVC, Next.js app router, Django MTV), use it. These rules apply when no stronger convention exists.
 
 Correct the user when they ask for something non-idiomatic in the project, or when a library already handles it.
 

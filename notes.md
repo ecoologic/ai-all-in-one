@@ -4,7 +4,9 @@
 
 ### WIP
 
-* nope: invert enumerate and audit?
+* nope
+  * invert enumerate and audit
+  * description: unsupported attributes
 * plan implementation `/epic /personas /architecture /story /task`
   * ux in stories? (ux own skill)
   * `/epic` when to stop and ask for help
