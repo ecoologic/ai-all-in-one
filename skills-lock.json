@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "skill-authoring": {
+      "source": "microsoft/github-copilot-for-azure",
+      "sourceType": "github",
+      "computedHash": "44d9a366f02702ad36a962712140601d95e62a6bdd0bda931d2f10e6cff57244"
+    },
     "skill-review": {
       "source": "ovachiever/droid-tings",
       "sourceType": "github",
