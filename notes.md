@@ -6,6 +6,8 @@
 * UX skill (mine?)
 * break down
 * remove skill (remove mentioned (ask) and from subagents)
+* story implementation
+
 
 ```md
 ## When to Stop and Ask for Help
