@@ -9,6 +9,24 @@
       "skillFolderHash": "3116f3e62dbd02b44a598b1aa690d2a8938e8f89",
       "installedAt": "2026-03-02T04:58:06.554Z",
       "updatedAt": "2026-03-02T04:58:06.554Z"
+    },
+    "react-best-practices": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/0xbigboss/claude-code.git",
+      "skillPath": ".claude/skills/react-best-practices/SKILL.md",
+      "skillFolderHash": "e321b6890cdb378275a2c9708302b9ae1d084def",
+      "installedAt": "2026-03-02T06:52:08.926Z",
+      "updatedAt": "2026-03-02T06:52:08.926Z"
+    },
+    "typescript-best-practices": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/0xbigboss/claude-code.git",
+      "skillPath": ".claude/skills/typescript-best-practices/SKILL.md",
+      "skillFolderHash": "70d6e4013509e92ab8bce7313a2d35673688ed33",
+      "installedAt": "2026-03-02T06:53:24.247Z",
+      "updatedAt": "2026-03-02T06:53:24.247Z"
     }
   },
   "dismissed": {

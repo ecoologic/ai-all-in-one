@@ -2,36 +2,23 @@
 
 ## TODO
 
-* skill review in plan subagent
-* UX skill (mine?)
-* break down
-* remove skill (remove mentioned (ask) and from subagents)
 * story implementation
+* agents: plan, implement, review, qa
+* UX skill (mine?)
+* security skill
+* ami and react-doctor
+* remove skill (remove mentioned (ask) and from subagents)
 
+## General
 
 ```md
 ## When to Stop and Ask for Help
 ```
 
-## Wireframe command
+## Readability
 
-* lovable??
-* start by doing one, iterations in tabs
-* keep title and description in sync
-* tabbing for iteration on each
-* self contained html
-* looks like $app
-* ux/ui best practices
-* 3 _different_ wireframes
+avoid shortening names, their length should depend on the context, global terms should be more specific, while inside a class, component or folder some prefixes might be redundant.
 
+## TS
 
-## FS
-
-```
-~/dev/ai (only git)
-  .agents (actual)
-  .claude
-
-~/.agents symlink
-~/.claude
-```
+use `as const` whenever possible.
