@@ -1,6 +1,6 @@
 ---
 name: ux-laws
-description: "Must use when building or reviewing user-facing interfaces. TRIGGER when: creating UI components, reviewing UX, designing flows, or laying out screens. DO NOT TRIGGER when: pure backend, API-only code, or DevOps. Applies Laws of UX (Hick's, Fitts's, Miller's, Jakob's, etc.) to ensure usable, intuitive interfaces."
+description: "Must use when building or reviewing user-facing interfaces. TRIGGER when: creating UI components, reviewing UX, designing flows, or laying out screens. Applies Laws of UX (Hick's, Fitts's, Miller's, Jakob's, etc.) to ensure usable, intuitive interfaces."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---

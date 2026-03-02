@@ -32,6 +32,17 @@ Stories should be small. For example, each of the CRUD operations should be _at 
 
 Work that has _low cohesion_ must be treated as a different story. For example, uploading a picture in your profile, is technically different from regular properties, so it should be treated as a separate story.
 
+Even a simple dropdown or a text field, might become its own story if they depend on other work that relates to another story.
+
+Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story.
+
+## When to split a story
+
+<!-- TODO: part of the review step -->
+Ask the question: is this shippable as a cohesive, complete and usable feature?
+
+It is OK to return to the same UI to add a field in a different story.
+
 ## Step 1: Resolve epic input
 
 Determine the epic source from `$ARGUMENTS`:
@@ -68,7 +79,7 @@ Separate into two groups:
 
 For each actionable story, add *Pros* and *Cons* of starting with that story first.
 
-## Step 6: Write `docs/<epic-name>/stories.md`
+## Step 6: Write `docs/<epic-slug>/stories.md`
 
 Create the file with this structure:
 
