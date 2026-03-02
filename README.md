@@ -27,6 +27,6 @@ Only active in this repo:
 
 - `.claude/` — project-level Claude Code config (gitignored)
   - `skills/` — symlinks to skills available only in this repo
-- `kokoro/` — Kokoro TTS integration: hotkey listener, Docker wrapper, binary
+- `tts/` — Kokoro TTS integration: hotkey listener, Docker wrapper, binary
 - `notes.md` — development TODOs and notes
 - `CLAUDE.md` — instructions for Claude Code when working in this repo
