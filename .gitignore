@@ -1,10 +1,19 @@
 # OS
 .DS_Store
 
-# Claude runtime state
+# Claude runtime / transient state
+claude/backups/
+claude/cache/
+claude/debug/
+claude/file-history/
+claude/history.jsonl
+claude/mcp-needs-auth-cache.json
+claude/plans/
+claude/plugins/
+claude/projects/
+claude/session-env/
+claude/shell-snapshots/
 claude/tasks/
-**/.lock
-**/.highwatermark
 
 # Agent nested installs (prevent future accidents)
 **/.agent/
