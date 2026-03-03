@@ -34,7 +34,7 @@ Work that has _low cohesion_ must be treated as a different story. For example, 
 
 Even a simple dropdown or a text field, might become its own story if they depend on other work that relates to another story.
 
-Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story.
+Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story. A story doesn't need to create all fields at the same time, a story can be split so that the field is added in another story. For example, a profile _doesn't need_ to have an address when it's first created, unless it's simple enough, like basic fields that don't require too much validation like `githubUrl`.
 
 ## When to split a story
 

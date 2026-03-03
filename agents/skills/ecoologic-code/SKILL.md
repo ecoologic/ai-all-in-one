@@ -48,11 +48,14 @@ Do not duplicate patterns already covered by those skills.
 
 ## Readability
 
-- Name length matches scope: global = specific (`calculateShippingCost`), local = short (`cost`)
+- Name length matches scope: global = specific (`calculateShippingCost`), local = short (`cost`, and shipping can be inferred from context)
 - One word in English, one word in code: `separateEachWord`, NEVER `jamwordstogether`
 - Use the domain's exact terms. If the business says "Shipment", code `Shipment`, not `Delivery`
 - Avoid hungarian notation like `userArray`, prefer common language, domain oriented, like `users`
-- Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`
+- Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`, `statusSet -> possibleStatuses`
+- The name depends and indicates what the value is. So, for example, `billingChoice` is always the object, NEVER the id, that would be `billingChoiceId` and `company` is a terrible name for `companyName`, eg: `site -> siteUrl`
+- Maps can be precisely expressed by how they are accessed, eg: `userById = { '<id>': { name: "Erik" }}` and `usersByName = { 'Erik': [{ name: "Erik" }]}` clearly indicates the return type is a list
+- Avoid generics like `data, map, time` when possible, be precise
 
 <example>
 // Good: domain terms, clear scope
@@ -219,8 +222,9 @@ Before writing code, answer:
 
 ## TypeScript
 
-- Use `as const` when appropriate
-- Prefer maps over `switch` statements
+- DO NOT CREATE new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
+- Use `as const` where possible
+- Prefer maps over `switch` statements (always prefer declarative code!)
 
 ## Style
 
