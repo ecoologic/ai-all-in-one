@@ -23,7 +23,7 @@ Context sources:
 
 ## Step 2: Audit the latest response
 
-From each source, extract every directive, constraint, preference, or rule that governs your behaviour. For each, check it against your most recent response (the one immediately before the user invoked `/check-context`). Also check $ARGUMENTS for clues about what the user suspects.
+From each source, extract every directive, constraint, preference, or rule that governs your behaviour. For each, check it against your most recent response (the one immediately before the user invoked `/nope`). Also check $ARGUMENTS for clues about what the user suspects.
 
 For each violation found, note:
 - Which instruction was broken

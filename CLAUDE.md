@@ -6,9 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal AI development workspace that serves as the single source of truth for:
-- **Agent skills** shared across 10+ AI coding agents (Claude Code, Cursor, Cline, Copilot, etc.)
-- **Kokoro TTS** local text-to-speech integration via Docker
+Read the README.md.
 
 ## Architecture
 
@@ -47,22 +45,6 @@ npx skills init <name>        # Create new skill scaffold
 ```
 
 Browse: https://skills.sh/
-
-### Kokoro TTS
-
-```sh
-# Start the TTS server
-docker run -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu:latest
-
-# Run the hotkey listener (Ctrl+Space = read/stop, Ctrl+Shift+Q = quit)
-pip install -r kokoro/requirements.txt
-python3 kokoro/kokoro_hotkey.py
-
-# Read a file aloud
-python3 kokoro/kokoro_read_file.py <filepath>
-```
-
-API endpoint: `http://localhost:8880/v1/audio/speech`
 
 ## Conventions
 
