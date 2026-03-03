@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(xargs ls:*)",
+      "Bash(gh repo:*)",
+      "WebSearch",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:martinfowler.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:www.jimmybogard.com)",
+      "WebFetch(domain:lawsofux.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:claude.com)",
+      "WebFetch(domain:institute.sfeir.com)",
+      "WebFetch(domain:www.humanlayer.dev)",
+      "WebFetch(domain:skills.sh)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx skills:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}

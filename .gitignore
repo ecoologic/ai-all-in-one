@@ -15,11 +15,22 @@ claude/session-env/
 claude/shell-snapshots/
 claude/tasks/
 
-# Agent nested installs (prevent future accidents)
+# Agent nested installs (prevent accidents in subdirs)
 **/.agent/
-**/.agents/
-**/.claude/
 **/.trunk/
+
+# ── .agents: track skills, ignore the rest ──
+.agents/*
+!.agents/skills/
+
+# ── .claude: track commands, skills, rules, settings — ignore transient data ──
+.claude/*
+!.claude/commands/
+!.claude/skills/
+!.claude/rules/
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/CLAUDE.md
 
 # Secrets safety net
 *.env
