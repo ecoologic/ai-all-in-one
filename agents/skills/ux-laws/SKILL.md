@@ -28,6 +28,11 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 ---
 
+## Quick rules
+
+- Don't use dark patterns
+- Order lists
+
 ## Cognitive Load & Complexity
 
 | Law                | Rule                                                                                 |
@@ -91,6 +96,7 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 </WizardStep>
 
 // Bad: all options dumped at once
+
 <Form>
   <PlanSelector /><BillingFields /><TeamSettings /><IntegrationConfig />
 </Form>
@@ -119,10 +125,10 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 ## Quick Checklist
 
-| Question                                       | If no...                                   |
-| ---------------------------------------------- | ------------------------------------------ |
-| Does the UI minimize cognitive load?           | Apply Hick's, Miller's, and chunking       |
-| Are primary actions obvious and reachable?     | Apply Fitts's Law and Von Restorff         |
-| Does this match user expectations?             | Apply Jakob's Law and mental models        |
-| Is progress visible in multi-step flows?       | Apply Goal-Gradient and Zeigarnik          |
-| Are response times under 400ms or loading shown? | Apply Doherty Threshold                  |
+| Question                                         | If no...                             |
+| ------------------------------------------------ | ------------------------------------ |
+| Does the UI minimize cognitive load?             | Apply Hick's, Miller's, and chunking |
+| Are primary actions obvious and reachable?       | Apply Fitts's Law and Von Restorff   |
+| Does this match user expectations?               | Apply Jakob's Law and mental models  |
+| Is progress visible in multi-step flows?         | Apply Goal-Gradient and Zeigarnik    |
+| Are response times under 400ms or loading shown? | Apply Doherty Threshold              |

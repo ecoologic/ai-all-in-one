@@ -24,7 +24,7 @@ This command is part of a process, `/epic -> /story -> task`.
 
 > A user story is not a technical task or implementation detail. "As a developer, I want to create a DB table" is not a user story — it describes work for the builder, not value for the user. Items like "set up an API endpoint," "refactor the auth module," or "add a database index" are technical tasks (subtasks of a story or separate backlog items), not stories. Slicing stories by technology layer (frontend, backend) instead of vertical user-facing slices is an anti-pattern. A user story is also not a detailed spec — overloading it with implementation details defeats its purpose. Not everything in a backlog needs to be a user story; purely technical work should use a different format.
 
-## Scope of a user story
+## Scope and size of a user story
 
 <!-- TODO: formatting, examples -->
 
@@ -36,7 +36,7 @@ Even a simple dropdown or a text field, might become its own story if they depen
 
 Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story. A story doesn't need to create all fields at the same time, a story can be split so that the field is added in another story. For example, a profile _doesn't need_ to have an address when it's first created, unless it's simple enough, like basic fields that don't require too much validation like `githubUrl`.
 
-## When to split a story
+### When and how to split a story
 
 <!-- TODO: part of the review step -->
 Ask the question: is this shippable as a cohesive, complete and usable feature?
@@ -63,6 +63,8 @@ Example: "user authentication system" → `user-auth`
 NOTE: _epic_, _feature_, _delivery_ and the like are not good pre/suffixes.
 
 ## Step 3: Break into user stories
+
+<!-- TODO: multiagent? -->
 
 Keeping in mind what a user story is and what is not (above), split the work into user stories. For each:
 - Canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
@@ -106,16 +108,20 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
       _When_ ...
       _Then_ ...
 
+### Fields
+
+NOTE: DO NOT, FOR ANY REASON LOOK AT THE CODE. This can be done just by looking at the UI or provided docs. Or, clarify with the user. Then, propose your list:
+
+- [List all the fields in the user experience grouped by page/view]
+      - Format:
+            - _Field_: Exact and precise Source or reason (where did you find this field, why do we need it). This can be just a link
+      - Example:
+            - _User name_: As per UI design provided in `docs/new-users/design.md`
+
 ### Requirements
-- (only if relevant)
+- list
 
 ### UX considerations
-- (only if relevant)
+- list
 ---
 ```
-
-## Step 8: Summary
-
-List the stories "as a... so that..."
-
-Recommend which story to start first with a brief rationale.
