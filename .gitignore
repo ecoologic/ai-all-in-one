@@ -1,6 +1,8 @@
 # OS
 .DS_Store
 
+tmp/**
+
 # Claude runtime / transient state
 claude/backups/
 claude/cache/

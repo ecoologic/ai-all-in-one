@@ -45,6 +45,24 @@
       "skillFolderHash": "",
       "installedAt": "2026-03-03T00:43:55.421Z",
       "updatedAt": "2026-03-03T00:43:55.421Z"
+    },
+    "conflict-resolution": {
+      "source": "troykelly/claude-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/troykelly/claude-skills.git",
+      "skillPath": "skills/conflict-resolution/SKILL.md",
+      "skillFolderHash": "e6e20a226eaf17db9d238cb402ea5a230fb86187",
+      "installedAt": "2026-03-04T01:24:32.467Z",
+      "updatedAt": "2026-03-04T01:24:32.467Z"
+    },
+    "explore": {
+      "source": "yonatangross/orchestkit",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/yonatangross/orchestkit.git",
+      "skillPath": "plugins/ork/skills/explore/SKILL.md",
+      "skillFolderHash": "d9ebd78cad711c606948ed136de4394a09fad3df",
+      "installedAt": "2026-03-04T02:08:01.383Z",
+      "updatedAt": "2026-03-04T02:08:01.383Z"
     }
   },
   "dismissed": {

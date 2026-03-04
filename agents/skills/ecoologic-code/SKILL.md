@@ -90,6 +90,7 @@ const doc = makeDoc(o);
 
 ## Elegance
 
+- Use POSIX standards like always having a new line at EOF
 - Write "positive" code, eg: `if(active)`, not `if(!inactive)`
 - Strive to write elegant code that reads like English
 

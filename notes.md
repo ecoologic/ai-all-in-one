@@ -1,25 +1,27 @@
 # Notes
 
-## TODO
+## TODOs
 
-### WIP
+` /install-github-app`  https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md
 
-* nope
-  * invert enumerate and audit
-  * description: unsupported attributes
-* plan implementation `/epic /personas /architecture /story /task`
-  * ux in stories? (ux own skill)
-  * `/epic` when to stop and ask for help
-* agents: plan, implement, review, test (TDD and blackbox), qa
-* UX skill (mine?)
+`pr-comments` 2!!!!
 
-### Secondary
-* security skill
-* ami and react-doctor
-* remove skill command (remove mentioned (ask) and from subagents)
+## Process
+
+* Plan commands
+  * `/epic /personas /architecture /story /task /review /pr`
+* Review
+  * `/review-unhappy-path /review-security /review-bugs /review-qa`
+* PR addressing comments
+  * `/pr-comments`
+
+---
 
 ## General
 
 ```md
 ## When to Stop and Ask for Help
+
+## Error Handling
+
 ```

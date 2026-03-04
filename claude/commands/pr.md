@@ -168,13 +168,15 @@ EOF
 )"
 ```
 
-### 8. Report Results
+### 8. Misc amends
+
+List using a few words each line what other changes are part of this PR
+
+### 9. Report Results
 
 Output:
 - PR URL
 - Title used
-- Whether PR was created or updated
-- A note that it is a draft PR
 
 ## Important Notes
 
