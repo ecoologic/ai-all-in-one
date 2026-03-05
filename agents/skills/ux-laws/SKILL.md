@@ -32,6 +32,7 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 - Don't use dark patterns
 - Order lists
+- Update the URL when using: tabs, accordions, widgets etc
 
 ## Cognitive Load & Complexity
 

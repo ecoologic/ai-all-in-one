@@ -4,13 +4,25 @@ argument-hint: <file-path-or-epic-description>
 allowed-tools: [Read, Glob, Grep, Write, Edit, TaskCreate, TaskUpdate, TaskList]
 ---
 
-# Epic command
+# Epic
 
-You are breaking down a broad epic into actionable, FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Coding and codebase investigation is completely _forbidden_ for this command.
+Pipeline:
+```
+[p-epic] -> p-personas -> p-architecture -> p-story(N) -> p-task(N×M) -> p-review -> p-review-*(K) -> p-review-issue(K) -> p-pr -> p-pr-comments(C)
+ ^current
+```
 
-The purpose of this command is to describe in a structured format how a feature is used and for what purpose, it's NOT to produce any code. Only documentation. This command ends with the creation of the user stories document. Each user story will be implemented individually as a separate command.
+## Skills
 
-This command is part of a process, `/epic -> /story -> task`.
+No specialized skills required. This command uses only core tools.
+
+## Purpose
+
+Break down a broad epic into actionable user stories FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Coding and codebase investigation is completely _forbidden_ for this command.
+
+The purpose is to describe in a structured format how a feature is used and for what purpose, it's NOT to produce any code. Only documentation. This command ends with the creation of the user stories document. Each user story will be implemented individually via `/p-story`.
+
+**This command produces documentation only. No code. No commits.**
 
 ## What is a _user story_
 
@@ -36,6 +48,10 @@ Even a simple dropdown or a text field, might become its own story if they depen
 
 Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story. A story doesn't need to create all fields at the same time, a story can be split so that the field is added in another story. For example, a profile _doesn't need_ to have an address when it's first created, unless it's simple enough, like basic fields that don't require too much validation like `githubUrl`.
 
+If a table cell has a link to an un-existing page, one story might be to print the table without the link, and successive story can add a working link to the page subject of the latter story.
+
+If a page has tabbing, the first story might implement the page without any tabbing, and the second story might add it. OR we can have a tabbing system with one tab. In these situations, the best approach is to **ask the prompter**.
+
 ### When and how to split a story
 
 <!-- TODO: part of the review step -->
@@ -55,12 +71,27 @@ Output:
 Epic: <one-line summary>
 ```
 
-## Step 2: Derive epic slug
+## Step 2: Resolve docs path and derive epic slug
+
+### 2a. Resolve `<project>`
+
+1. Run `basename $(git rev-parse --show-toplevel)` to get the git root folder name
+2. If `~/dev/docs/settings.json` exists and has a key matching that name under `projects`:
+   - Use `name` as `<project>` if present, otherwise keep the git root basename
+3. After deriving the slug (Step 2b), update `~/dev/docs/settings.json` to set `epic` to the new slug
+
+### 2b. Derive `<epic-slug>`
 
 From the epic content, derive a slugified `<epic-slug>` (lowercase, hyphens, no special chars).
 Example: "user authentication system" → `user-auth`
 
 NOTE: _epic_, _feature_, _delivery_ and the like are not good pre/suffixes.
+
+### 2c. Docs path
+
+All artifacts go in: `~/dev/docs/<project>/<epic-slug>/`
+
+Create the directory if it doesn't exist (`mkdir -p`).
 
 ## Step 3: Break into user stories
 
@@ -81,7 +112,7 @@ Separate into two groups:
 
 For each actionable story, add *Pros* and *Cons* of starting with that story first.
 
-## Step 6: Write `docs/<epic-slug>/stories.md`
+## Step 6: Write stories
 
 Create the file with this structure:
 
@@ -116,12 +147,29 @@ NOTE: DO NOT, FOR ANY REASON LOOK AT THE CODE. This can be done just by looking 
       - Format:
             - _Field_: Exact and precise Source or reason (where did you find this field, why do we need it). This can be just a link
       - Example:
-            - _User name_: As per UI design provided in `docs/new-users/design.md`
+            - _User name_: As per UI design provided in `~/dev/docs/<project>/new-users/design.md`
 
 ### Requirements
 - list
 
-### UX considerations
+### UX considerations (by story or can be grouped for several similar stories)
 - list
+
+NOTE: Even with a UI design, we need to assume inconsistencies, so it's a good idea to NOT make too many assumptions and defer to implementation, where we can check the code and be consistent.
 ---
 ```
+
+## Step 7: Write the stories to `~/dev/docs/<project>/<epic-slug>/stories.md`
+
+You have permissions to do that now. If you have links to documentation, UI or context, add them at the bottom of the file, in a References h2 section.
+
+## Step 8: Check with the user
+
+Now it's time to see what the user thinks of this.
+
+For no reason at all you are supposed to start coding. That is done in another step.
+
+## Error handling
+
+- **Empty arguments with no conversation context** → ask the user to provide an epic description or file path
+- **File path does not exist** → report the exact path checked, ask the user to provide the correct one

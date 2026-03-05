@@ -17,7 +17,8 @@
       "WebFetch(domain:skills.sh)",
       "WebFetch(domain:github.com)",
       "Bash(npx skills:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

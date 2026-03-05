@@ -37,15 +37,6 @@
       "installedAt": "2026-03-03T00:04:07.718Z",
       "updatedAt": "2026-03-03T00:04:07.718Z"
     },
-    "create-github-pull-request-from-specification": {
-      "source": "github/awesome-copilot",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/github/awesome-copilot.git",
-      "skillPath": "skills/create-github-pull-request-from-specification/SKILL.md",
-      "skillFolderHash": "",
-      "installedAt": "2026-03-03T00:43:55.421Z",
-      "updatedAt": "2026-03-03T00:43:55.421Z"
-    },
     "conflict-resolution": {
       "source": "troykelly/claude-skills",
       "sourceType": "github",
