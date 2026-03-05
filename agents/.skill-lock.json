@@ -54,6 +54,15 @@
       "skillFolderHash": "d9ebd78cad711c606948ed136de4394a09fad3df",
       "installedAt": "2026-03-04T02:08:01.383Z",
       "updatedAt": "2026-03-04T02:08:01.383Z"
+    },
+    "lovable": {
+      "source": "10k-digital/lovable-claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/10k-digital/lovable-claude-code.git",
+      "skillPath": "plugins/lovable/skills/lovable/SKILL.md",
+      "skillFolderHash": "1ca9a8b8a7bccf47d10373ceec014a0a53bbfd7c",
+      "installedAt": "2026-03-05T11:11:17.654Z",
+      "updatedAt": "2026-03-05T11:11:17.654Z"
     }
   },
   "dismissed": {

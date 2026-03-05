@@ -4,7 +4,8 @@
 
 ` /install-github-app`  https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md
 
-`pr-comments` 2!!!!
+* each project skill (NOT PUBLIC)
+  *
 
 ## Process
 

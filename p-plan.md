@@ -1,103 +1,119 @@
-# Command Pipeline
+# Planning Pipeline
 
 ## Flow
 
 ```
-p-epic -> p-personas -> p-architecture -> p-story(N) -> p-task(N×M) -> p-review -> p-review-*(K) -> p-review-issue(K) -> p-pr -> p-pr-comments(C)
+p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 ```
 
-## Cardinality
+## Shared Rules
 
-| Stage              | Input                   | Output                           | 1:N                    |
-| ------------------ | ----------------------- | -------------------------------- | ---------------------- |
-| `p-epic`           | Epic description        | `~/dev/docs/<project>/<slug>/stories.md`         | 1 → N stories          |
-| `p-personas`       | Stories file            | `~/dev/docs/<project>/<slug>/personas.md`        | N stories → P personas |
-| `p-architecture`   | Stories + personas      | `~/dev/docs/<project>/<slug>/architecture.md`    | 1 per epic             |
-| `p-story N`        | Stories file + story #  | `~/dev/docs/<project>/<slug>/story-<N>-tasks.md` | 1 → M tasks            |
-| `p-task N`         | Tasks file + task #     | Source code                      | 1 → code               |
-| `p-review`         | Branch diff             | `~/dev/docs/<project>/<slug>/review.md`          | 1 → K findings         |
-| `p-review-*`       | Branch diff             | `~/dev/docs/<project>/<slug>/review-<type>.md`   | 1 → K findings         |
-| `p-review-issue N` | Review file + finding # | Code fix                         | 1 → 1 fix              |
-| `p-pr`             | Branch                  | GitHub draft PR                  | 1 → 1                  |
-| `p-pr-comments N`  | PR comment #            | Code fix + reply                 | 1 → 1 fix              |
+All `p-` commands MUST follow these rules. Each command inlines its own copy of these rules for self-contained execution.
 
-## Docs path
+### Glossary
 
-```
-~/dev/docs/<project>/<epic-slug>/
-```
+The shared glossary at `./tmp/planning/glossary.md` is the single source of truth for domain terminology.
 
-Resolution order for `<project>`:
-1. If `~/dev/docs/settings.json` has a key matching the git root basename → use its value
-2. Else → `basename $(git rev-parse --show-toplevel)`
+**Every `p-` command must:**
+1. Read `./tmp/planning/glossary.md` at the start (if it exists)
+2. Use glossary terms and Code Names consistently throughout all outputs
+3. Add new domain terms discovered during execution
+4. Never remove existing entries
+5. Never rename existing terms — ask the user if there's a conflict
 
-Example `~/dev/docs/settings.json`:
-```json
-{
-  "projects": {
-    "pineapple-monorepo": {
-      "name": "pineapple",
-      "epic": "user-auth"
-    }
-  }
-}
+**Glossary table format:**
+
+```markdown
+# Glossary
+> Last updated: <date>
+
+| Domain Term | Code Name | Definition | Source | Status |
+| ----------- | --------- | ---------- | ------ | ------ |
 ```
 
-- `name` — overrides the `<project>` folder name (optional, defaults to git root basename)
-- `epic` — default `<epic-slug>` when no argument is provided (optional)
+- **Code Name**: actual class/type/table name in code (or `—` if not yet in codebase)
+- **Source**: file path where it exists (or `—` if new)
+- **Status**: `exists` | `new` | `rename` | `exists (extend with ...)`
 
-Running from `~/dev/pineapple-monorepo` with no args → `~/dev/docs/pineapple/user-auth/`
+**Progressive enrichment:** Earlier commands (p-epic) may leave Code Name/Source as `—`. Later commands (p-architecture, p-story) fill them in as codebase is explored.
 
-## Artifact chain
+### Global Architecture
 
-```
-~/dev/docs/<project>/<epic-slug>/
-├── stories.md              ← p-epic
-├── personas.md             ← p-personas
-├── architecture.md         ← p-architecture
-├── story-1-tasks.md        ← p-story 1
-├── story-2-tasks.md        ← p-story 2
-├── review.md               ← p-review
-├── review-security.md      ← p-review-security
-├── review-bugs.md          ← p-review-bugs
-├── review-unhappy-path.md  ← p-review-unhappy-path
-└── review-qa.md            ← p-review-qa
-```
+The global architecture map at `./tmp/planning/global-architecture.md` is the single source of truth for project structure.
 
-## Design decisions
+**Commands that explore the codebase (`p-architecture`, `p-story`) must:**
+1. Read `./tmp/planning/global-architecture.md` at the start (if it exists)
+2. Merge new structural findings back into it before finishing
+3. Edit inline in the relevant section — never append a changelog
 
-| Decision          | Choice                                       |
-| ----------------- | -------------------------------------------- |
-| Prefix            | All pipeline commands: `p-`                  |
-| Lean commands     | Minimal prose, direct instructions, no bloat |
-| No subdirectories | Claude Code doesn't support nested commands  |
-| Review output     | Persisted to files with numbered findings    |
-| Review flow       | Sequential, each also works standalone       |
-| Commit behavior   | Commands never commit — user controls        |
+### Naming
 
-## Shared patterns (all `p-*` commands)
+- NEVER define synonyms — if a term exists in the glossary, use its exact Code Name everywhere. One concept = one name
+- NEVER abbreviate names — use the domain's exact terms (`team-management`, not `team-mgmt`; `Invitation`, not `Invite`)
+- Slugs use full words separated by hyphens
 
-1. Frontmatter: `description`, `argument-hint`, `allowed-tools`
-2. Pipeline line: flow with `^current` marker
-3. Skills list
-4. Docs path resolution: `basename` of git root, overridable via `~/dev/docs/settings.json` → `~/dev/docs/<project>/<epic-slug>/`
-5. Error handling: missing inputs → suggest which command to run first
-6. No auto-commit
+### Scope boundaries
 
-## Implementation order
+- NEVER write or modify application code from any `p-` command (code is written only in `p-task`)
+- NEVER write files outside `./tmp/planning/` (except `p-task` which writes to codebase)
+- NEVER propose extractions for hypothetical future use (YAGNI)
+- NEVER start implementation after generating planning artifacts
 
-| #   | Command                 | Type            | Status                                      |
-| --- | ----------------------- | --------------- | ------------------------------------------- |
-| 0   | `p-epic`                | Rename + update | Done                                        |
-| 1   | `p-architecture`        | New             | Done                                        |
-| 2   | `p-personas`            | New             | Deferred                                    |
-| 3   | `p-story`               | Rename + update | Rename from `story.md`, add pipeline/skills |
-| 4   | `p-task`                | New             |                                             |
-| 5   | `p-review`              | New             |                                             |
-| 6   | `p-review-unhappy-path` | New             |                                             |
-| 7   | `p-review-security`     | New             |                                             |
-| 8   | `p-review-bugs`         | New             |                                             |
-| 9   | `p-review-qa`           | New             |                                             |
-| 10  | `p-review-issue`        | New             |                                             |
-| 11  | `p-pr`                  | Rename + update | Rename from `pr.md`                         |
-| 12  | `p-pr-comments`         | New             |                                             |
+### User checkpoints
+
+Every `p-` command must present results to the user and get confirmation before the pipeline moves to the next step. No command auto-chains into the next.
+
+### Pipeline I/O
+
+Each command declares a Pipeline I/O table in its header. The glossary appears as `In/Out` in every command.
+
+All artifacts live under `./tmp/planning/<epic-slug>/` except the glossary which is shared at `./tmp/planning/glossary.md`.
+
+## Docs
+
+AI should write the files even in plan mode (only in the `./tmp/<epic-slug>` folder), so I can review them there.
+
+Call `/p-epic epic-slug`
+Reads: `./tmp/planning/<epic-slug>/idea.md`
+Writes: `./tmp/planning/<epic-slug>/epic.md`
+Updates: `./tmp/planning/glossary.md`
+
+idea.md is READ ONLY, can reference all required docs like ui etc
+The folder of the docs defines the epic-slug.
+Epic.md contains the list of stories (n. title, as a user I want...)
+
+Call `/p-personas epic-slug`
+Reads: `idea, epic`
+Writes: `personas`
+Edits: `epic` (updates personas in stories, improves "so that..." with persona context)
+Updates: `glossary` (if new persona-related terms)
+
+Call `/p-architecture epic-slug`
+Reads: `idea, epic, glossary`
+Reads: codebase (first command that can, but only read, no writes)
+Writes: `architecture`
+Updates: `glossary` (enriches Code Names, Sources, Statuses from codebase)
+
+Call `/p-story epic-slug 1`
+Reads: `epic, architecture, glossary`
+Reads: codebase
+Writes: `story-<n>/details`
+Writes: `story-<n>/task-<n>`
+Updates: `glossary` (fills in Code Names/Sources discovered during investigation)
+Edits: `architecture` (addendum if new insights found)
+
+Call `/p-task epic-slug 1-1`
+Reads: `story-<n>/task-<n>, architecture, glossary`
+Writes: codebase (first command that can write code)
+
+## Commands details
+
+Split into sub-agents when possible and set the model.
+
+### Story
+
+Further investigates patterns and common folders (eg: utils)
+Defines tasks to extract code so it can be reused.
+Defines new types
+
+### Task

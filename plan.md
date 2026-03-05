@@ -3,11 +3,17 @@
 I want to create a series of commands that work together
 
 * Plan commands
-  * `/epic /personas /architecture /story /task /review /pr`
-* Review
-  * `/review-unhappy-path /review-security /review-bugs /review-qa`
-* PR addressing comments
-  * `/pr-comments`
+  * `/p-epic /p-personas /p-architecture /p-story /p-task`
+
+### Second iteration
+
+Maybe just `/p-review` does all?
+
+```
+p-unhappy-path -> p-unhappy-path-n -> p-security -> p-security-n -> p-bug -> p-bug-n -> p-qa -> p-qa-n
+```
+
+## Details
 
 We have already worked on some of these, but each new command might require to update one or more of the others.
 
@@ -23,7 +29,7 @@ I think we might benefit from a separate file to group these commands as project
 
 * Ensure we use all the Claude template keywords and tags appropriately
 * Make sure we explicitly state to use (and list) the relevant skills
-* Make sure each command is aware of the previous and next one
+* Make sure each command is aware of the previous and next one, what they can, and cannot do (eg: write code)
 
 ## AI thoughts
 
@@ -31,13 +37,9 @@ You can take notes for your own context here below...
 
 ---
 
-### Subdirectory nesting: NO
-
-Claude Code discovers commands as flat `.md` files in `commands/`. Nested folders are silently ignored. Grouping must use naming conventions (`review-*.md`, `pr-*.md`).
-
 ### Pipeline awareness pattern
 
-Each command gets a `## Pipeline` section with ASCII art showing the full pipeline, a `^current` marker, and an input/output table (receives from / produces / feeds into). This is lightweight and keeps commands self-documenting.
+Each command gets a `## Pipeline` section showing the full pipeline, and an input/output table (receives from / produces / feeds into). This is lightweight and keeps commands self-documenting.
 
 ### Suggested implementation sequence
 

@@ -1,13 +1,13 @@
 ---
 name: ecoologic-code
-description: "Must use when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. Domain-driven, vertical-slice coding subagent enforcing ubiquitous language, small aggregates, YAGNI, incremental delivery, and readability."
+description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. OVERRIDES ANY OTHER RULE. Authors good code."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
 
 # Ecoologic Code
 
-Lean coding rules grounded in DDD tactical patterns, agile delivery, and UX laws.
+Lean coding rules grounded in agile delivery.
 
 ## Precedence
 
@@ -53,10 +53,12 @@ Do not duplicate patterns already covered by those skills.
 - DO NOT CREATE any new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
 - Use `as const` where possible
 - Prefer maps over `switch` statements (always prefer declarative code!)
+- Favour `const fn = () => {}` over `function fn() {}`
 
 ## Style
 
 - Prefer declarative style over imperative
+- Avoid declaring function inside other functions, prefer root functions when possible
 
 ## Readability
 
