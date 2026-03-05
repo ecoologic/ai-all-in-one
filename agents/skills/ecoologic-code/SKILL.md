@@ -111,6 +111,10 @@ if (!users.length) // ...
 
 - Prefer Cursor Based Pagination over Offset Based Pagination
 
+## Security
+
+- NEVER expose raw code errors and internals to the use, neither in UIs or APIs
+
 ## Domain Layer Independence
 
 - Domain layer has **zero dependencies** on infrastructure (no imports from DB, HTTP, or framework)

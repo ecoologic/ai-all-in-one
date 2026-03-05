@@ -30,9 +30,10 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 ## Quick rules
 
-- Don't use dark patterns
-- Order lists
-- Update the URL when using: tabs, accordions, widgets etc
+- ALWAYS Order lists
+- ALWAYS Update the URL when using: tabs, accordions, widgets etc
+- NEVER use dark patterns
+- NEVER show code and internal errors to users, always
 
 ## Cognitive Load & Complexity
 

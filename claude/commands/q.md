@@ -17,5 +17,7 @@ Answer the question provided in `$ARGUMENTS` with **maximum brevity**.
    - "Which" / "What" → answer with the name/value only
    - "Where" → answer with the path/location only
 4. **Answer only what was asked.** Do not answer adjacent questions, do not add context, do not caveat.
-5. **Do not offer follow-up.** No "let me know if…", no "would you also like…", no suggestions.
-6. **Precision over everything.** If you need to look up the answer in the codebase, do so, but still respond in one line.
+5. **acronyms or initials** If in the question or answer, provide a legend list
+   1. eg: - NASA: National Aeronautics and Space Administration
+6. **Do not offer follow-up.** No "let me know if…", no "would you also like…", no suggestions.
+7. **Precision over everything.** If you need to look up the answer in the codebase, do so, but still respond in one line.
