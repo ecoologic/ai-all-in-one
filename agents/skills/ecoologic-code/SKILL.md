@@ -54,6 +54,8 @@ Do not duplicate patterns already covered by those skills.
 - Use `as const` where possible
 - Prefer maps over `switch` statements (always prefer declarative code!)
 - Favour `const fn = () => {}` over `function fn() {}`
+- Use TypeScript type guards when possible `function isNumber(value: unknown): value is number {`
+  Note that these have high changes of reusability and should be stored closed to the type they assert
 
 ## Style
 
