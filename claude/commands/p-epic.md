@@ -121,7 +121,7 @@ Status: <created | already exists>
 Keeping in mind what a user story is and what is not (above), split the work into user stories. For each:
 - Canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
 - User Context section (role, goals, use case)
-- Acceptance criteria in _Given_/_When_/_Then_ format as markdown checkboxes `- [ ]`
+- Acceptance criteria in _Given_/_When_/_Then_ format as numbered markdown checkboxes `1. [ ]`
 - Requirements where relevant (performance, security, accessibility)
 - Assess prerequisites: does this depend on another story or missing infrastructure?
 
@@ -129,9 +129,10 @@ Output: Display each story title and its canonical "As a..." statement before pr
 
 ## Step 4: Classify and evaluate
 
-Separate into two groups:
+Separate into three groups:
 1. **Actionable** — no prerequisites, can start now given current codebase
 2. **Blocked** — depends on other stories or missing infrastructure
+3. **Nice to have** — secondary stories that emerged during investigation/discussion but are not essential for the epic's core value. These are candidates for a future iteration
 
 Output: Display the classification table (story title, group, rationale) before proceeding.
 
@@ -147,7 +148,7 @@ The following notes apply to the Fields and UX considerations sections inside ea
 Create the file with this structure:
 
 ```md
-# <Epic Name> (<epic-slug>) — Actionable Stories
+# <Epic Name> (<epic-slug>)
 
 > Epic: <summary>
 > Generated: <date>
@@ -162,12 +163,12 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - Use Case: ...
 
 ### Acceptance Criteria
-- [ ] _Given_ ...
-      _When_ ...
-      _Then_ ...
-- [ ] _Given_ ...
-      _When_ ...
-      _Then_ ...
+1. [ ] _Given_ ...
+       _When_ ...
+       _Then_ ...
+2. [ ] _Given_ ...
+       _When_ ...
+       _Then_ ...
 
 ### Fields
 
@@ -185,6 +186,25 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 ---
 ```
 
+After all actionable and blocked stories, add a Nice to have section:
+
+```md
+---
+
+## Nice to Have
+
+Stories that emerged during investigation but are not essential for the epic's core value.
+These are candidates for a future iteration — keep them lightweight (title + "As a..." + brief rationale).
+
+### N2H-1: <title>
+
+_As a_ [role], _I want_ [action], _so that_ [benefit].
+
+> **Rationale**: Why this came up and why it's secondary.
+
+---
+```
+
 If links to documentation, UI, or context exist, add them at the bottom of the file in a `## References` section.
 
 ## Step 6: Update glossary
@@ -198,7 +218,7 @@ At this stage, Code Name and Source will typically be `—` (resolved later by p
 
 Display a structured summary via `AskUserQuestion`:
 
-1. **Story count**: X actionable, Y blocked
+1. **Story count**: X actionable, Y blocked, Z nice-to-have
 2. **Recommended starter**: Story N — because [rationale]
 3. **Assumptions made**: List any assumptions that need validation
 4. **Open questions**: List anything that needs clarification before proceeding
@@ -209,12 +229,12 @@ Implementation happens in later pipeline steps.
 
 - [ ] `epic.md` exists at `./tmp/planning/<epic-slug>/epic.md`
 - [ ] Every story uses canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
-- [ ] Every story has acceptance criteria in _Given_/_When_/_Then_ format
+- [ ] Every story has numbered acceptance criteria in _Given_/_When_/_Then_ format
 - [ ] Every story has Fields and UX considerations sections
 - [ ] Every story respects its definition "What a story is"
 - [ ] Every story respects the definition "What a story is _not_"
 - [ ] Every story is "minimal", broken into the minimum valuable iteration
-- [ ] Stories are classified as actionable or blocked
+- [ ] Stories are classified as actionable, blocked, or nice-to-have
 - [ ] No story is sliced by technology layer
 - [ ] `glossary.md` at `./tmp/planning/glossary.md` is created or updated with new domain terms
 - [ ] No synonyms — every concept has exactly one name, consistent with the glossary

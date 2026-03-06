@@ -1,5 +1,11 @@
 # Planning Pipeline
 
+## TODOs
+
+* Idea: `p-idea` to brainstorm??
+* eg: `p-epic` finds epic for later
+  * Nice-to-have
+
 ## Flow
 
 ```
@@ -58,6 +64,18 @@ The global architecture map at `./tmp/planning/global-architecture.md` is the si
 - NEVER write files outside `./tmp/planning/` (except `p-task` which writes to codebase)
 - NEVER propose extractions for hypothetical future use (YAGNI)
 - NEVER start implementation after generating planning artifacts
+
+### QA ideas
+
+`p-task` (and any steps after it) may discover bugs in code **we wrote** (i.e. code produced by earlier `p-task` runs in the same or a previous epic). Ignore issues from features not yet implemented.
+
+When a bug is found, append it to `./tmp/planning/<epic-slug>/qa-ideas.md`:
+
+```markdown
+- [ ] **<short title>** — <description of the bug and where it was found> (`<file-path>:<line>`)
+```
+
+Create the file if it doesn't exist. Never remove existing entries.
 
 ### User checkpoints
 
