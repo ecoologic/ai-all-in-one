@@ -3,8 +3,16 @@
 All in one folder. Then linked to global with:
 
 ```sh
+# Make sure all these folder don't already exist, or you might get double-nesting
 ln -s ~/dev/ai/agents ~/.agents
 ln -s ~/dev/ai/claude ~/.claude
+ln -s ~/dev/ai/cursor ~/.cursor
+
+ln -s ~/dev/ai/agents/commands ~/.claude/commands
+ln -s ~/dev/ai/agents/commands ~/.cursor/commands
+
+ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.claude/CLAUDE.md
+ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
 ```
 
 ## Global files
@@ -18,6 +26,12 @@ Symlinked to `~` so all AI agents pick them up:
 - `claude/` → `~/.claude` — Claude Code user-level config
   - `skills/` — symlinks to `~/.agents/skills/`, makes skills available to Claude Code
   - `settings.json` — Claude Code user settings
+
+- `cursor/` → `~/.cursor` — Cursor user-level config (whole directory symlinked)
+  - `commands/` — global slash commands, each `.md` file becomes `/filename` in chat
+  - `rules/` — global rules applied across all projects
+  - `skills-cursor/` — Cursor-specific skills (separate from `~/.agents/skills/`)
+  - NOTE: Cursor is its own git repo
 
 - `skills-lock.json` — skill lock file (v1 format, separate from agents lock)
 

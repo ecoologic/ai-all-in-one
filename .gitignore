@@ -26,6 +26,9 @@ claude/ide/
 .agents/*
 !.agents/skills/
 
+# ── cursor: its own git repo — ignore entirely ──
+cursor/
+
 # ── .claude: track commands, skills, rules, settings — ignore transient data ──
 .claude/*
 !.claude/commands/
