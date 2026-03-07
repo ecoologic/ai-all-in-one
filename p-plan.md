@@ -5,6 +5,7 @@
 * Idea: `p-idea` to brainstorm??
 * eg: `p-epic` finds epic for later
   * Nice-to-have
+* reusable code: a document to index it (alongside architecture.md) `./tmp/planning/reusable-code.md`
 
 ## Flow
 
