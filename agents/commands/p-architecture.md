@@ -6,8 +6,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 # Architecture
 
-> **Scope**: Repository-agnostic. Use `./tmp/planning/global-architecture.md` to understand the current system shape before reasoning about any specific stack.
-
 Pipeline position:
 ```
 p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
@@ -21,7 +19,7 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 | **In**     | `./tmp/planning/<epic-slug>/idea.md`         | Raw epic idea and links to supporting artifacts                                                              |
 | **In**     | `./tmp/planning/<epic-slug>/epic.md`         | Stories from `p-epic`                                                                                        |
 | **In**     | `./tmp/planning/<epic-slug>/personas.md`     | Personas (optional)                                                                                          |
-| **In/Out** | `./tmp/planning/global-architecture.md`      | Lean system map: major parts, responsibilities, communication paths, stable contracts, durable boundaries    |
+| **In** | `./tmp/planning/global-architecture.md`      | Lean system map: major parts, responsibilities, communication paths, stable contracts, durable boundaries    |
 | **In/Out** | `./tmp/planning/glossary.md`                 | Shared glossary (created or updated)                                                                         |
 | **Out**    | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture document, including inferred ERD, critique, recommended model, and change mapping |
 
@@ -29,7 +27,7 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 
 Always work in this order:
 
-1. Understand the feature from the epic inputs and referenced artifacts
+1. Understand the feature from the epic inputs and their referenced artifacts
 2. Load `./tmp/planning/global-architecture.md` to understand the current system shape
 3. Explore only the codebase areas that are relevant to the stories and still need confirmation
 
@@ -55,26 +53,26 @@ Why this order:
 - Treat the inferred ERD as a review artifact and hypothesis, not source-of-truth architecture
 - Prefer existing code and established project conventions over prototype structure when they conflict
 - If input files materially disagree, surface the conflict and ask the user before locking in architecture decisions
-- Keep `global-architecture.md` lean and cross-epic; never let the current epic pollute it with story-specific rationale
+
+<!-- TODO: refactor the document so global-architecture is read-only -->
 
 ## Anti-Patterns
 
 - NEVER start with broad codebase exploration before understanding the epic inputs
-- NEVER commit to a technical decision without presenting options to the user first
+- NEVER commit to a technical decision without presenting options to the user first (using pros/cons tables)
 - NEVER explore codebase without story list as context
-- NEVER duplicate p-story's per-story deep investigation
 - NEVER silently trust a UI/prototype data model
-- NEVER turn `global-architecture.md` into an epic diary
 
 ## Step 1: Resolve input files
 
 `$ARGUMENTS` = `<epic-slug>`. Docs path: `./tmp/planning/<epic-slug>/`
 
 Read:
-- `epic.md` (required — if missing, tell user to run `/p-epic` first)
-- `idea.md`
-- `personas.md` if it exists
+- `./tmp/planning/global-architecture.md`
 - `./tmp/planning/glossary.md` if it exists
+- `epic.md` (required — if missing, tell user to run `/p-epic` first)
+- `idea.md` (required - if missing, stop the command)
+- `personas.md` if it exists
 
 Input files for this command means:
 1. the pipeline inputs above
@@ -89,14 +87,7 @@ Extract:
 
 ### 1a. Collect referenced artifacts
 
-Follow references from the input files to supporting materials such as:
-- UI designs
-- prototype repos
-- screenshots
-- PRDs/specs
-- schema docs
-- API docs
-- any other artifact that clarifies what this epic is trying to build
+Follow references from the input files to all supporting materials.
 
 Keep an explicit list of which artifacts were read. These become part of the evidence base for `architecture.md`.
 
@@ -120,8 +111,6 @@ Stories: 4
   - Story 4: Manage roles
 Personas: loaded
 Lovable prototype: github.com/org/team-management-prototype (detected from idea.md)
-
-Slugs use full words separated by hyphens. Never abbreviate.
 </example>
 
 ## Step 2: Understand the epic from input files

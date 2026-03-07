@@ -1,6 +1,10 @@
 # Planning Pipeline
 
-## TODOs
+## Goal
+
+Our goal is to create a series of commands that work together to break down an idea all the way down to the code level. All the work will be done by AI, and the user will only review the results and provide feedback. But good architecture and code quality is key to the success of the project.
+
+## Possible improvements to consider
 
 * Idea: `p-idea` to brainstorm??
 * eg: `p-epic` finds epic for later
