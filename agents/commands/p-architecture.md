@@ -6,7 +6,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 # Architecture
 
-> **Scope**: Repository-agnostic. Use `./tmp/planning/global-architecture.md` to understand the current system shape any specific stack.
+> **Scope**: Repository-agnostic. Use `./tmp/planning/global-architecture.md` to understand the current system shape before reasoning about any specific stack.
 
 Pipeline position:
 ```
@@ -24,6 +24,19 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 | **In/Out** | `./tmp/planning/global-architecture.md`      | Lean system map: major parts, responsibilities, communication paths, stable contracts, durable boundaries    |
 | **In/Out** | `./tmp/planning/glossary.md`                 | Shared glossary (created or updated)                                                                         |
 | **Out**    | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture document, including inferred ERD, critique, recommended model, and change mapping |
+
+## Recommended Process
+
+Always work in this order:
+
+1. Understand the feature from the epic inputs and referenced artifacts
+2. Load `./tmp/planning/global-architecture.md` to understand the current system shape
+3. Explore only the codebase areas that are relevant to the stories and still need confirmation
+
+Why this order:
+- feature understanding tells you what to look for
+- `global-architecture.md` prevents broad, redundant repo exploration
+- targeted code exploration should validate fit, reuse, constraints, and conventions, not define the epic from scratch
 
 ## Skills
 
@@ -46,6 +59,7 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 
 ## Anti-Patterns
 
+- NEVER start with broad codebase exploration before understanding the epic inputs
 - NEVER commit to a technical decision without presenting options to the user first
 - NEVER explore codebase without story list as context
 - NEVER duplicate p-story's per-story deep investigation
