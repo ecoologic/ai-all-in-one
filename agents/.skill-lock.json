@@ -63,6 +63,24 @@
       "skillFolderHash": "1ca9a8b8a7bccf47d10373ceec014a0a53bbfd7c",
       "installedAt": "2026-03-05T11:11:17.654Z",
       "updatedAt": "2026-03-05T11:11:17.654Z"
+    },
+    "software-architecture-design": {
+      "source": "vasilyu1983/ai-agents-public",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vasilyu1983/ai-agents-public.git",
+      "skillPath": "frameworks/shared-skills/skills/software-architecture-design/SKILL.md",
+      "skillFolderHash": "5503d5599a3035231fab43cc52aa51bf3a194e22",
+      "installedAt": "2026-03-07T23:55:58.756Z",
+      "updatedAt": "2026-03-07T23:55:58.756Z"
+    },
+    "architecture-blueprint-generator": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/github/awesome-copilot.git",
+      "skillPath": "skills/architecture-blueprint-generator/SKILL.md",
+      "skillFolderHash": "85df2c5df09933ba0cf7b1e3b39469d4437c8d95",
+      "installedAt": "2026-03-07T23:56:02.301Z",
+      "updatedAt": "2026-03-07T23:56:02.301Z"
     }
   },
   "dismissed": {
