@@ -1,15 +1,15 @@
-# Planning Pipeline
+# Agile Planning Pipeline
 
 ## Goal
 
-Our goal is to create a series of commands that work together to break down an idea all the way down to the code level. All the work will be done by AI, and the user will only review the results and provide feedback. But good architecture and code quality is key to the success of the project.
+Our goal is to create a series of agile commands that work together to break down an idea all the way down to the code level. All the work will be done by AI, and the user will only review the results and provide feedback. But good architecture and code quality is key to the success of the project.
 
 ## Possible improvements to consider
 
+* `p-global-architecture` to generate the global architecture map from the codebase, very high level
 * Idea: `p-idea` to brainstorm??
 * eg: `p-epic` finds epic for later
   * Nice-to-have
-* reusable code: a document to index it (alongside architecture.md) `./tmp/planning/reusable-code.md`
 
 ## Flow
 
@@ -20,6 +20,10 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 ## Shared Rules
 
 All `p-` commands MUST follow these rules. Each command inlines its own copy of these rules for self-contained execution.
+
+### Global Architecture
+
+The global architecture map at `./tmp/planning/global-architecture.md` is the single source of truth for project structure.
 
 ### Glossary
 
@@ -47,10 +51,6 @@ The shared glossary at `./tmp/planning/glossary.md` is the single source of trut
 - **Status**: `exists` | `new` | `rename` | `exists (extend with ...)`
 
 **Progressive enrichment:** Earlier commands (p-epic) may leave Code Name/Source as `—`. Later commands (p-architecture, p-story) fill them in as codebase is explored.
-
-### Global Architecture
-
-The global architecture map at `./tmp/planning/global-architecture.md` is the single source of truth for project structure.
 
 **Commands that explore the codebase (`p-architecture`, `p-story`) must:**
 1. Read `./tmp/planning/global-architecture.md` at the start (if it exists)
@@ -113,25 +113,25 @@ Updates: `glossary` (if new persona-related terms)
 
 Call `/p-architecture epic-slug`
 Reads: `idea, epic, glossary`
-Reads: codebase (first command that can, but only read, no writes)
+Reads: codebase (first command that can access the codebase, but only read, no writes)
 Writes: `architecture`
 Updates: `glossary` (enriches Code Names, Sources, Statuses from codebase)
 
 Call `/p-story epic-slug 1`
-Reads: `epic, architecture, glossary`
+Reads: `epic, global-architecture, architecture, glossary`
 Reads: codebase
-Writes: `story-<n>/details`
-Writes: `story-<n>/task-<n>`
+Writes: `epic` (updates the specific story with specific UX details)
+Writes: `story-<n>-tasks`
 Updates: `glossary` (fills in Code Names/Sources discovered during investigation)
 Edits: `architecture` (addendum if new insights found)
 
 Call `/p-task epic-slug 1-1`
-Reads: `story-<n>/task-<n>, architecture, glossary`
+Reads: `story-<n>-tasks, architecture, glossary`
 Writes: codebase (first command that can write code)
 
 ## Commands details
 
-Split into sub-agents when possible and set the model.
+Split into sub-agents when possible and use the best model to maximize outcome quality.
 
 ### Story
 
@@ -140,3 +140,5 @@ Defines tasks to extract code so it can be reused.
 Defines new types
 
 ### Task
+
+TODO
