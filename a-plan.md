@@ -4,7 +4,6 @@
 
 - Planning starts from an incomplete idea, noisy inputs, and premature assumptions.
   - Planning is hard. It starts with a foggy idea, and lots of misinformation. We need to work towards the best solution and UX for our users, we don't know yet what we want
-
 - Without an overarching system of information, separate tasks to deliver the initial idea can be inconsistent and deliver non-cohesive behavior
   - If AI breaks work down without shared context, the resulting stories and tasks can drift apart and produce non-cohesive behavior.
 - Large PRs and tech-stack-based breakdowns are hard to review because the reviewer cannot see the full product and architecture intent.
@@ -31,6 +30,7 @@ a-global-architecture (separate, occasional, cross-epic)
 ## Artifact Layout
 
 All planning artifacts use relative paths rooted at `tmp/planning/`.
+Gitignore `tmp` and make a new repo in the planning folder, plans stay separate from the codebase.
 
 - Shared across epics:
   - `tmp/planning/glossary.md`
@@ -67,6 +67,8 @@ Notes:
 
 ### `/a-epic <epic-slug>`
 
+The list of user stories and the personas that will be used to build the product. It's detached from the codebase, we're still defining what we want to build. No need to design architecture until we have decided what to build.
+
 Reads:
 - `tmp/planning/<epic-slug>/idea.md`
 - `tmp/planning/glossary.md`
@@ -87,6 +89,8 @@ Notes:
 - if the shared repo-wide artifacts are missing, run `/a-global-architecture` first
 
 ### `/a-architecture <epic-slug>`
+
+Design the technical architecture changes for an epic based on the existing code. Tasks will read this to have a shared understanding how to build the product. And will need less repeated investigation.
 
 Reads:
 - `tmp/planning/<epic-slug>/idea.md`
@@ -109,6 +113,8 @@ Notes:
 
 ### `/a-story <epic-slug> <story-number>`
 
+Break down a single story into a detailed implementation plan and task list.
+
 Reads:
 - `tmp/planning/<epic-slug>/epic.md`
 - `tmp/planning/<epic-slug>/architecture.md`
@@ -130,6 +136,8 @@ Updates:
 - `tmp/planning/global-architecture.md` only when story work reveals durable cross-epic structure
 
 ### `/a-task <epic-slug> <story-number>-<task-number>`
+
+We're finally coding. Now we know what and how to build.
 
 Reads:
 - `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
