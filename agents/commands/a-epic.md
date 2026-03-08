@@ -1,151 +1,155 @@
 ---
-description: Break down an epic into actionable user stories
+description: Break down an idea into personas and actionable user stories
 argument-hint: <epic-slug>
-allowed-tools: [Read, Write, Edit, AskUserQuestion]
+allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
 # Epic
 
 This command is a single step of a longer pipeline:
-```
-a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
+```text
+a-epic -> a-architecture -> a-story(s) -> a-task(s)
 ^current
 ```
-Next: `/a-architecture` (personas step is optional)
+Next: `/a-architecture`
 
 ### Pipeline I/O
 
-| Direction | File                                 | Description             |
-| --------- | ------------------------------------ | ----------------------- |
-| **In**    | `./tmp/planning/<epic-slug>/idea.md` | Raw epic idea           |
-| **In/Out** | `./tmp/planning/glossary.md`        | Shared glossary (read for consistent naming, updated with new terms) |
-| **Out**   | `./tmp/planning/<epic-slug>/epic.md` | Structured user stories |
+| Direction | File | Description |
+| --------- | ---- | ----------- |
+| **In** | `./tmp/planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
+| **In/Out** | `./tmp/planning/glossary.md` | Shared domain glossary created by `/a-global-architecture` |
+| **In** | `./tmp/planning/global-architecture.md` | Shared repo-wide context created by `/a-global-architecture` |
+| **Out** | `./tmp/planning/<epic-slug>/epic.md` | Structured story list and initial story framing |
+| **Out** | `./tmp/planning/<epic-slug>/personas.md` | Personas, actors, and usage context for later stages |
 
 ## Skills
 
-Invoke these skills during execution via Skill tool:
-- `lovable` if `ideas.md` links a Lovable project
-- `ux-laws`
+Invoke these skills during execution via `Skill` when relevant:
+- `lovable` if `idea.md` or its references point to a Lovable prototype
+- `ux-laws` when shaping story boundaries or interaction expectations from the user perspective
 
 ## Purpose
 
-Break down a broad epic into actionable user stories FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Describe in a structured format how a feature is used and for what purpose. Each user story will be implemented individually via `/a-story`.
+Turn a rough idea into a high-quality epic packet for the rest of the pipeline:
+- `epic.md` defines the story list and the shape of the work
+- `personas.md` captures the actors, goals, and contexts that later commands must inherit
 
-**This command produces documentation only. No code. No commits.**
+This command produces planning artifacts only. It must not investigate the codebase or write implementation code.
 
 ## Rules
 
 - NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
-- NEVER define synonyms — if a term exists in the glossary, use its exact Code Name everywhere. One concept = one name
-- NEVER abbreviate new names — use the domain's exact terms (`team-management`, not `team-mgmt`; `UserProfile`, not `UsrProf`)
-- NEVER propose extractions for hypothetical future use (YAGNI)
-- NEVER start implementation after generating planning artifacts
+- NEVER investigate the codebase for this step; rely on `idea.md` and its referenced product artifacts only
+- NEVER define synonyms; if a term exists in the glossary, use its exact term everywhere
+- NEVER abbreviate new names
+- NEVER slice stories by technology layer
+- NEVER write implementation details, API shapes, schema designs, or task-level work into `epic.md`
+- produce `personas.md` in this command so later stages inherit the same actors and usage context
 
-## Anti-Patterns
+## What Is A User Story
 
-ANTI-PATTERN CHECK — verify each story does NOT match any of the following:
+> A user story is a short, plain-language description of a capability told from the perspective of someone who uses the system, not someone who builds it. It follows the template "As a [persona], I want [goal] so that [benefit]" and describes what the user can do and why it matters, never how it is implemented. Each story should be small enough to complete in a single iteration, deliver standalone value, and be independently testable.
 
-- NEVER read, write, or generate code
-- NEVER investigate the codebase (no Glob, Grep, or file reads outside the planning directory)
-- NEVER slice stories by technology layer (frontend, backend, database). Slice by vertical user-facing value
-- NEVER write implementation details, API designs, or database schemas in stories
-- NEVER frame stories from the builder's perspective ("As a developer, I want to create a DB table...")
+## What A User Story Is Not
 
-## What is a _user story_
+> A user story is not a technical task or implementation detail. "As a developer, I want to create a DB table" is not a user story. Items like "set up an API endpoint," "refactor the auth module," or "add a database index" are technical tasks, not user stories. Slicing work by frontend, backend, and database instead of by vertical user value is an anti-pattern.
 
-> A user story is a short, plain-language description of a capability told from the perspective of someone who uses the system — not someone who builds it. It follows the template "As a [persona], I want [goal] so that [benefit]" and describes what the user can do and why it matters, never how it's implemented. Each story should be small enough to complete in a single iteration, deliver standalone value (a new ability the user didn't have before), and be independently testable. The written story is a placeholder for a conversation, not a full specification. Good stories follow the INVEST criteria: Independent, Negotiable, Valuable, Estimable, Small, and Testable.
+## Story Quality Bar
 
-## What a _user story_ is NOT
+A valid story:
+- is written from the user or actor perspective
+- delivers a cohesive vertical slice of value
+- is small enough to implement independently
+- can be reviewed and tested on its own
 
-> A user story is not a technical task or implementation detail. "As a developer, I want to create a DB table" is not a user story — it describes work for the builder, not value for the user. Items like "set up an API endpoint," "refactor the auth module," or "add a database index" are technical tasks (subtasks of a story or separate backlog items), not stories. Slicing stories by technology layer (frontend, backend) instead of vertical user-facing slices is an anti-pattern. A user story is also not a detailed spec — overloading it with implementation details defeats its purpose. Not everything in a backlog needs to be a user story; purely technical work should use a different format.
-
-## Scope and size of a user story
-
-<!-- TODO: formatting, examples -->
-
-Stories should be small. For example, each of the CRUD operations should be _at most_ one story.
-
-Work that has _low cohesion_ must be treated as a different story. For example, uploading a picture in your profile, is technically different from regular properties, so it should be treated as a separate story.
-
-Even a simple dropdown or a text field, might become its own story if they depend on other work that relates to another story.
-
-Even a table column might become its own feature if the data it displays is a big piece of work that belongs to another story. A story doesn't need to create all fields at the same time, a story can be split so that the field is added in another story. For example, a profile _doesn't need_ to have an address when it's first created, unless it's simple enough, like basic fields that don't require too much validation like `githubUrl`.
-
-If a table cell has a link to an un-existing page, one story might be to print the table without the link, and successive story can add a working link to the page subject of the latter story.
-
-If a page has tabbing, the first story might implement the page without any tabbing, and the second story might add it. OR we can have a tabbing system with one tab. In these situations, the best approach is to **ask the prompter**.
-
-### When and how to split a story
-<!-- TODO: is this section effective? -->
-
-Ask yourself the questions:
-1. is this shippable as a cohesive, complete and usable feature?
-2. Are all the fields models etc _required and used_ for the work we're doing?
-
-It is OK to return to the same UI to add a field in a different story.
+A bad story:
+- is framed from the builder perspective
+- exists only to create infrastructure
+- bundles unrelated UI, backend, and data work without a single user outcome
+- embeds technical design decisions that belong later in the pipeline
 
 ## Step 0: Load glossary
 
-Read `./tmp/planning/glossary.md` if it exists. Use its terms and Code Names consistently throughout all outputs. Never introduce alternative names for glossary terms.
+Read:
+- `./tmp/planning/glossary.md`
+- `./tmp/planning/global-architecture.md`
 
-## Step 1: Resolve epic input
+Use the glossary terms consistently. Never introduce an alternative name for an existing concept.
+
+If either shared file is missing, stop and tell the user to run `/a-global-architecture` first.
+
+## Step 1: Resolve inputs
 
 `$ARGUMENTS` = `<epic-slug>`
 
-Read the idea file at `./tmp/planning/<epic-slug>/idea.md`.
+Read `./tmp/planning/<epic-slug>/idea.md`.
 
-If `idea.md` does not exist at that path, report the exact path checked and stop. Do not fall back to other input modes.
+If `idea.md` does not exist, report the exact path checked and stop. Do not fall back to another file or prompt mode.
+
+Also follow references from `idea.md` to supporting materials such as product notes, design files, screenshots, research, or prototype links. Keep a list of what was read.
 
 Output:
-```
+```text
 Epic slug: <epic-slug>
-Epic: <one paragraph summary from idea.md>
+Epic summary: <one paragraph>
+Referenced artifacts: <list or none>
 ```
 
-## Step 2: Resolve docs path
+## Step 2: Create personas
 
-All artifacts go in: `./tmp/planning/<epic-slug>/`
+Derive the actors and usage contexts needed to reason about the epic. Write `./tmp/planning/<epic-slug>/personas.md`.
 
-Create the directory if it doesn't exist.
+Use this structure:
 
-Output:
+```md
+# <Epic Name> Personas
+
+> Epic: <epic-slug>
+> Generated: <date>
+
+## Persona 1: <name>
+- Role: ...
+- Primary goals: ...
+- Current pain points: ...
+- Context of use: ...
+- Permissions or constraints: ...
+
+## Persona 2: <name>
+...
+
+## Shared Constraints
+- ...
+
+## References
+- ...
 ```
-Docs path: ./tmp/planning/<epic-slug>/
-Status: <created | already exists>
-```
 
-## Step 3: Break into user stories
+Only include personas that matter to the epic. Avoid speculative future roles.
 
-<!-- TODO: multiagent? eg: Launch up to 3 explore agents **in parallel**: then 3a, 3b 3c -->
+## Step 3: Break the epic into stories
 
-Keeping in mind what a user story is and what is not (above), split the work into user stories. For each:
-- Canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
-- User Context section (role, goals, use case)
-- Acceptance criteria in _Given_/_When_/_Then_ format as numbered markdown checkboxes `1. [ ]`
-- Requirements where relevant (performance, security, accessibility)
-- Assess prerequisites: does this depend on another story or missing infrastructure?
+Split the work into minimal, user-facing stories. For each story:
+- use canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
+- include a brief user context
+- include numbered acceptance criteria in _Given_ / _When_ / _Then_ form
+- include requirements only when they are truly part of the user-facing outcome
+- assess prerequisites or dependencies between stories
 
-Output: Display each story title and its canonical "As a..." statement before proceeding to classification.
+Before writing files, display each story title and canonical statement.
 
-## Step 4: Classify and evaluate
+## Step 4: Classify the stories
 
-Separate into three groups:
-1. **Actionable** — no prerequisites, can start now given current codebase
-2. **Blocked** — depends on other stories or missing infrastructure
-3. **Nice to have** — secondary stories that emerged during investigation/discussion but are not essential for the epic's core value. These are candidates for a future iteration
+Classify each story as:
+1. **Actionable** — can be taken into architecture and detailed breakdown now
+2. **Blocked** — depends on another story or a prerequisite not yet available
+3. **Nice to have** — valid but not essential for the epic's first valuable iteration
 
-Output: Display the classification table (story title, group, rationale) before proceeding.
+Display the classification table before writing outputs.
 
-<!-- TODO: group stories, more explicit? -->
+## Step 5: Write `epic.md`
 
-## Step 5: Write stories to `./tmp/planning/<epic-slug>/epic.md`
-
-The following notes apply to the Fields and UX considerations sections inside each story:
-
-- **Fields**: DO NOT look at the code to determine fields. Derive fields from the UI, provided docs, or by clarifying with the user. List all fields in the user experience grouped by page/view.
-- **UX considerations**: Even with a UI design, assume inconsistencies exist. Avoid making too many assumptions — defer to implementation where code can be checked for consistency.
-
-Create the file with this structure:
+Write `./tmp/planning/<epic-slug>/epic.md` with this structure:
 
 ```md
 # <Epic Name> (<epic-slug>)
@@ -153,7 +157,7 @@ Create the file with this structure:
 > Epic: <summary>
 > Generated: <date>
 
-## Story 1: <title>(short) example: Create user</title>
+## Story 1: <title>
 
 _As a_ [role], _I want_ [action], _so that_ [benefit].
 
@@ -171,76 +175,62 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
        _Then_ ...
 
 ### Fields
-
-- [List all the fields in the user experience grouped by page/view]
-      - Format:
-            - _Field_: Exact and precise Source or reason (where did you find this field, why do we need it). This can be just a link
-      - Example:
-            - _User name_: As per UI design provided in `./tmp/planning/<epic-slug>/design.md`
+- Group fields by page, view, or interaction surface
+- For each field, note the exact source or rationale
 
 ### Requirements
-- list
+- ...
 
-### UX considerations (by story or can be grouped for several similar stories)
-- list
----
-```
+### UX Considerations
+- ...
 
-After all actionable and blocked stories, add a Nice to have section:
+### Dependencies
+- ...
 
-```md
 ---
 
 ## Nice to Have
+...
 
-Stories that emerged during investigation but are not essential for the epic's core value.
-These are candidates for a future iteration — keep them lightweight (title + "As a..." + brief rationale).
-
-### N2H-1: <title>
-
-_As a_ [role], _I want_ [action], _so that_ [benefit].
-
-> **Rationale**: Why this came up and why it's secondary.
-
----
+## References
+- ...
 ```
 
-If links to documentation, UI, or context exist, add them at the bottom of the file in a `## References` section.
+Do not look at the codebase to determine fields. Derive them from the idea and product artifacts only.
 
 ## Step 6: Update glossary
 
-Add new domain terms discovered during this step to `./tmp/planning/glossary.md`. Create the file if it doesn't exist. Never remove existing entries. Never rename existing terms — ask the user if there's a conflict.
+If this step reveals durable product terms that later stages must reuse, update `./tmp/planning/glossary.md`.
 
-At this stage, Code Name and Source will typically be `—` (resolved later by a-architecture). Status should be `new` for terms not yet in codebase.
+Rules:
+- never remove entries
+- never rename an existing term without explicit user approval
+- at this stage, `Code Name` and `Source` may be `—` when the codebase has not yet been investigated
 
 ## Step 7: Present to user
-<!-- TODO: make it easy for the user to review all names (models, fields, titles etc) -->
 
-Display a structured summary via `AskUserQuestion`:
+Summarize:
+1. story count by classification
+2. recommended starting story
+3. personas created
+4. assumptions and open questions
+5. any glossary entries added
 
-1. **Story count**: X actionable, Y blocked, Z nice-to-have
-2. **Recommended starter**: Story N — because [rationale]
-3. **Assumptions made**: List any assumptions that need validation
-4. **Open questions**: List anything that needs clarification before proceeding
-
-Implementation happens in later pipeline steps.
+Ask the user to review and approve before moving to `/a-architecture`.
 
 ## Success Criteria
 
 - [ ] `epic.md` exists at `./tmp/planning/<epic-slug>/epic.md`
-- [ ] Every story uses canonical format: _As a_ [role], _I want_ [action], _so that_ [benefit]
-- [ ] Every story has numbered acceptance criteria in _Given_/_When_/_Then_ format
-- [ ] Every story has Fields and UX considerations sections
-- [ ] Every story respects its definition "What a story is"
-- [ ] Every story respects the definition "What a story is _not_"
-- [ ] Every story is "minimal", broken into the minimum valuable iteration
-- [ ] Stories are classified as actionable, blocked, or nice-to-have
-- [ ] No story is sliced by technology layer
-- [ ] `glossary.md` at `./tmp/planning/glossary.md` is created or updated with new domain terms
-- [ ] No synonyms — every concept has exactly one name, consistent with the glossary
-- [ ] User has reviewed and approved the stories
+- [ ] `personas.md` exists at `./tmp/planning/<epic-slug>/personas.md`
+- [ ] every story uses canonical _As a / I want / so that_ format
+- [ ] every story has numbered acceptance criteria in _Given / When / Then_ form
+- [ ] stories are sliced by user value, not by tech layer
+- [ ] any durable new terms were added to `./tmp/planning/glossary.md`
+- [ ] no synonyms were introduced
+- [ ] the user reviewed the output before the pipeline advanced
 
-## Error handling
+## Error Handling
 
-- **Empty arguments** — Ask the user to provide an epic slug
-- **`idea.md` does not exist** — Report the exact path checked (`./tmp/planning/<epic-slug>/idea.md`), ask the user to create it first
+- **Empty arguments** — ask the user to provide an epic slug
+- **Missing `idea.md`** — report the exact path checked and ask the user to create it first
+- **Weak input** — say what is missing, keep assumptions explicit, and ask the user instead of inventing certainty

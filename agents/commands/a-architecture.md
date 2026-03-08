@@ -1,5 +1,5 @@
 ---
-description: Design the technical architecture for an epic based on stories and personas
+description: Design the technical architecture for an epic from stories, personas, and the codebase
 argument-hint: <epic-slug>
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 ---
@@ -7,361 +7,206 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 # Architecture
 
 Pipeline position:
-```
-a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
-                         ^current
+```text
+a-epic -> a-architecture -> a-story(s) -> a-task(s)
+           ^current
 ```
 
 ### Pipeline I/O
 
-| Direction  | File                                         | Description                                                                                                   |
-| ---------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **In**     | `./tmp/planning/<epic-slug>/idea.md`         | Raw epic idea and links to supporting artifacts                                                              |
-| **In**     | `./tmp/planning/<epic-slug>/epic.md`         | Stories from `a-epic`                                                                                        |
-| **In**     | `./tmp/planning/<epic-slug>/personas.md`     | Personas (optional)                                                                                          |
-| **In** | `./tmp/planning/global-architecture.md`      | Lean system map: major parts, responsibilities, communication paths, stable contracts, durable boundaries    |
-| **In/Out** | `./tmp/planning/glossary.md`                 | Shared glossary baseline; update only after the user approves proposed glossary changes                      |
-| **Out**    | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture document, including inferred ERD, critique, recommended model, and change mapping |
+| Direction | File | Description |
+| --------- | ---- | ----------- |
+| **In** | `./tmp/planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
+| **In** | `./tmp/planning/<epic-slug>/epic.md` | Story list from `/a-epic` |
+| **In** | `./tmp/planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
+| **In/Out** | `./tmp/planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
+| **In/Out** | `./tmp/planning/global-architecture.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure |
+| **Out** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping |
 
-## Recommended Process
+## Purpose
 
-Always work in this order:
+Translate product intent into a grounded architecture for this epic.
 
-1. Understand the feature from the epic inputs and their referenced artifacts
-2. Load `./tmp/planning/global-architecture.md` to understand the current system shape
-3. Explore only the codebase areas that are relevant to the stories and still need confirmation
+This command must clearly separate:
+- what the epic is trying to build
+- what the current system already looks like
+- what architecture is recommended for this epic
 
-Why this order:
-- feature understanding tells you what to look for
-- `global-architecture.md` prevents broad, redundant repo exploration
-- targeted code exploration should validate fit, reuse, constraints, and conventions, not define the epic from scratch
+It is the first epic-specific step that may inspect the codebase.
 
 ## Skills
 
-- `architecture-blueprint-generator` — generate or refresh the lean structural system map when `global-architecture.md` is missing, weak, or stale (Steps 3 and 9c)
-- `explore` — codebase exploration (Step 4)
-- `ecoologic-code` — naming, patterns, domain alignment (Steps 4–6)
-- `software-architecture-design` — system-level tradeoffs, boundaries, contracts, and architectural decision framing (Step 6)
-- `mermaid-diagrams` — diagrams (Step 7)
-- `lovable` — when a Lovable prototype or similar UI prototype is detected in the input files (Steps 1–4)
+Use these skills when relevant:
+- `explore` for targeted multi-area codebase exploration
+- `architecture-blueprint-generator` when `global-architecture.md` is stale or too weak to guide targeted exploration
+- `ecoologic-code` to validate naming and pattern alignment
+- `software-architecture-design` for meaningful tradeoff decisions
+- `mermaid-diagrams` for ERD and flow diagrams
+- `lovable` when input artifacts reference a Lovable prototype
 
 ## Rules
 
 - NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
-- NEVER define synonyms — if a term exists in the glossary, use its exact Code Name everywhere. One concept = one name
-- NEVER abbreviate new names — use the domain's exact terms (`team-management`, not `team-mgmt`; `UserProfile`, not `UsrProf`)
-- NEVER propose extra functionality for hypothetical future use (YAGNI)
-- NEVER start implementation after generating planning artifacts
-- Treat the inferred ERD as a review artifact and hypothesis, not source-of-truth architecture
-- Prefer existing code and established project conventions over prototype structure when they conflict
-- If input files materially disagree, surface the conflict and ask the user before locking in architecture decisions
-- Treat `./tmp/planning/glossary.md` as the approved naming baseline; keep newly discovered terms provisional inside `architecture.md` until the user approves them
-
-<!-- TODO: refactor the document so global-architecture is read-only -->
-
-## Anti-Patterns
-
 - NEVER start with broad codebase exploration before understanding the epic inputs
-- NEVER commit to a technical decision without presenting options to the user first (using pros/cons tables)
-- NEVER explore codebase without story list as context
-- NEVER silently trust a UI/prototype data model
+- NEVER silently trust a prototype or UI-shaped data model
+- NEVER define synonyms; glossary terms stay canonical unless the user explicitly approves a rename
+- Treat inferred models as hypotheses until challenged against the codebase and project conventions
+- Prefer existing code and established conventions over prototype structure when they conflict
+- Update `glossary.md` only for durable confirmed terms or mappings; ask before renaming an existing term
+- Update `global-architecture.md` only for durable cross-epic structure, not epic-local design detail
 
-## Step 1: Resolve input files
+## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<epic-slug>`. Docs path: `./tmp/planning/<epic-slug>/`
+`$ARGUMENTS` = `<epic-slug>`
 
 Read:
-- `./tmp/planning/glossary.md` if it exists
-- `epic.md` (required — if missing, tell user to run `/a-epic` first)
-- `idea.md` (required - if missing, stop the command)
-- `personas.md` if it exists
+- `./tmp/planning/<epic-slug>/idea.md`
+- `./tmp/planning/<epic-slug>/epic.md`
+- `./tmp/planning/<epic-slug>/personas.md`
+- `./tmp/planning/glossary.md`
+- `./tmp/planning/global-architecture.md`
 
-Input files for this command means:
-1. the pipeline inputs above
-2. any design/product/technical artifacts they reference
+If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact missing path. The expected producer is `/a-epic`.
+
+If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+
+Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Keep an explicit list of what was read.
 
 Extract:
 - epic name and slug
-- story list and story summaries
-- actors and personas
-- obvious domain concepts and constraints
-- all referenced artifacts that may clarify the target system
+- story list and summaries
+- personas and constraints
+- domain concepts and obvious relationships
+- contradictions, gaps, and unknowns
 
-### 1a. Collect referenced artifacts
+## Step 2: Understand the target system
 
-Follow references from the input files to all supporting materials.
+Before exploring the codebase, derive from the inputs:
+1. intended user flows
+2. domain concepts implied by the stories
+3. likely entities and relationships
+4. likely system areas involved
+5. open questions and weak assumptions
 
-Keep an explicit list of which artifacts were read. These become part of the evidence base for `architecture.md`.
+### 2a. Infer an ERD from the inputs
 
-### 1b. Detect prototype sources
+Infer a provisional domain model from all useful input evidence, not only the UI.
 
-Check whether any input file or referenced artifact points to a prototype source (Lovable, Figma-linked prototype repo, low-code proof of concept, etc.). If found:
+If evidence is strong enough:
+- include the inferred ERD in `architecture.md`
+- label it as a review artifact, not accepted truth
 
-1. Clone or locate the prototype source
-2. Flag it as a **prototype source**
-3. In Step 4, dedicate one explore agent specifically to that prototype source
-
-Prototype sources contain valuable prior art: UI components, page layouts, form patterns, queries, integrations, and data assumptions. They are useful for extraction and review, but they are not authoritative architecture.
-
-<example>
-Epic: Team Management (team-management)
-Docs: ./tmp/planning/team-management/
-Stories: 4
-  - Story 1: Invite team member
-  - Story 2: Accept invitation
-  - Story 3: Remove team member
-  - Story 4: Manage roles
-Personas: loaded
-Lovable prototype: github.com/org/team-management-prototype (detected from idea.md)
-</example>
-
-## Step 2: Understand the epic from input files
-
-Before exploring the codebase, understand what this epic is trying to build.
-
-From the input files and their referenced artifacts, derive:
-1. the target user flows for this epic
-2. the domain concepts implied by the stories
-3. key relationships and constraints
-4. the parts of the system likely to be involved
-5. likely reuse opportunities or extraction candidates
-6. open questions, weak assumptions, and contradictions in the inputs
-
-This step is the bridge between product/design intent and system architecture. The rest of the command should answer: how does this epic fit into the current system, and what architecture should we recommend for it?
-
-### 2a. Infer an ERD from the input files
-
-Infer a provisional ERD or domain relationship model from all available input evidence, not only the UI.
-
-If there is enough evidence:
-1. draft the ERD
-2. include it in `architecture.md`
-3. label it as an inferred review artifact, not accepted truth
-
-If there is not enough evidence:
-1. say so explicitly
-2. record which inputs are insufficient
-3. NEVER fabricate missing entities or relationships
+If evidence is weak:
+- say so explicitly
+- record what evidence is missing
+- do not fabricate entities or relationships
 
 ### 2b. Apply source-of-truth hierarchy
 
-When the inputs disagree, use this order:
+When sources disagree, use this order:
 1. input files and referenced artifacts beat guesswork
-2. existing code and established project conventions beat prototype structure
-3. the inferred ERD is a hypothesis that must be challenged before it shapes the final recommendation
+2. existing code and established conventions beat prototype structure
+3. the inferred ERD remains a hypothesis until validated
 
-If a contradiction materially affects the architecture, ask the user via `AskUserQuestion`.
+If a contradiction materially changes the architecture recommendation, ask the user before finalizing.
 
-## Step 3: Load existing architecture
+## Step 3: Load shared repo context
 
-Read `./tmp/planning/global-architecture.md` if it exists. Use it as the primary structural map of the current system. Stop if it is missing.
+Read `./tmp/planning/global-architecture.md` and use it to narrow exploration.
 
-If `global-architecture.md` is missing, clearly stale, or too weak to guide targeted exploration, invoke `architecture-blueprint-generator` to derive the current system structure from the codebase, then condense the result into a lean `global-architecture.md` focused only on durable structure.
+If it is stale or too weak:
+- do targeted structural exploration or invoke `architecture-blueprint-generator`
+- refresh `global-architecture.md` only with durable cross-epic structure
 
-Look for:
-- major parts of the system
-- responsibilities and ownership boundaries
-- communication paths between parts (`ui -> api`, `api -> db`, jobs, queues, webhooks, external services, etc.)
-- stable contracts and shared abstractions
-- durable integrations and infrastructure assumptions
-
-Use it to skip redundant exploration. Only investigate areas that are:
-1. relevant to this epic
-2. missing from the global map
-3. potentially stale or contradicted by the code you read
+Use the shared map to understand:
+- major system areas
+- responsibilities and boundaries
+- communication paths between parts
+- stable contracts and integrations
 
 ## Step 4: Explore relevant codebase areas
 
-Invoke `explore` skill. Determine which system areas are relevant based on:
+Use targeted exploration only in areas relevant to the stories and still needing confirmation.
+
+Use `Agent` with explore subagents or equivalent targeted search. Launch one agent per relevant area, up to 5, and reserve one slot for a prototype source when present.
+
+Each exploration prompt must include:
 1. the story list
-2. the inferred target flows and entities from Step 2
-3. the current structure described in `global-architecture.md`
+2. the inferred entities, flows, and open questions
+3. the glossary baseline
+4. the specific system area to inspect
 
-Launch one explore agent per relevant system area (max 5; group related areas if >5). **If a prototype source was detected in Step 1b, reserve one agent slot for it** — it is the highest-priority reuse and critique source.
+Each exploration result must report:
+- relevant file paths
+- existing patterns and conventions
+- reuse candidates
+- naming matches and conflicts
+- how the area communicates with the rest of the system
+- any durable structure that may belong in `global-architecture.md`
 
-Each agent prompt must:
-1. Start with the story list from Step 1
-2. Include the inferred entities, flows, and open questions from Step 2
-3. Scope to its directory, service, package, app, repo, or other relevant system area
-4. Report: file paths, patterns, naming conventions, reuse candidates, extraction opportunities
-5. Focus on: existing components/services/types/models/contracts that overlap with story needs
-6. Note how this area communicates with the rest of the system
+Display a summary of findings by system area before moving on.
 
-Before launching agents, extract the relevant existing terms from `./tmp/planning/glossary.md` if it exists and include them as the current approved naming baseline.
+## Step 5: Reconcile terminology
 
-Each agent must also report:
-7. glossary matches: where current code or artifacts already align with existing glossary terms
-8. glossary conflicts: where code, inputs, or prototypes use a competing name for the same concept
-9. glossary candidates: genuinely new domain concepts, code names, or definitions discovered during exploration
-
-Do **not** update `./tmp/planning/glossary.md` during exploration. Treat any new terms, renames, or code-name mappings from this step as proposals to reconcile later in `architecture.md`.
-
-### Prototype source agent (when detected)
-
-This agent explores the prototype source with an **extraction and critique mindset**:
-
-<example>
-Agent 1 — Lovable prototype (`../team-management-prototype/`):
-"Given these stories from the Team Management epic: [...]
-
-Explore the Lovable prototype. For each story, find:
-1. Components that implement or partially implement the story (pages, forms, lists, modals)
-2. Queries, edge functions, API calls, or data access that match story needs
-3. UI patterns worth extracting: layout, navigation, form validation, toast/notification usage
-4. Types, interfaces, or entities already implied
-5. The ERD or domain model implied by the prototype
-6. What works and can be adapted vs. what's prototype-only throwaway
-
-For each finding, note:
-- File path in prototype
-- What to extract (component, pattern, query, type)
-- Which current system area it should map to
-- What needs to change (rename, refactor, split, merge, generalize)
-- Which parts of the implied data model look suspicious or UI-shaped"
-</example>
-
-### Current system agents
-
-<example>
-Agent 2 — `apps/ui/`:
-"Given these stories from the Team Management epic: [...]
-[If a prototype source exists: "A prototype source exists with prior art. Focus on the project patterns and conventions that extracted code must conform to."]
-
-Explore the UI area. Find:
-1. Existing components, pages, hooks that overlap with story needs
-2. Patterns: how are list views, forms, and modals built?
-3. Reuse candidates: shared components, hooks (useTeams, useMembers), utilities
-4. File structure conventions: where do new pages, components, hooks go?
-5. How the UI communicates with the rest of the system"
-
-Agent 3 — `services/api/`: same stories, scoped to the API area. Focus on endpoints, services, models, middleware, persistence, and communication with DB/external systems.
-</example>
-
-Invoke `ecoologic-code` to validate findings align with project conventions.
-
-Output: summary of findings per system area (and prototype, if present) before proceeding.
-
-## Step 5: Terminology reconciliation
-
-Build a **proposed** glossary table from the findings in Steps 2–4.
-
-Use `./tmp/planning/glossary.md` as the approved naming baseline:
-- existing glossary terms stay canonical unless the user approves a change
-- never introduce synonyms for an existing glossary term
-- if findings suggest a rename or conflicting term, keep it in the proposal table and ask the user before promoting it
-
-This table is for `architecture.md`, not an immediate edit to the shared glossary. Use it as the working term map for Steps 6-8, but keep the shared glossary unchanged until the user approves the architecture output.
+Build a terminology table for `architecture.md`:
 
 | Domain Term | Code Name | Definition | Source | Status |
 | ----------- | --------- | ---------- | ------ | ------ |
 
-- **Code Name**: actual class/type/table name in code (or `—` if new)
-- **Status**: `exists` | `new` | `rename` | `exists (extend with ...)`
+Status values:
+- `exists`
+- `new`
+- `exists (extend with ...)`
+- `conflict`
+- `rename-request`
 
-Invoke `ecoologic-code` to validate naming alignment.
+Rules:
+- existing glossary terms remain canonical unless the user approves a change
+- add safe new glossary rows and safe enrichments to `glossary.md` in this command
+- do not silently rename existing glossary terms
+- keep conflicts and rename requests explicit in `architecture.md` and ask the user
 
-<example>
-| Domain Term | Code Name           | Definition                       | Source                | Status                        |
-| ----------- | ------------------- | -------------------------------- | --------------------- | ----------------------------- |
-| Team        | Team                | A group of users collaborating   | packages/shared-types | exists                        |
-| Member      | TeamMember          | A user within a team with a role | packages/shared-types | exists                        |
-| Invitation  | —                   | A pending request to join a team | —                     | new                           |
-| Role        | role (string field) | Permission level: admin, member  | TeamMember.role       | exists (extend with 'viewer') |
+## Step 6: Make architecture decisions
 
-"new" → model/migration tasks. "extend" → modification tasks. "exists" → no task needed.
-</example>
-
-## Step 6: Technical decisions
-
-Organize around change types:
+Organize decisions around change types:
 
 | Area | What Exists | What Changes | Decision | Rationale |
 | ---- | ----------- | ------------ | -------- | --------- |
 
-Action types: **Reuse as-is** | **Extend** | **Extract** | **New**
+Action types:
+- **Reuse as-is**
+- **Extend**
+- **Extract**
+- **New**
 
-Cover **only** what's relevant to stories.
-
-Decisions must be grounded in:
-1. the epic inputs and inferred target state
-2. the current system structure
+Ground decisions in:
+1. epic inputs and intended flows
+2. current system structure
 3. project conventions already present in the codebase
 
-Invoke `software-architecture-design` when evaluating system-level choices such as module/service boundaries, integration contracts, data consistency, communication patterns, scalability, resilience, or other decisions with cross-system tradeoffs.
+If a decision has meaningful tradeoffs, present options with pros and cons and ask the user before locking it in.
 
-Invoke `ecoologic-code` to validate decisions align with existing patterns.
+## Step 7: Critique the inferred model
 
-<example>
-| Area             | What Exists                   | What Changes            | Decision                          | Rationale                                              |
-| ---------------- | ----------------------------- | ----------------------- | --------------------------------- | ------------------------------------------------------ |
-| Invitation form  | MemberForm in ui/src/members/ | Add email + role fields | Extend existing                   | Consistent with current form pattern, reuse validation |
-| Invitation email | —                             | —                       | New: Lambda handler in api/       | Matches existing email handler pattern                 |
-| Role selector    | RoleSelect in ui/src/shared/  | Add 'viewer' option     | Extend existing                   | Already used in 2 other views                          |
-| Invitation list  | —                             | —                       | New: follow DataTable pattern     | Reuse pagination, sorting, filtering                   |
-| Invitation type  | —                             | —                       | New: add to packages/shared-types | Keep types shared across ui and api                    |
+The architecture document must contain:
 
-Each row → one or more tasks. "Extend" = smaller task. "New following pattern" = task with clear reference.
-</example>
+### 7a. Inferred ERD from inputs
 
-If a decision has significant tradeoffs, present options **with pros/cons** and ask the user via `AskUserQuestion`.
-
-## Step 7: Diagrams and model review
-
-Invoke `mermaid-diagrams` skill.
-
-### 7a. Inferred ERD from input files
-
-Create a diagram that reflects the model implied by the input files and referenced artifacts.
-
-Rules:
-1. this is an inferred review artifact, not final truth
-2. derive it from all useful input evidence, not only the UI
-3. include it whenever there is enough evidence to infer a model
-4. if the evidence is weak, explicitly say the ERD is partial or unavailable
-
-Use `<<new>>` and `<<modified>>` stereotypes when helpful.
-
-<example>
-```mermaid
-classDiagram
-    class Team {
-        +string id
-        +string name
-    }
-    class TeamMember {
-        <<modified>>
-        +string userId
-        +string role
-        +string teamId
-    }
-    class Invitation {
-        <<new>>
-        +string email
-        +string role
-        +string teamId
-        +string status
-        +Date expiresAt
-    }
-    Team "1" --> "*" TeamMember
-    Team "1" --> "*" Invitation
-```
-</example>
+Include it when evidence is strong enough.
 
 ### 7b. Architectural critique of the inferred ERD
 
-Critique the inferred ERD harshly using both architecture good practices and project conventions.
-
-Evaluate:
+Critique it harshly. Evaluate:
 1. entity and aggregate boundaries
 2. ownership and lifecycle boundaries
 3. relationship quality and direction
-4. names, synonyms, and glossary alignment
-5. consistency with existing code names and project conventions
-6. suspicious UI-shaped entities or convenience-driven relationships
+4. naming and glossary alignment
+5. consistency with existing code and conventions
+6. suspicious UI-shaped or convenience-driven entities
 7. status blobs, nullable-field sprawl, duplicated data, and missing invariants
-8. missing tenant/auth/access boundaries
+8. missing tenant, auth, or access boundaries
 
-The output should clearly say:
+Say clearly:
 - what to keep
 - what to rename
 - what to split or merge
@@ -370,91 +215,26 @@ The output should clearly say:
 
 ### 7c. Recommended domain model
 
-After critique and codebase comparison, propose the domain model that should guide this epic.
+After critique and codebase comparison, propose the model that should guide this epic.
 
-This section may differ from the inferred ERD. Prefer sound boundaries and existing conventions over prototype structure when they conflict.
+### 7d. Key flow diagrams
 
-### 7d. Sequence diagrams (always, at least 1)
+Include at least one sequence diagram for a key story flow.
 
-One per key flow. Use `rect` blocks to highlight new behavior, labeled with story name.
+### 7e. Change inventory
 
-<example>
+List every new or modified artifact that later story and task work will depend on.
 
-```mermaid
-sequenceDiagram
-    actor Admin
-    participant UI as ui
-    participant API as api
-    participant DB as Database
+## Step 8: Write `architecture.md`
 
-    rect rgb(200, 255, 200)
-        Note over Admin,DB: Story 1: Invite team member
-        Admin->>UI: Fill invitation form (email, role)
-        UI->>API: POST /teams/:id/invitations
-        API->>DB: INSERT invitation
-        API->>API: sendInvitationEmail()
-        API-->>UI: 201 Created
-        UI-->>Admin: Show success toast
-    end
-```
+Write `./tmp/planning/<epic-slug>/architecture.md` with this structure:
 
-</example>
-
-### 7e. Change inventory (always)
-
-Each row approximates one task.
-
-<example>
-| Type      | Name                            | Action | Story   | Details                                       |
-| --------- | ------------------------------- | ------ | ------- | --------------------------------------------- |
-| Type      | Invitation                      | new    | 1, 2    | Add to packages/shared-types                  |
-| Model     | Invitation                      | new    | 1, 2    | email, role, teamId, status, expiresAt, token |
-| Migration | add_invitations_table           | new    | 1       | invitations table with FK to teams            |
-| Endpoint  | POST /teams/:id/invitations     | new    | 1       | Create invitation, send email                 |
-| Endpoint  | POST /invitations/:token/accept | new    | 2       | Accept invitation, create TeamMember          |
-| Component | InvitationForm                  | new    | 1       | Extends MemberForm pattern                    |
-| Component | InvitationList                  | new    | 1, 3    | Follows DataTable pattern                     |
-| Hook      | useInvitations                  | new    | 1, 2, 3 | CRUD operations for invitations               |
-| Field     | TeamMember.role                 | modify | 4       | Add 'viewer' to allowed values                |
-| Handler   | sendInvitationEmail             | new    | 1       | Follows existing email handler pattern        |
-</example>
-
-<!-- TODO: Not needed? -->
-
-## Step 8: Story mapping
-
-| Story | System Areas | New | Modified | Reused | Risk |
-| ----- | ------------ | --- | -------- | ------ | ---- |
-
-Risk: `low` (isolated), `medium` (crosses multiple system areas), `high` (shared contract, data boundary, or infrastructure change).
-
-## Step 9: Write outputs
-
-### 9a. Stage and promote glossary updates
-
-First, write all proposed terminology changes into the `## Proposed Glossary Updates` section of `architecture.md`.
-
-Do **not** edit `./tmp/planning/glossary.md` yet.
-
-Only after the user explicitly approves the architecture output and the proposed glossary rows:
-- merge approved new terms into `./tmp/planning/glossary.md`
-- enrich approved existing rows with Code Name, Source, or Status updates
-- preserve all pre-existing entries
-- never create synonyms
-- never apply a rename without explicit user approval
-
-If approval is not obtained in this run, leave the shared glossary unchanged.
-
-### 9b. Write architecture.md
-
-Write to `./tmp/planning/<epic-slug>/architecture.md`:
-
-```markdown
+```md
 # <Epic Name> — Architecture
 > Epic: <epic-slug>
 > Generated: <date>
-> Stories: ./tmp/planning/<epic-slug>/epic.md
-> Personas: <path or "N/A">
+> Stories: `./tmp/planning/<epic-slug>/epic.md`
+> Personas: `./tmp/planning/<epic-slug>/personas.md`
 
 ## Epic Summary
 ## Input Review
@@ -462,20 +242,18 @@ Write to `./tmp/planning/<epic-slug>/architecture.md`:
 ### Referenced Artifacts
 ### Input Conflicts and Gaps
 
-## Proposed Glossary Updates
-> Provisional until approved and merged into `./tmp/planning/glossary.md`
+## Terminology
 | Domain Term | Code Name | Definition | Source | Status |
 
 ### Intended User Flows
 ### Key Domain Concepts
 ### System Areas Likely Involved
+
 ## Current System Landscape
-### <system area>
 ### <system area>
 ### Communication Paths and Boundaries
 
 ## Reuse and Extraction Plan
-<!-- When a prototype source exists, this section is critical -->
 | Candidate | Source | Action | Stories | Target System Area |
 
 ## Technical Decisions
@@ -493,72 +271,70 @@ Write to `./tmp/planning/<epic-slug>/architecture.md`:
 ## Story Mapping
 | Story | System Areas | New | Modified | Reused | Risk |
 
-## Risks and Open Questions
+## Upstream Updates Applied
+- glossary updates made in this run
+- global architecture updates made in this run
+- conflicts or rename requests left for user review
 
+## Risks and Open Questions
 ## References
 ```
 
-`/a-story` reads this entire file for technical context to break down one story into many tasks.
+## Step 9: Update shared artifacts
 
-<!-- TODO: in only? -->
-### 9c. Update global architecture
+### 9a. Update glossary
 
-Merge only durable structural findings from Steps 3–8 back into `./tmp/planning/global-architecture.md`:
-- major system areas, modules, apps, services, packages, or repositories
-- responsibilities and ownership boundaries
-- stable communication paths between parts
-- durable contracts, integrations, and infrastructure touchpoints
-- stable entities or relationships only when they are truly cross-epic structure
+Update `./tmp/planning/glossary.md` in this command when the findings are durable and safe:
+- add new terms
+- enrich existing rows with confirmed code names, sources, or statuses
 
-Edit inline in the relevant section — do not append a changelog.
+Do not:
+- remove rows
+- rename an existing term without explicit user approval
+- persist uncertain conflicts as canonical truth
 
-Do **not** merge back:
+### 9b. Update global architecture
+
+Update `./tmp/planning/global-architecture.md` only with durable cross-epic structure such as:
+- stable modules and boundaries
+- major responsibilities
+- communication paths
+- stable contracts and integrations
+
+Do not merge back:
 - current epic goals
 - story-specific rationale
 - temporary assumptions
-- provisional domain decisions that exist only for this epic
-
-This keeps the global file current for the next epic or coding session.
+- epic-local design detail
 
 ## Step 10: Present to user
 
 Summarize:
 - key decisions
-- inferred ERD and the most important critiques
-- recommended model changes
+- ERD critique and recommended model
 - reuse opportunities
-- proposed glossary additions, conflicts, and rename requests
+- glossary updates applied
+- glossary conflicts or rename requests still open
+- global architecture updates applied
 - risks and open questions
 
-Ask the user to review and approve the architecture output before `/a-story`.
-Do not update `./tmp/planning/glossary.md` until the user also approves the `## Proposed Glossary Updates` section.
+Ask the user to review and approve before moving to `/a-story`.
 
 ## Success Criteria
 
-- [ ] architecture.md exists with all sections above
-- [ ] Every story appears in Story Mapping AND Change Inventory
-- [ ] Proposed Glossary Updates table has Status column for each term
-- [ ] architecture.md includes an inferred ERD, or explicitly explains why one could not be inferred
-- [ ] architecture.md includes an architectural critique of the inferred ERD
-- [ ] architecture.md includes a recommended domain model for this epic
-- [ ] At least one sequence diagram uses `rect` to highlight new behavior
-<!-- TODO: task level? -->
-- [ ] Change Inventory lists every new/modified artifact
-- [ ] Reuse Plan identifies opportunities (or explicitly states none found)
-- [ ] global-architecture.md remains lean and contains only durable structural knowledge
+- [ ] `architecture.md` exists with the required sections
+- [ ] every story appears in Story Mapping and Change Inventory
+- [ ] the inferred ERD is included or explicitly unavailable
+- [ ] the inferred ERD is criticized, not just described
+- [ ] the recommended domain model is explicit
+- [ ] any safe durable glossary updates were applied
+- [ ] any `global-architecture.md` updates are lean and cross-epic
+- [ ] the user reviewed the result before the pipeline advanced
 
-## Error handling
+## Error Handling
 
-- **Missing epic.md** — "Run `/a-epic` first."
-- **Missing or weak global-architecture.md** — Perform minimal structural exploration and create/update a lean global map
-- **Empty/new codebase** — Skip deep reuse analysis, focus on greenfield decisions for this epic
-- **Inputs too weak for ERD** — State that the ERD is partial/unavailable and list the missing evidence
-- **Conflicting input artifacts** — Surface the conflict and ask the user before finalizing architecture decisions
-- **Unknown domain concepts** — Ask user via `AskUserQuestion`.
-- **Missing personas** — Proceed without, note in output.
-
-<example>
-BAD: "The system should use a microservices architecture with event-driven communication"
-BAD: "The Invitation aggregate root publishes InvitationCreated domain events via the bounded context's event bus"
-GOOD: "Create Invitation type in the shared contract layer, model it in the API following the existing Team pattern, and store it in the current persistence layer. Fields: email, role, teamId, status, expiresAt, token. Add the required persistence change."
-</example>
+- **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
+- **Missing or weak `global-architecture.md`** — continue, perform minimal structural mapping, and keep the shared file lean
+- **Empty or new codebase** — say so explicitly and focus on greenfield decisions
+- **Inputs too weak for an ERD** — record the gap instead of fabricating certainty
+- **Conflicting input artifacts** — surface the conflict and ask the user before finalizing

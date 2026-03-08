@@ -1,362 +1,285 @@
 ---
-description: Break down a user story into implementation tasks with code investigation, UX review, and consistency checks
+description: Break down a single story into a detailed implementation plan and task list
 argument-hint: <epic-slug> <story-number>
-allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, TaskCreate, TaskUpdate, TaskList, AskUserQuestion, Skill]
+allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
 
 # Story Breakdown
 
 This command is a single step of a longer pipeline:
+```text
+a-epic -> a-architecture -> a-story(s) -> a-task(s)
+                         ^current
 ```
-a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
-                                           ^current
-```
-Next: `/a-task` consumes the task files produced by this command
+Next: `/a-task` consumes the task list produced by this command
 
 ### Pipeline I/O
 
 | Direction | File | Description |
-|-----------|------|-------------|
-| **In**  | `./tmp/planning/<epic-slug>/epic.md`          | User stories from `/a-epic` |
-| **In**  | `./tmp/planning/<epic-slug>/architecture.md`  | Architecture from `/a-architecture` |
-| **In**  | `./tmp/planning/<epic-slug>/personas.md`       | Personas (optional) |
-| **In/Out** | `./tmp/planning/glossary.md`                    | Shared glossary (read for consistent naming, updated with new terms) |
-| **In/Out** | `./tmp/planning/global-architecture.md`         | Global architecture map (read for context, updated with new findings) |
-| **Out** | `./tmp/planning/<epic-slug>/story-<N>/details.md`  | Story details document |
-| **Out** | `./tmp/planning/<epic-slug>/story-<N>/task-<N>.md` | Individual task files |
-| **Out** | `./tmp/planning/<epic-slug>/architecture.md`       | Addendum (if new insights found) |
+| --------- | ---- | ----------- |
+| **In** | `./tmp/planning/<epic-slug>/epic.md` | User stories from `/a-epic` |
+| **In** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture` |
+| **In** | `./tmp/planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
+| **In/Out** | `./tmp/planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
+| **In/Out** | `./tmp/planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
+| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story |
+| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list that `/a-task` reads |
 
 ## Skills
 
-Invoke these skills during execution via Skill tool when conditions are met:
-- `ux-laws` — UX evaluation (Step 4), always invoke for stories with UI
-- `react-best-practices` — component design validation (Step 5), invoke if project uses React
-- `typescript-best-practices` — type design validation (Step 5), invoke if project uses TypeScript
-- `web-design-guidelines` — UI compliance check (Step 5), invoke if story involves web UI
+Invoke these skills when relevant:
+- `ux-laws` for stories with UI
+- `react-best-practices` when the project uses React
+- `typescript-best-practices` when the project uses TypeScript
+- `web-design-guidelines` when the story includes web UI
 
 ## Purpose
 
-Break a single user story (from `/a-epic` output) into concrete implementation tasks. Investigate the codebase, check consistency, identify reuse opportunities, and define UX/UI before producing the task list.
-
-**IMPORTANT**: This command produces a task breakdown document. It does NOT write implementation code. Code is written in the task step. However, codebase read access is allowed and expected.
+Break one story into a concrete, code-informed implementation plan without writing code. This command should:
+- investigate the current codebase
+- define reuse opportunities and constraints
+- refine story-level details when needed
+- produce a clean task list for `/a-task`
 
 ## Rules
 
 - NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
-- NEVER define synonyms — if a term exists in the glossary, use its exact Code Name everywhere. One concept = one name
-- NEVER abbreviate new names — use the domain's exact terms (`team-management`, not `team-mgmt`; `UserProfile`, not `UsrProf`)
-- NEVER propose extractions for hypothetical future use (YAGNI)
-- NEVER start implementation after generating planning artifacts
+- NEVER skip codebase investigation; task planning must be grounded in the real codebase
+- NEVER define synonyms; if a term exists in the glossary, use its canonical name
+- NEVER abbreviate new names
+- NEVER propose extractions for hypothetical future use
+- NEVER produce multi-concern tasks; each task should have one primary concern
+- refine higher-level artifacts only when the finding is durable and useful beyond this one local note
 
-## Anti-Patterns
-
-- NEVER skip codebase exploration — tasks must be grounded in existing patterns
-- NEVER create tasks that address multiple concerns — one concern per task
-
-## Step 1: Resolve story input
+## Step 1: Resolve required inputs
 
 `$ARGUMENTS` = `<epic-slug> <story-number>`
 
-Parse the two values:
-- **epic-slug** — used to resolve paths under `./tmp/planning/<epic-slug>/`
-- **story number** — which story to break down (e.g. `2` for "Story 2")
+Read:
+- `./tmp/planning/<epic-slug>/epic.md`
+- `./tmp/planning/<epic-slug>/architecture.md`
+- `./tmp/planning/<epic-slug>/personas.md`
+- `./tmp/planning/glossary.md`
+- `./tmp/planning/global-architecture.md`
 
-Read `./tmp/planning/<epic-slug>/epic.md` via Read tool. Extract the specified story section (everything under `## Story N: ...` until the next `## Story` or end of file). This is the **story context** for all subsequent steps.
+If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-Also read `./tmp/planning/<epic-slug>/architecture.md` via Read tool for technical context.
+If `epic.md`, `architecture.md`, or `personas.md` is missing, stop and report the exact path checked.
 
-Read `./tmp/planning/glossary.md` if it exists. Use its terms and Code Names consistently throughout all outputs. Never introduce alternative names for glossary terms.
-
-Check if `./tmp/planning/<epic-slug>/personas.md` exists. If yes, read it. If no, note its absence but continue — personas are optional input.
-
-Define these terms for consistent use throughout:
-- **Story context**: the full extracted story section (title, "As a..." statement, acceptance criteria, fields, requirements, UX considerations)
-- **Story summary**: the story title + "As a..." statement (one-liner for agent prompts)
+Extract the requested story section from `epic.md`. The story context includes:
+- title
+- canonical story statement
+- acceptance criteria
+- fields
+- requirements
+- UX considerations
+- dependencies
 
 Output:
-```
-Story: <story title>
-Epic: <epic name from file header>
+```text
+Story: <title>
+Epic: <epic name>
 Architecture: loaded
-Personas: <loaded | not found — proceeding without>
+Personas: loaded
 Has UI: <yes | no>
 ```
 
-## Step 2: Codebase investigation
+## Step 2: Investigate the codebase
 
-Read `./tmp/planning/global-architecture.md` if it exists. Use it as baseline context for exploration — focus agents on areas not covered or potentially outdated.
+Use `global-architecture.md` and `architecture.md` to scope targeted code exploration.
 
-Use the Agent tool with `subagent_type="Explore"` to investigate the codebase in parallel. Launch up to 3 explore agents simultaneously for:
+Use targeted search and explore agents to gather:
+1. related existing code
+2. patterns and conventions
+3. reuse opportunities
 
-### 2a. Find related existing code
+Each investigation result should report:
+- relevant files
+- why they matter
+- patterns to follow
+- reusable components, services, types, or utilities
+- naming matches or conflicts with the glossary
 
-Prompt: "Find all files, components, services, models, routes, and tests related to: [story summary]. Look for existing implementations that overlap, adjacent features, and shared utilities. Report file paths, key exports, and brief descriptions."
+Display the findings before proceeding.
 
-### 2b. Find patterns and conventions
+## Step 3: Check consistency
 
-Prompt: "Identify the project's patterns for: routing, state management, API calls, form handling, validation, component structure, styling approach, test structure. Focus on patterns relevant to: [story summary]. Report the conventions with file examples."
+Based on the investigation, evaluate:
+1. naming conventions
+2. file placement conventions
+3. API and service patterns
+4. component patterns
+5. test patterns
+6. type and contract patterns
 
-### 2c. Find reuse opportunities
+Flag inconsistencies that matter to this story. Do not fix unrelated issues.
 
-Prompt: "Search for existing components, hooks, utilities, services, types, and abstractions that could be reused or extended for: [story summary]. Also identify near-duplicates that should be extracted into shared code. Report each with file path and rationale."
+## Step 4: Define UX
 
-Collect results from all three agents and structure findings as:
+If the story has UI, use `ux-laws` and define:
+- user flow
+- states
+- feedback
+- accessibility requirements
 
-**Related Files**
+If there is no UI, explicitly note that UX/UI sections are skipped.
 
-| File | Type | Relevance |
-|------|------|-----------|
-| `src/...` | component/service/model/... | Brief description of how it relates |
+## Step 5: Define UI and extraction opportunities
 
-**Conventions**
-- Routing: [pattern with file example]
-- State management: [pattern with file example]
-- API calls: [pattern with file example]
-- ... (only conventions relevant to this story)
+If the story has UI, define:
+- component inventory
+- hierarchy
+- important props and state boundaries
+- styling approach
+- responsive behavior
 
-**Reuse Candidates**
+Then identify justified extractions:
+- shared components
+- shared utilities
+- shared types
+- necessary refactors
 
-| Candidate | File | Action |
-|-----------|------|--------|
-| ... | `src/...` | Reuse as-is / Extend / Extract from |
+Only include extractions that are clearly warranted by this story.
 
-## Step 3: Consistency check
+## Step 6: Refine upstream artifacts when needed
 
-Based on Step 2 findings, evaluate (analysis only — do not create or modify files):
+This command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
+- update `epic.md` when the story wording, boundaries, sequencing, or dependencies need correction
+- update `architecture.md` when story work reveals epic-specific technical details other stories should inherit
+- update `glossary.md` when durable domain names, code names, sources, or statuses are confirmed
+- update `global-architecture.md` only when the work reveals durable cross-epic structure
 
-1. **Naming conventions** — Do existing entities follow a naming pattern? What should new entities be named?
-2. **File structure** — Where should new files go based on existing layout?
-3. **API patterns** — How do existing endpoints/services work? What shape should new ones follow?
-4. **Component patterns** — What component structure, prop patterns, and composition strategies are used?
-5. **Test patterns** — How are similar features tested? What test utilities exist?
-6. **Type patterns** — How are types/interfaces organized? Shared types file? Co-located?
+Summarize every such update in the output.
 
-Flag any inconsistencies found in the existing code that should be noted (but NOT fixed as part of this story unless directly related).
+## Step 7: Write `story-<story-number>.md`
 
-Output: Display key consistency findings and any flags before proceeding.
+Write `./tmp/planning/<epic-slug>/story-<story-number>.md` with this structure:
 
-## Step 4: UX definition
+```md
+# Story <story-number>: <title>
 
-> If the story has no UI, skip Steps 4-5 and note "No UI — Steps 4-5 skipped" in the output.
-
-Invoke the `ux-laws` skill via Skill tool to evaluate the story's user experience:
-
-1. Review the story's acceptance criteria and user context
-2. Apply relevant UX laws (Hick's, Fitts's, Miller's, Jakob's, etc.)
-3. Define:
-   - **User flow** — step-by-step interaction from the user's perspective
-   - **States** — empty, loading, loaded, error, edge cases
-   - **Feedback** — what the user sees/hears at each step
-   - **Accessibility** — keyboard nav, screen readers, focus management
-
-If the story has a UI design reference (linked in the stories file), read it and cross-reference with UX laws. Flag any design inconsistencies.
-
-Output: Display the user flow and states table before proceeding.
-
-## Step 5: UI definition
-
-Based on existing codebase patterns (Step 2b) and UX definition (Step 4):
-
-1. **Component inventory** — List every UI component needed (new and existing)
-2. **Component hierarchy** — Parent/child relationships
-3. **Props and state** — Key props, local state, shared state for each component
-4. **Styling approach** — Follow the project's existing styling method
-5. **Responsive behavior** — Mobile/desktop differences if applicable
-
-If the project uses React, invoke the `react-best-practices` skill via Skill tool to validate component design decisions.
-
-If the project uses TypeScript, invoke the `typescript-best-practices` skill via Skill tool to validate type design.
-
-If the story involves web UI, invoke the `web-design-guidelines` skill via Skill tool to cross-check.
-
-Output: Display the component inventory table and hierarchy before proceeding.
-
-## Step 6: Identify extraction opportunities
-
-From Steps 2-5, list any code that should be extracted or refactored:
-
-1. **New shared components** — UI pieces usable beyond this story
-2. **New shared utilities** — Logic usable beyond this story
-3. **New shared types** — Types usable beyond this story
-4. **Refactors** — Existing code that should be cleaned up to support this story
-
-For each, state:
-- What to extract
-- From where (existing file) or why (new need)
-- Where it should live
-- Whether it blocks the story or can be done in parallel
-
-**IMPORTANT**: Only propose extractions that are clearly justified. Follow YAGNI — do not extract for hypothetical future use.
-
-Output: Display the extractions table before proceeding.
-
-## Step 7: Define implementation tasks
-
-Break the story into ordered, atomic implementation tasks. Each task should be:
-- **Small** — completable in a single focused session
-- **Testable** — has clear verification criteria
-- **Independent** — can be committed and (ideally) deployed separately
-- **Ordered** — dependencies are explicit
-
-For each task, write via Write tool to `./tmp/planning/<epic-slug>/story-<N>/task-<T>.md`:
-
-```markdown
-### Task T: <imperative title>
-
-**Type**: [component | hook | service | api | model | migration | test | config | refactor]
-**Files**: [list of files to create or modify]
-**Depends on**: [Task numbers, or "none"]
-
-**Description**:
-[What to implement, with specifics from the codebase investigation]
-
-**Acceptance criteria**:
-- [ ] [Specific, testable criterion]
-- [ ] [Another criterion]
-
-**Notes**:
-- [Relevant findings from codebase investigation]
-- [Patterns to follow, with file references]
-- [Reuse opportunities identified]
-```
-
-Example task:
-
-```markdown
-### Task 1: Add UserProfile model and migration
-
-**Type**: model | migration
-**Files**: src/models/UserProfile.ts, src/migrations/20240101_add_user_profile.ts
-**Depends on**: none
-
-**Description**:
-Create the UserProfile entity following the existing model pattern in `src/models/User.ts`. Add a migration for the `user_profiles` table with fields from the story's Fields section.
-
-**Acceptance criteria**:
-- [ ] UserProfile model exists with all required fields
-- [ ] Migration creates the user_profiles table
-- [ ] Model follows the naming and structure conventions from existing models
-
-**Notes**:
-- Follow the BaseEntity pattern from `src/models/Base.ts`
-- Use the same column decorator style as `src/models/User.ts`
-```
-
-### Task ordering guidelines
-
-1. Types/interfaces first (if new shared types are needed)
-2. Data layer (models, migrations, API routes)
-3. Business logic (services, hooks)
-4. UI components (bottom-up: leaf components first, then containers)
-5. Integration (wiring components together, routing)
-6. Tests (or alongside each task if TDD is preferred)
-
-## Step 8: Update glossary
-
-If codebase investigation (Step 2) revealed new domain terms, or if terms gained Code Names or Sources that were previously `—`, add them to `./tmp/planning/glossary.md`. Create the file if it doesn't exist. Never remove existing entries. Never rename existing terms — ask the user if there's a conflict.
-
-## Step 9: Write the story details
-
-Write the story details via Write tool to `./tmp/planning/<epic-slug>/story-<N>/details.md`.
-
-Create the directories if they don't exist (`mkdir -p`).
-
-If findings during investigation revealed new architectural insights, append them to `./tmp/planning/<epic-slug>/architecture.md` under a new section `## Addendum from Story <N>`.
-
-If codebase investigation revealed new endpoints, packages, stores, or structural changes not in `./tmp/planning/global-architecture.md`, update it inline in the relevant section.
-
-### details.md structure
-
-```markdown
-# <Story Title> — Details
-
-> Story: <full story statement>
 > Epic: <epic name>
 > Generated: <date>
-> Personas: <loaded | N/A>
+> Source Story: `./tmp/planning/<epic-slug>/epic.md`
+
+_As a_ [role], _I want_ [action], _so that_ [benefit].
+
+## User Context
+- ...
+
+## Acceptance Criteria
+1. [ ] ...
 
 ## Codebase Context
-
 ### Related Code
-- [Summary of findings from Step 2a]
+- ...
 
-### Patterns to Follow
-- [Summary of findings from Step 2b]
+### Patterns To Follow
+- ...
 
 ### Reuse Opportunities
-- [Summary of findings from Step 2c]
+- ...
 
 ## Consistency Notes
-- [Key findings from Step 3]
+- ...
 
 ## UX Definition
-
 ### User Flow
-1. [Step-by-step flow]
+1. ...
 
 ### States
 | State | Description | UI Behavior |
-|-------|-------------|-------------|
-| ... | ... | ... |
+| ----- | ----------- | ----------- |
 
 ### Accessibility
-- [Key a11y requirements]
+- ...
 
 ## UI Definition
-
 ### Component Inventory
 | Component | New/Existing | Location |
-|-----------|-------------|----------|
-| ... | ... | ... |
+| --------- | ------------ | -------- |
 
 ### Component Hierarchy
-- [Parent/child tree]
+- ...
 
 ## Extractions
 | What | From/Why | Target Location | Blocks Story? |
-|------|----------|-----------------|---------------|
-| ... | ... | ... | ... |
+| ---- | -------- | --------------- | ------------- |
 
-## Tasks
-
-- Task 1: <title> -> `task-1.md`
-- Task 2: <title> -> `task-2.md`
+## Upstream Updates Applied
 - ...
 
----
-
 ## References
-- Epic: `./tmp/planning/<epic-slug>/epic.md`
-- Architecture: `./tmp/planning/<epic-slug>/architecture.md`
-- [Any design docs, API docs, or other references from the story]
+- `./tmp/planning/<epic-slug>/architecture.md`
+- `./tmp/planning/global-architecture.md`
 ```
 
-## Step 10: Present to user
+## Step 8: Write `story-<story-number>-tasks.md`
+
+Write `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` as the single source of truth for `/a-task`.
+
+Use this structure:
+
+```md
+# Story <story-number> Tasks: <title>
+
+> Epic: <epic name>
+> Story: `./tmp/planning/<epic-slug>/story-<story-number>.md`
+> Generated: <date>
+
+## Task 1: <imperative title>
+
+**Type**: [component | hook | service | api | model | migration | test | config | refactor]
+**Files**: `path/a`, `path/b`
+**Depends on**: none
+
+**Description**:
+...
+
+**Acceptance Criteria**:
+- [ ] ...
+
+**Notes**:
+- ...
+
+## Task 2: <imperative title>
+...
+```
+
+Task ordering guidelines:
+1. shared types and contracts
+2. data layer and migrations
+3. business logic
+4. UI components
+5. integration and wiring
+6. tests
+
+## Step 9: Present to user
 
 Summarize:
-1. Number of tasks identified
-2. Estimated dependency chain (critical path)
-3. Any risks or open questions
-4. Suggested starting task
+1. number of tasks
+2. critical path
+3. reuse opportunities
+4. upstream updates applied
+5. risks and open questions
+6. recommended starting task
 
-Ask the user to review before proceeding to implementation.
-
-Implementation happens in `/a-task`.
+Ask the user to review before moving to `/a-task`.
 
 ## Success Criteria
 
-- [ ] `details.md` exists at `./tmp/planning/<epic-slug>/story-<N>/details.md`
-- [ ] All task files exist at `./tmp/planning/<epic-slug>/story-<N>/task-<T>.md`
-- [ ] Every task has: Type, Files, Depends on, Description, Acceptance criteria
-- [ ] Task dependencies form a valid DAG (no cycles)
-- [ ] `glossary.md` at `./tmp/planning/glossary.md` is updated with any new terms discovered
-- [ ] No synonyms — every concept uses its glossary Code Name consistently
-- [ ] User has been presented a summary and reviewed
+- [ ] `story-<story-number>.md` exists
+- [ ] `story-<story-number>-tasks.md` exists
+- [ ] every task has type, files, dependencies, description, and acceptance criteria
+- [ ] task ordering is explicit
+- [ ] any durable naming updates were propagated to `glossary.md`
+- [ ] any durable cross-epic structure updates were propagated to `global-architecture.md`
+- [ ] the user reviewed the output before the pipeline advanced
 
 ## Error Handling
 
-- **Empty arguments** — Ask the user to provide both epic slug and story number
-- **`epic.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/epic.md`), tell user: "Run `/a-epic` first."
-- **Story N not found in epic.md** — List available story numbers from the file, ask the user to pick one
-- **`architecture.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/architecture.md`), tell user: "Run `/a-architecture` first."
-- **Codebase exploration returns no results** — Report to user, ask if this is a new feature area, skip consistency checks, focus on patterns from elsewhere in the codebase
+- **Empty arguments** — ask the user to provide both epic slug and story number
+- **Story not found in `epic.md`** — list available story numbers and ask the user to pick one
+- **Missing shared repo files** — tell the user to run `/a-global-architecture` first
+- **Missing epic-specific files** — report the exact missing path and tell the user which earlier command to run
+- **No relevant code found** — say so explicitly and treat the story as a greenfield area while still following project-wide patterns

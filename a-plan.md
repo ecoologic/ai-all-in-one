@@ -26,7 +26,7 @@ a-epic -> a-architecture -> a-story(s) -> a-task(s)
 a-global-architecture (separate, occasional, cross-epic)
 ```
 
-`a-global-architecture` is not part of the normal per-epic sequence. It is a repo-wide mapping command that may be run once at the start, or later when durable system structure changes or when the repo map is missing/stale.
+`a-global-architecture` is the prerequisite repo-wide context step. It is run before epic planning begins, and again later whenever durable shared structure or domain language changes enough that the shared artifacts need refresh.
 
 ## Artifact Layout
 
@@ -47,11 +47,30 @@ The `epic-slug` is part of the command input and must match the folder under `tm
 
 ## Command Contracts
 
+### `/a-global-architecture`
+
+Reads:
+- codebase (read-only)
+- repo docs and durable product/architecture references
+
+Writes:
+- `tmp/planning/global-architecture.md`
+- `tmp/planning/glossary.md`
+
+Updates:
+- both files whenever durable cross-epic structure or shared domain language changes
+
+Notes:
+- this command owns the shared repo-wide artifacts
+- later commands may refine those artifacts when they discover durable knowledge
+- downstream commands should assume both files exist because this command is the prerequisite that creates them
+
 ### `/a-epic <epic-slug>`
 
 Reads:
 - `tmp/planning/<epic-slug>/idea.md`
-- `tmp/planning/glossary.md` if present
+- `tmp/planning/glossary.md`
+- `tmp/planning/global-architecture.md`
 
 Writes:
 - `tmp/planning/<epic-slug>/epic.md`
@@ -65,6 +84,7 @@ Notes:
 - `idea.md` may reference any supporting materials such as UI, product notes, or research docs.
 - `epic.md` contains the story list and initial story framing.
 - `personas.md` is a separate artifact, but it is produced as part of `/a-epic` rather than by its own command.
+- if the shared repo-wide artifacts are missing, run `/a-global-architecture` first
 
 ### `/a-architecture <epic-slug>`
 
@@ -73,6 +93,7 @@ Reads:
 - `tmp/planning/<epic-slug>/epic.md`
 - `tmp/planning/<epic-slug>/personas.md`
 - `tmp/planning/glossary.md`
+- `tmp/planning/global-architecture.md`
 - codebase (read-only)
 
 Writes:
@@ -93,7 +114,7 @@ Reads:
 - `tmp/planning/<epic-slug>/architecture.md`
 - `tmp/planning/<epic-slug>/personas.md`
 - `tmp/planning/glossary.md`
-- `tmp/planning/global-architecture.md` if present
+- `tmp/planning/global-architecture.md`
 - codebase (read-only)
 
 Writes:
@@ -133,6 +154,37 @@ Each command declares a Pipeline I/O table in its header.
 
 `tmp/planning/glossary.md` is always available as `In/Out`, but it should only be updated when a command discovers a durable domain term worth standardizing.
 
+### Artifact Ownership And Promotion
+
+Every planning artifact has a primary owner command:
+
+- `a-global-architecture` owns `tmp/planning/global-architecture.md`
+- `a-global-architecture` owns `tmp/planning/glossary.md`
+- `a-epic` owns `tmp/planning/<epic-slug>/epic.md`
+- `a-epic` owns `tmp/planning/<epic-slug>/personas.md`
+- `a-architecture` owns `tmp/planning/<epic-slug>/architecture.md`
+- `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>.md`
+- `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
+- `a-task` owns code changes
+
+Later commands may refine higher-level artifacts when they discover durable knowledge. This is an allowed part of the workflow, not an exception.
+
+Allowed promotion targets:
+
+- update `epic.md` when deeper work sharpens story wording, boundaries, sequencing, or prerequisites
+- update `architecture.md` when story or task work reveals epic-specific technical truth that other stories should inherit
+- update `glossary.md` when a durable domain term, code name, source, or status is confirmed
+- update `global-architecture.md` only when work reveals durable cross-epic structure, boundaries, contracts, or communication paths
+
+Not allowed:
+
+- pushing temporary task notes into shared artifacts
+- promoting speculative future abstractions
+- treating story-local implementation detail as repo-wide architecture
+- rewriting higher-level artifacts without a durable reason
+
+When a command updates a higher-level artifact, it must summarize what changed and why before the pipeline advances.
+
 ### Source Of Truth Hierarchy
 
 - Avoid guesswork
@@ -156,6 +208,18 @@ It must not accumulate:
 - story-specific design details
 - Assumptions of any type
 
+`tmp/planning/glossary.md` should stay domain-based and cross-epic.
+
+It may include:
+- stable domain terms
+- canonical names used across planning and implementation
+- confirmed code names, sources, and statuses
+
+It must not accumulate:
+- temporary aliases
+- speculative future terminology
+- story-local wording that is not durable
+
 ### Naming
 
 - Never define synonyms. If a term exists in the glossary, use its exact Code Name everywhere.
@@ -175,9 +239,10 @@ It must not accumulate:
 Detailed work is allowed to refine higher-level artifacts when it uncovers durable knowledge.
 
 Allowed examples:
+- `a-story` discovers the current story should be split differently and updates `epic.md`
 - `a-story` discovers architecture details that belong in `architecture.md` for other stories to use
 - `a-story` or `a-task` discovers durable domain names that belong in `glossary.md`
-- `a-architecture`, `a-story`, or `a-task` discovers durable high-level cross-epic structure that belongs in `global-architecture.md` (particularly when the code proves the fiile is outdated)
+- `a-architecture`, `a-story`, or `a-task` discovers durable high-level cross-epic structure that belongs in `global-architecture.md` (particularly when the code proves the file is outdated)
 
 Not allowed:
 - pushing temporary task-level implementation noise into shared artifacts
