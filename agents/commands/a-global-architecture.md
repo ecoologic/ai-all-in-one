@@ -30,6 +30,8 @@ This command owns two cross-epic artifacts:
 
 Later commands may refine them, but this command is the baseline producer.
 
+The architecture map must explicitly call out the shared reuse surface of the repo, especially any `common` package and any durable reusable folders such as `types/`, `components/`, `utils/`, `hooks/`, or similar shared locations.
+
 ## Skills
 
 Use these skills when relevant:
@@ -52,10 +54,13 @@ Use these skills when relevant:
 
 Inspect the codebase and stable docs to identify:
 - major apps, services, packages, and modules
+- shared or common reuse areas, including packages and reusable folders
+- reusable code buckets such as general types, shared UI components, hooks, helpers, utils, schemas, or constants
 - responsibilities and ownership boundaries
 - communication paths between major parts
 - stable integrations and infrastructure touchpoints
 - durable shared contracts
+- whether shared building blocks live in packages, folders, or both
 - cross-epic domain language already present in docs or code
 
 Use targeted exploration with parallel agents when helpful, but keep the result focused on durable shared context.
@@ -100,6 +105,27 @@ Use this structure:
 - responsibility
 - key boundaries
 
+## Code Reuse Surface
+Briefly explain where engineers should look first for code that is designed to be reused across features or epics.
+
+| Reusable Area | Type | What Lives Here | Reuse Guidance | Main Consumers |
+| ------------- | ---- | --------------- | -------------- | -------------- |
+| `src/components` | folder | shared UI building blocks | reuse as-is before creating feature-local UI | web app, admin app |
+| `src/types` | folder | shared domain and API types | extend carefully; avoid duplicate type aliases elsewhere | frontend, backend |
+| ... | ... | ... | ... | ... |
+
+### Notes
+- Prefer durable shared folders over feature-local folders when both exist.
+- Call out when a folder appears reusable in practice even if it is not formally named `shared` or `common`.
+- Mention when the same concern is split across multiple reusable folders, for example `types/` plus `schemas/`.
+
+## Shared Reuse Details
+### <shared package or folder>
+- type: `package` | `folder`
+- purpose
+- what is intended for reuse
+- who consumes it
+
 ## Communication Paths
 - `ui -> api`
 - `api -> db`
@@ -114,6 +140,12 @@ Use this structure:
 ## References
 - ...
 ```
+
+If the repo has a `common` package, name it explicitly and describe what kinds of code should be reused from it.
+
+If reusable code lives in general folders instead of packages, name those folders explicitly too, for example shared `types/`, `components/`, `utils/`, `hooks/`, `schemas/`, or similar locations.
+
+The `Code Reuse Surface` section must be easy to scan and must explicitly list the most reusable folders or packages in the repo, not just describe reuse abstractly.
 
 Do not include:
 - current epic goals
@@ -136,6 +168,9 @@ Ask the user to review before epic-specific planning begins.
 - [ ] `./tmp/planning/global-architecture.md` exists
 - [ ] `./tmp/planning/glossary.md` exists
 - [ ] the architecture file is lean and cross-epic
+- [ ] the architecture file contains a clear `Code Reuse Surface` section
+- [ ] reusable areas such as a `common` package or reusable folders are explicit when they exist
+- [ ] common reusable folders such as `types/`, `components/`, `utils/`, or equivalents are listed when they exist
 - [ ] the glossary is domain-based and canonical
 - [ ] no synonyms were introduced
 - [ ] the user reviewed the shared artifacts before moving on
