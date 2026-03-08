@@ -12,6 +12,7 @@ ln -s ~/dev/ai/agents/commands ~/.claude/commands
 ln -s ~/dev/ai/agents/commands ~/.cursor/commands
 
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.claude/CLAUDE.md
+# Won't work reliably
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
 ```
 
@@ -29,7 +30,7 @@ Symlinked to `~` so all AI agents pick them up:
 
 - `cursor/` → `~/.cursor` — Cursor user-level config (whole directory symlinked)
   - `commands/` — global slash commands, each `.md` file becomes `/filename` in chat
-  - `rules/` — global rules applied across all projects
+  - `rules/` — Cursor rule files; documented cross-project global rules are User Rules configured in Settings
   - `skills-cursor/` — Cursor-specific skills (separate from `~/.agents/skills/`)
   - NOTE: Cursor is its own git repo
 
