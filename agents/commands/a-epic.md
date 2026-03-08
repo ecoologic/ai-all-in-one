@@ -8,10 +8,10 @@ allowed-tools: [Read, Write, Edit, AskUserQuestion]
 
 This command is a single step of a longer pipeline:
 ```
-p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
+a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
 ^current
 ```
-Next: `/p-architecture` (personas step is optional)
+Next: `/a-architecture` (personas step is optional)
 
 ### Pipeline I/O
 
@@ -29,7 +29,7 @@ Invoke these skills during execution via Skill tool:
 
 ## Purpose
 
-Break down a broad epic into actionable user stories FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Describe in a structured format how a feature is used and for what purpose. Each user story will be implemented individually via `/p-story`.
+Break down a broad epic into actionable user stories FOCUSED ON USER EXPERIENCE, not tech like "create a DB table". Describe in a structured format how a feature is used and for what purpose. Each user story will be implemented individually via `/a-story`.
 
 **This command produces documentation only. No code. No commits.**
 
@@ -211,7 +211,7 @@ If links to documentation, UI, or context exist, add them at the bottom of the f
 
 Add new domain terms discovered during this step to `./tmp/planning/glossary.md`. Create the file if it doesn't exist. Never remove existing entries. Never rename existing terms — ask the user if there's a conflict.
 
-At this stage, Code Name and Source will typically be `—` (resolved later by p-architecture). Status should be `new` for terms not yet in codebase.
+At this stage, Code Name and Source will typically be `—` (resolved later by a-architecture). Status should be `new` for terms not yet in codebase.
 
 ## Step 7: Present to user
 <!-- TODO: make it easy for the user to review all names (models, fields, titles etc) -->

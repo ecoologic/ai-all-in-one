@@ -8,7 +8,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 Pipeline position:
 ```
-p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
+a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
                          ^current
 ```
 
@@ -17,7 +17,7 @@ p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
 | Direction  | File                                         | Description                                                                                                   |
 | ---------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **In**     | `./tmp/planning/<epic-slug>/idea.md`         | Raw epic idea and links to supporting artifacts                                                              |
-| **In**     | `./tmp/planning/<epic-slug>/epic.md`         | Stories from `p-epic`                                                                                        |
+| **In**     | `./tmp/planning/<epic-slug>/epic.md`         | Stories from `a-epic`                                                                                        |
 | **In**     | `./tmp/planning/<epic-slug>/personas.md`     | Personas (optional)                                                                                          |
 | **In** | `./tmp/planning/global-architecture.md`      | Lean system map: major parts, responsibilities, communication paths, stable contracts, durable boundaries    |
 | **In/Out** | `./tmp/planning/glossary.md`                 | Shared glossary baseline; update only after the user approves proposed glossary changes                      |
@@ -72,7 +72,7 @@ Why this order:
 
 Read:
 - `./tmp/planning/glossary.md` if it exists
-- `epic.md` (required — if missing, tell user to run `/p-epic` first)
+- `epic.md` (required — if missing, tell user to run `/a-epic` first)
 - `idea.md` (required - if missing, stop the command)
 - `personas.md` if it exists
 
@@ -498,7 +498,7 @@ Write to `./tmp/planning/<epic-slug>/architecture.md`:
 ## References
 ```
 
-`/p-story` reads this entire file for technical context to break down one story into many tasks.
+`/a-story` reads this entire file for technical context to break down one story into many tasks.
 
 <!-- TODO: in only? -->
 ### 9c. Update global architecture
@@ -530,7 +530,7 @@ Summarize:
 - proposed glossary additions, conflicts, and rename requests
 - risks and open questions
 
-Ask the user to review and approve the architecture output before `/p-story`.
+Ask the user to review and approve the architecture output before `/a-story`.
 Do not update `./tmp/planning/glossary.md` until the user also approves the `## Proposed Glossary Updates` section.
 
 ## Success Criteria
@@ -549,7 +549,7 @@ Do not update `./tmp/planning/glossary.md` until the user also approves the `## 
 
 ## Error handling
 
-- **Missing epic.md** — "Run `/p-epic` first."
+- **Missing epic.md** — "Run `/a-epic` first."
 - **Missing or weak global-architecture.md** — Perform minimal structural exploration and create/update a lean global map
 - **Empty/new codebase** — Skip deep reuse analysis, focus on greenfield decisions for this epic
 - **Inputs too weak for ERD** — State that the ERD is partial/unavailable and list the missing evidence

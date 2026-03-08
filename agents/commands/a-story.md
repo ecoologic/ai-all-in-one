@@ -8,17 +8,17 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, TaskCreate, TaskUpdate, Ta
 
 This command is a single step of a longer pipeline:
 ```
-p-epic -> p-personas -> p-architecture -> p-story(s) -> p-task(s-t)
+a-epic -> a-personas -> a-architecture -> a-story(s) -> a-task(s-t)
                                            ^current
 ```
-Next: `/p-task` consumes the task files produced by this command
+Next: `/a-task` consumes the task files produced by this command
 
 ### Pipeline I/O
 
 | Direction | File | Description |
 |-----------|------|-------------|
-| **In**  | `./tmp/planning/<epic-slug>/epic.md`          | User stories from `/p-epic` |
-| **In**  | `./tmp/planning/<epic-slug>/architecture.md`  | Architecture from `/p-architecture` |
+| **In**  | `./tmp/planning/<epic-slug>/epic.md`          | User stories from `/a-epic` |
+| **In**  | `./tmp/planning/<epic-slug>/architecture.md`  | Architecture from `/a-architecture` |
 | **In**  | `./tmp/planning/<epic-slug>/personas.md`       | Personas (optional) |
 | **In/Out** | `./tmp/planning/glossary.md`                    | Shared glossary (read for consistent naming, updated with new terms) |
 | **In/Out** | `./tmp/planning/global-architecture.md`         | Global architecture map (read for context, updated with new findings) |
@@ -36,7 +36,7 @@ Invoke these skills during execution via Skill tool when conditions are met:
 
 ## Purpose
 
-Break a single user story (from `/p-epic` output) into concrete implementation tasks. Investigate the codebase, check consistency, identify reuse opportunities, and define UX/UI before producing the task list.
+Break a single user story (from `/a-epic` output) into concrete implementation tasks. Investigate the codebase, check consistency, identify reuse opportunities, and define UX/UI before producing the task list.
 
 **IMPORTANT**: This command produces a task breakdown document. It does NOT write implementation code. Code is written in the task step. However, codebase read access is allowed and expected.
 
@@ -341,7 +341,7 @@ Summarize:
 
 Ask the user to review before proceeding to implementation.
 
-Implementation happens in `/p-task`.
+Implementation happens in `/a-task`.
 
 ## Success Criteria
 
@@ -356,7 +356,7 @@ Implementation happens in `/p-task`.
 ## Error Handling
 
 - **Empty arguments** — Ask the user to provide both epic slug and story number
-- **`epic.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/epic.md`), tell user: "Run `/p-epic` first."
+- **`epic.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/epic.md`), tell user: "Run `/a-epic` first."
 - **Story N not found in epic.md** — List available story numbers from the file, ask the user to pick one
-- **`architecture.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/architecture.md`), tell user: "Run `/p-architecture` first."
+- **`architecture.md` does not exist** — Report path checked (`./tmp/planning/<epic-slug>/architecture.md`), tell user: "Run `/a-architecture` first."
 - **Codebase exploration returns no results** — Report to user, ask if this is a new feature area, skip consistency checks, focus on patterns from elsewhere in the codebase

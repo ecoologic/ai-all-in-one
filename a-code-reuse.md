@@ -9,9 +9,9 @@ A reusable-code artifact is a good idea if it stores concrete, evidence-backed c
 
 Current direction:
 - global JSON file at `./tmp/planning/reusable-code.json`
-- seeded by `/p-architecture`
-- consumed and refined by `/p-story`
-- available later to `/p-task`
+- seeded by `/a-architecture`
+- consumed and refined by `/a-story`
+- available later to `/a-task`
 
 ## Proposed Contents
 
@@ -34,17 +34,17 @@ This goes beyond `{ file_path, signature, description }`, which is too weak to e
 
 ## Command Impact
 
-Update `agents/commands/p-architecture.md`:
+Update `agents/commands/a-architecture.md`:
 - add `./tmp/planning/reusable-code.json` as `In/Out`
 - emit structured reuse candidates during exploration and reuse analysis
 - keep durable structure in `global-architecture.md`, and tactical reuse candidates in `reusable-code.json`
 
-Update `agents/commands/p-story.md`:
+Update `agents/commands/a-story.md`:
 - read `./tmp/planning/reusable-code.json` before fresh exploration
 - start from matching reuse entries during codebase investigation
 - validate or refine candidate status at the story level
 
-Update `p-plan.md`:
+Update `a-plan.md`:
 - document the new artifact path and ownership rules
 - keep the responsibilities distinct:
 - `glossary.md` = naming source of truth
@@ -63,6 +63,6 @@ To prevent stale cache behavior:
 ## Pending Work
 
 1. Define the final JSON schema and lifecycle rules.
-2. Update `/p-architecture` to read and write the shared reuse artifact.
-3. Update `/p-story` to consume and refine the artifact.
-4. Update `p-plan.md` to document the artifact and its boundaries.
+2. Update `/a-architecture` to read and write the shared reuse artifact.
+3. Update `/a-story` to consume and refine the artifact.
+4. Update `a-plan.md` to document the artifact and its boundaries.
