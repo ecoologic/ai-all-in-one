@@ -19,6 +19,14 @@ Create a set of `a-` commands that progressively turn an idea into small impleme
 a-epic -> a-architecture -> a-story(s) -> a-task(s)
 ```
 
+## Revision Companion
+
+```text
+a-edit (separate, on demand, feedback-driven)
+```
+
+`a-edit` is not a new pipeline stage. It is a companion command used after any planning artifact already exists and needs a targeted correction or refinement based on feedback.
+
 ## Repo-Wide Context
 
 ```text
@@ -39,6 +47,7 @@ Gitignore `tmp` and make a new repo in the planning folder, plans stay separate 
   - `tmp/planning/<epic-slug>/idea.md`
   - `tmp/planning/<epic-slug>/epic.md`
   - `tmp/planning/<epic-slug>/personas.md`
+  - `tmp/planning/<epic-slug>/stretch-goals.md`
   - `tmp/planning/<epic-slug>/architecture.md`
   - `tmp/planning/<epic-slug>/story-<n>.md`
   - `tmp/planning/<epic-slug>/story-<n>-tasks.md`
@@ -77,6 +86,7 @@ Reads:
 Writes:
 - `tmp/planning/<epic-slug>/epic.md`
 - `tmp/planning/<epic-slug>/personas.md`
+- `tmp/planning/<epic-slug>/stretch-goals.md`
 
 Updates:
 - `tmp/planning/glossary.md` when new durable product terms are introduced
@@ -86,6 +96,7 @@ Notes:
 - `idea.md` may reference any supporting materials such as UI, product notes, or research docs.
 - `epic.md` contains the story list and initial story framing.
 - `personas.md` is a separate artifact, but it is produced as part of `/a-epic` rather than by its own command.
+- `stretch-goals.md` captures later-scope ideas that stay outside the active pipeline reading path.
 - if the shared repo-wide artifacts are missing, run `/a-global-architecture` first
 
 ### `/a-architecture <epic-slug>`
@@ -152,6 +163,30 @@ Writes:
 Edits:
 - planning artifacts only when implementation reveals durable knowledge that should be captured for future work
 
+### `/a-edit <artifact-type> [selector...] <feedback>`
+
+Revise one existing planning artifact in response to user feedback without rerunning the whole owner stage.
+
+Reads:
+- the owner command file for the selected artifact type
+- the current target artifact
+- the owner command's required inputs
+- codebase (read-only) only when the owner command is code-informed
+
+Writes:
+- the selected target planning artifact
+
+Updates:
+- `tmp/planning/glossary.md` only when the owner command for the selected artifact would have allowed a durable terminology update
+- `tmp/planning/global-architecture.md` only when the owner command for the selected artifact would have allowed a durable cross-epic update
+
+Notes:
+- `a-edit` is a feedback-driven companion command, not a new pipeline stage
+- it must read the original owner command contract before editing
+- it must edit exactly one primary planning artifact per run
+- supported artifact types are `global-architecture`, `glossary`, `epic`, `personas`, `stretch-goals`, `architecture`, `story`, and `story-tasks`
+- if feedback is broad enough that a constrained revision would be misleading, rerun the owner command instead
+
 ## Shared Rules
 
 All `a-` commands must follow these rules. Each command should inline the relevant parts so it can run as a self-contained instruction set.
@@ -170,10 +205,12 @@ Every planning artifact has a primary owner command:
 - `a-global-architecture` owns `tmp/planning/glossary.md`
 - `a-epic` owns `tmp/planning/<epic-slug>/epic.md`
 - `a-epic` owns `tmp/planning/<epic-slug>/personas.md`
+- `a-epic` owns `tmp/planning/<epic-slug>/stretch-goals.md`
 - `a-architecture` owns `tmp/planning/<epic-slug>/architecture.md`
 - `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>.md`
 - `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
 - `a-task` owns code changes
+- `a-edit` owns no artifacts; it revises an existing artifact using its owner command's contract
 
 Later commands may refine higher-level artifacts when they discover durable knowledge. This is an allowed part of the workflow, not an exception.
 
@@ -192,6 +229,19 @@ Not allowed:
 - rewriting higher-level artifacts without a durable reason
 
 When a command updates a higher-level artifact, it must summarize what changed and why before the pipeline advances.
+
+### Intentional Revision
+
+`a-edit` is the explicit feedback-driven revision path for planning artifacts that already exist.
+
+Rules:
+- `a-edit` must read the owner command file before changing the target artifact
+- `a-edit` must reread the owner command's required inputs before applying a revision
+- `a-edit` edits one primary artifact per run
+- `a-edit` should preserve valid existing content and make the smallest durable correction that addresses the feedback
+- `a-edit` may update `glossary.md` or `global-architecture.md` only when the owner command for the selected artifact would have allowed that promotion
+- `a-edit` must not be used to rewrite the codebase; code changes stay in `a-task`
+- when a constrained revision would be misleading because the artifact is broadly stale or the feedback changes the stage's core output, rerun the owner command instead
 
 ### Source Of Truth Hierarchy
 
@@ -255,6 +305,22 @@ Allowed examples:
 Not allowed:
 - pushing temporary task-level implementation noise into shared artifacts
 - rewriting higher-level docs without a durable reason
+
+### Downstream Impact
+
+When a planning artifact is revised, later artifacts may become stale even if they are not rewritten immediately.
+
+Default impact rules:
+- editing `global-architecture.md` may affect all epic-specific artifacts
+- editing `glossary.md` may affect every artifact that uses the corrected term
+- editing `epic.md` may affect `personas.md`, `architecture.md`, `story-<n>.md`, and `story-<n>-tasks.md` for that epic
+- editing `personas.md` may affect `architecture.md`, `story-<n>.md`, and `story-<n>-tasks.md` for that epic
+- editing `stretch-goals.md` usually does not affect the active pipeline unless now-work vs later-work boundaries changed
+- editing `architecture.md` may affect `story-<n>.md`, `story-<n>-tasks.md`, and future `a-task` runs for that epic
+- editing `story-<n>.md` may affect `story-<n>-tasks.md` and future `a-task` runs for that story
+- editing `story-<n>-tasks.md` may affect future `a-task` runs for that story
+
+Every `a-edit` run must include an `Affected artifacts / suggested reruns` summary before the pipeline advances.
 
 ### User Checkpoints
 
