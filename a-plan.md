@@ -37,22 +37,22 @@ a-global-architecture (separate, occasional, cross-epic)
 
 ## Artifact Layout
 
-All planning artifacts use relative paths rooted at `tmp/planning/`.
-Gitignore `tmp` and make a new repo in the planning folder, plans stay separate from the codebase.
+All planning artifacts use relative paths rooted at `planning/`.
+Plans live in the project root under `planning/`. Gitignore it or make it a separate repo to keep plans separate from the codebase.
 
 - Shared across epics:
-  - `tmp/planning/glossary.md`
-  - `tmp/planning/global-architecture.md`
+  - `planning/glossary.md`
+  - `planning/global-architecture.md`
 - Per epic:
-  - `tmp/planning/<epic-slug>/idea.md`
-  - `tmp/planning/<epic-slug>/epic.md`
-  - `tmp/planning/<epic-slug>/personas.md`
-  - `tmp/planning/<epic-slug>/stretch-goals.md`
-  - `tmp/planning/<epic-slug>/architecture.md`
-  - `tmp/planning/<epic-slug>/story-<n>.md`
-  - `tmp/planning/<epic-slug>/story-<n>-tasks.md`
+  - `planning/<epic-slug>/idea.md`
+  - `planning/<epic-slug>/epic.md`
+  - `planning/<epic-slug>/personas.md`
+  - `planning/<epic-slug>/stretch-goals.md`
+  - `planning/<epic-slug>/architecture.md`
+  - `planning/<epic-slug>/story-<n>.md`
+  - `planning/<epic-slug>/story-<n>-tasks.md`
 
-The `epic-slug` is part of the command input and must match the folder under `tmp/planning/`.
+The `epic-slug` is part of the command input and must match the folder under `planning/`.
 
 ## Command Contracts
 
@@ -63,8 +63,8 @@ Reads:
 - repo docs and durable product/architecture references
 
 Writes:
-- `tmp/planning/global-architecture.md`
-- `tmp/planning/glossary.md`
+- `planning/global-architecture.md`
+- `planning/glossary.md`
 
 Updates:
 - both files whenever durable cross-epic structure or shared domain language changes
@@ -79,17 +79,17 @@ Notes:
 The list of user stories and the personas that will be used to build the product. It's detached from the codebase, we're still defining what we want to build. No need to design architecture until we have decided what to build.
 
 Reads:
-- `tmp/planning/<epic-slug>/idea.md`
-- `tmp/planning/glossary.md`
-- `tmp/planning/global-architecture.md`
+- `planning/<epic-slug>/idea.md`
+- `planning/glossary.md`
+- `planning/global-architecture.md`
 
 Writes:
-- `tmp/planning/<epic-slug>/epic.md`
-- `tmp/planning/<epic-slug>/personas.md`
-- `tmp/planning/<epic-slug>/stretch-goals.md`
+- `planning/<epic-slug>/epic.md`
+- `planning/<epic-slug>/personas.md`
+- `planning/<epic-slug>/stretch-goals.md`
 
 Updates:
-- `tmp/planning/glossary.md` when new durable product terms are introduced
+- `planning/glossary.md` when new durable product terms are introduced
 
 Notes:
 - `idea.md` is read-only input.
@@ -104,19 +104,19 @@ Notes:
 Design the technical architecture changes for an epic based on the existing code. Tasks will read this to have a shared understanding how to build the product. And will need less repeated investigation.
 
 Reads:
-- `tmp/planning/<epic-slug>/idea.md`
-- `tmp/planning/<epic-slug>/epic.md`
-- `tmp/planning/<epic-slug>/personas.md`
-- `tmp/planning/glossary.md`
-- `tmp/planning/global-architecture.md`
+- `planning/<epic-slug>/idea.md`
+- `planning/<epic-slug>/epic.md`
+- `planning/<epic-slug>/personas.md`
+- `planning/glossary.md`
+- `planning/global-architecture.md`
 - codebase (read-only)
 
 Writes:
-- `tmp/planning/<epic-slug>/architecture.md`
+- `planning/<epic-slug>/architecture.md`
 
 Updates:
-- `tmp/planning/glossary.md` when codebase investigation reveals durable code names, sources, statuses, or terms worth standardizing
-- `tmp/planning/global-architecture.md` only when the command uncovers durable cross-epic structure that belongs in the repo map, not epic specific
+- `planning/glossary.md` when codebase investigation reveals durable code names, sources, statuses, or terms worth standardizing
+- `planning/global-architecture.md` only when the command uncovers durable cross-epic structure that belongs in the repo map, not epic specific
 
 Notes:
 - In the normal epic pipeline, `a-architecture` is the first epic-specific command that may read the codebase.
@@ -127,34 +127,34 @@ Notes:
 Break down a single story into a detailed implementation plan and task list.
 
 Reads:
-- `tmp/planning/<epic-slug>/epic.md`
-- `tmp/planning/<epic-slug>/architecture.md`
-- `tmp/planning/<epic-slug>/personas.md`
-- `tmp/planning/glossary.md`
-- `tmp/planning/global-architecture.md`
+- `planning/<epic-slug>/epic.md`
+- `planning/<epic-slug>/architecture.md`
+- `planning/<epic-slug>/personas.md`
+- `planning/glossary.md`
+- `planning/global-architecture.md`
 - codebase (read-only)
 
 Writes:
-- `tmp/planning/<epic-slug>/story-<story-number>.md`
-- `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
+- `planning/<epic-slug>/story-<story-number>.md`
+- `planning/<epic-slug>/story-<story-number>-tasks.md`
 
 Edits:
-- `tmp/planning/<epic-slug>/epic.md` when detailed story work sharpens the story definition
-- `tmp/planning/<epic-slug>/architecture.md` when story-level investigation reveals architecture details that should be captured upstream
+- `planning/<epic-slug>/epic.md` when detailed story work sharpens the story definition
+- `planning/<epic-slug>/architecture.md` when story-level investigation reveals architecture details that should be captured upstream
 
 Updates:
-- `tmp/planning/glossary.md` when investigation reveals durable names or source mappings worth preserving
-- `tmp/planning/global-architecture.md` only when story work reveals durable cross-epic structure
+- `planning/glossary.md` when investigation reveals durable names or source mappings worth preserving
+- `planning/global-architecture.md` only when story work reveals durable cross-epic structure
 
 ### `/a-task <epic-slug> <story-number>-<task-number>`
 
 We're finally coding. Now we know what and how to build.
 
 Reads:
-- `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
-- `tmp/planning/<epic-slug>/architecture.md`
-- `tmp/planning/<epic-slug>/story-<story-number>.md` if needed
-- `tmp/planning/glossary.md`
+- `planning/<epic-slug>/story-<story-number>-tasks.md`
+- `planning/<epic-slug>/architecture.md`
+- `planning/<epic-slug>/story-<story-number>.md` if needed
+- `planning/glossary.md`
 - codebase
 
 Writes:
@@ -177,8 +177,8 @@ Writes:
 - the selected target planning artifact
 
 Updates:
-- `tmp/planning/glossary.md` only when the owner command for the selected artifact would have allowed a durable terminology update
-- `tmp/planning/global-architecture.md` only when the owner command for the selected artifact would have allowed a durable cross-epic update
+- `planning/glossary.md` only when the owner command for the selected artifact would have allowed a durable terminology update
+- `planning/global-architecture.md` only when the owner command for the selected artifact would have allowed a durable cross-epic update
 
 Notes:
 - `a-edit` is a feedback-driven companion command, not a new pipeline stage
@@ -195,20 +195,20 @@ All `a-` commands must follow these rules. Each command should inline the releva
 
 Each command declares a Pipeline I/O table in its header.
 
-`tmp/planning/glossary.md` is always available as `In/Out`, but it should only be updated when a command discovers a durable domain term worth standardizing.
+`planning/glossary.md` is always available as `In/Out`, but it should only be updated when a command discovers a durable domain term worth standardizing.
 
 ### Artifact Ownership And Promotion
 
 Every planning artifact has a primary owner command:
 
-- `a-global-architecture` owns `tmp/planning/global-architecture.md`
-- `a-global-architecture` owns `tmp/planning/glossary.md`
-- `a-epic` owns `tmp/planning/<epic-slug>/epic.md`
-- `a-epic` owns `tmp/planning/<epic-slug>/personas.md`
-- `a-epic` owns `tmp/planning/<epic-slug>/stretch-goals.md`
-- `a-architecture` owns `tmp/planning/<epic-slug>/architecture.md`
-- `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>.md`
-- `a-story` owns `tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
+- `a-global-architecture` owns `planning/global-architecture.md`
+- `a-global-architecture` owns `planning/glossary.md`
+- `a-epic` owns `planning/<epic-slug>/epic.md`
+- `a-epic` owns `planning/<epic-slug>/personas.md`
+- `a-epic` owns `planning/<epic-slug>/stretch-goals.md`
+- `a-architecture` owns `planning/<epic-slug>/architecture.md`
+- `a-story` owns `planning/<epic-slug>/story-<story-number>.md`
+- `a-story` owns `planning/<epic-slug>/story-<story-number>-tasks.md`
 - `a-task` owns code changes
 - `a-edit` owns no artifacts; it revises an existing artifact using its owner command's contract
 
@@ -248,12 +248,12 @@ Rules:
 - Avoid guesswork
 - Inferred models are hypotheses until validated
 - Existing code and stable project conventions beat prototype structure
-- `tmp/planning/global-architecture.md` is the source of truth for durable repo structure and communication paths, unless contradicted by the codebase (which of course is the ultimate source of truth, but not always available)
-- `tmp/planning/<epic-slug>/architecture.md` is the source of truth for epic-specific architecture decisions.
+- `planning/global-architecture.md` is the source of truth for durable repo structure and communication paths, unless contradicted by the codebase (which of course is the ultimate source of truth, but not always available)
+- `planning/<epic-slug>/architecture.md` is the source of truth for epic-specific architecture decisions.
 
 ### Global Architecture
 
-`tmp/planning/global-architecture.md` should stay lean and cross-epic.
+`planning/global-architecture.md` should stay lean and cross-epic.
 
 It may include:
 - stable modules, boundaries, and responsibilities
@@ -266,7 +266,7 @@ It must not accumulate:
 - story-specific design details
 - Assumptions of any type
 
-`tmp/planning/glossary.md` should stay domain-based and cross-epic.
+`planning/glossary.md` should stay domain-based and cross-epic.
 
 It may include:
 - stable domain terms
@@ -287,7 +287,7 @@ It must not accumulate:
 ### Scope Boundaries
 
 - No planning command before `a-task` may write or modify application code.
-- No planning artifact may be written outside `tmp/planning/`.
+- No planning artifact may be written outside `planning/`.
 - `a-task` is the only command that may write to the codebase.
 - `a-task` may run only after the user has approved the relevant planning artifacts.
 - Never propose extractions for hypothetical future use (YAGNI).

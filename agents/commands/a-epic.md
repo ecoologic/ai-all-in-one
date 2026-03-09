@@ -17,12 +17,12 @@ Next: `/a-architecture`
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./tmp/planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
-| **In/Out** | `./tmp/planning/glossary.md` | Shared domain glossary created by `/a-global-architecture` |
-| **In** | `./tmp/planning/global-architecture.md` | Shared repo-wide context created by `/a-global-architecture` |
-| **Out** | `./tmp/planning/<epic-slug>/epic.md` | Structured now-work story list plus epic-level ERD, requirements, UX framing, and UI references for later stages |
-| **Out** | `./tmp/planning/<epic-slug>/personas.md` | Personas, actors, and usage context for later stages |
-| **Out** | `./tmp/planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path |
+| **In** | `./planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
+| **In/Out** | `./planning/glossary.md` | Shared domain glossary created by `/a-global-architecture` |
+| **In** | `./planning/global-architecture.md` | Shared repo-wide context created by `/a-global-architecture` |
+| **Out** | `./planning/<epic-slug>/epic.md` | Structured now-work story list plus epic-level ERD, requirements, UX framing, and UI references for later stages |
+| **Out** | `./planning/<epic-slug>/personas.md` | Personas, actors, and usage context for later stages |
+| **Out** | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path |
 
 ## Skills
 
@@ -42,7 +42,7 @@ This command produces planning artifacts only. It must not investigate the codeb
 
 ## Rules
 
-- NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
+- NEVER write or modify application code, create commits, or write files outside `./planning/`
 - NEVER investigate the codebase for this step; rely on `idea.md` and its referenced product artifacts only
 - NEVER define synonyms; if a term exists in the glossary, use its exact term everywhere
 - NEVER abbreviate new names
@@ -108,8 +108,8 @@ When several reasonable splits exist, prefer the smallest user-visible slice and
 ## Step 0: Load glossary
 
 Read:
-- `./tmp/planning/glossary.md`
-- `./tmp/planning/global-architecture.md`
+- `./planning/glossary.md`
+- `./planning/global-architecture.md`
 
 Use the glossary terms consistently. Never introduce an alternative name for an existing concept.
 
@@ -121,7 +121,7 @@ If either shared file is missing, stop and tell the user to run `/a-global-archi
 
 If `<epic-slug>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
 
-Read `./tmp/planning/<epic-slug>/idea.md`.
+Read `./planning/<epic-slug>/idea.md`.
 
 If `idea.md` does not exist, report the exact path checked and stop. Do not fall back to another file or prompt mode.
 
@@ -139,7 +139,7 @@ UI references found: <list or none>
 
 ## Step 2: Create personas
 
-Derive the actors and usage contexts needed to reason about the epic. Write `./tmp/planning/<epic-slug>/personas.md`.
+Derive the actors and usage contexts needed to reason about the epic. Write `./planning/<epic-slug>/personas.md`.
 
 Use this structure:
 
@@ -191,7 +191,7 @@ Treat `Nice to have` stories as stretch goals. Do not include them in the main s
 
 ## Step 5: Write `epic.md`
 
-Write `./tmp/planning/<epic-slug>/epic.md` with this structure:
+Write `./planning/<epic-slug>/epic.md` with this structure:
 
 ```md
 # <Epic Name> (<epic-slug>)
@@ -247,7 +247,7 @@ When UI references exist, include all of them in `epic.md`, even if only some st
 
 ## Step 6: Write `stretch-goals.md`
 
-Write `./tmp/planning/<epic-slug>/stretch-goals.md` with this structure:
+Write `./planning/<epic-slug>/stretch-goals.md` with this structure:
 
 ```md
 # <Epic Name> Stretch Goals
@@ -281,7 +281,7 @@ If there are no stretch goals, still create the file and say so clearly.
 
 ## Step 7: Update glossary
 
-If this step reveals durable product terms that later stages must reuse, update `./tmp/planning/glossary.md`.
+If this step reveals durable product terms that later stages must reuse, update `./planning/glossary.md`.
 
 Rules:
 - never remove entries
@@ -304,9 +304,9 @@ Ask the user to review and approve before moving to `/a-architecture`.
 
 ## Success Criteria
 
-- [ ] `epic.md` exists at `./tmp/planning/<epic-slug>/epic.md`
-- [ ] `personas.md` exists at `./tmp/planning/<epic-slug>/personas.md`
-- [ ] `stretch-goals.md` exists at `./tmp/planning/<epic-slug>/stretch-goals.md`
+- [ ] `epic.md` exists at `./planning/<epic-slug>/epic.md`
+- [ ] `personas.md` exists at `./planning/<epic-slug>/personas.md`
+- [ ] `stretch-goals.md` exists at `./planning/<epic-slug>/stretch-goals.md`
 - [ ] all required inputs and followed references were validated before planning continued
 - [ ] every story uses canonical _As a / I want / so that_ format
 - [ ] every story has numbered acceptance criteria in _Given / When / Then_ form
@@ -314,7 +314,7 @@ Ask the user to review and approve before moving to `/a-architecture`.
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
 - [ ] `Nice to have` stories, if any, were written only to `stretch-goals.md`
 - [ ] UI-facing references from the inputs were preserved in `epic.md`, or `- None` was written explicitly
-- [ ] any durable new terms were added to `./tmp/planning/glossary.md`
+- [ ] any durable new terms were added to `./planning/glossary.md`
 - [ ] no synonyms were introduced
 - [ ] the user reviewed the output before the pipeline advanced
 

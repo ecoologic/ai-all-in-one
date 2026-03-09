@@ -4,7 +4,7 @@
 
 `a-task` (and any steps after it) may discover bugs in code **we wrote** (i.e. code produced by earlier `a-task` runs in the same or a previous epic). Ignore issues from features not yet implemented.
 
-When a bug is found, append it to `./tmp/planning/<epic-slug>/qa-ideas.md`:
+When a bug is found, append it to `./planning/<epic-slug>/qa-ideas.md`:
 
 ```markdown
 - [ ] **<short title>** — <description of the bug and where it was found> (`<file-path>:<line>`)

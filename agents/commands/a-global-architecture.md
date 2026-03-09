@@ -17,8 +17,8 @@ a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-task(s)
 | --------- | ---- | ----------- |
 | **In** | codebase | Read-only repo structure, conventions, modules, contracts, and domain language |
 | **In** | durable repo docs | Product docs, architecture docs, ADRs, README files, and stable references |
-| **Out** | `./tmp/planning/global-architecture.md` | Lean cross-epic map of major system areas, boundaries, and communication paths |
-| **Out** | `./tmp/planning/glossary.md` | Shared domain glossary with canonical names, code names, sources, and statuses |
+| **Out** | `./planning/global-architecture.md` | Lean cross-epic map of major system areas, boundaries, and communication paths |
+| **Out** | `./planning/glossary.md` | Shared domain glossary with canonical names, code names, sources, and statuses |
 
 ## Purpose
 
@@ -73,7 +73,7 @@ Use targeted exploration with parallel agents when helpful, but keep the result 
 
 ## Step 2: Build the glossary
 
-Write `./tmp/planning/glossary.md` as the canonical shared naming artifact.
+Write `./planning/glossary.md` as the canonical shared naming artifact.
 
 Use this structure:
 
@@ -97,7 +97,7 @@ Only include durable terms that later planning and implementation work should in
 
 ## Step 3: Build the global architecture map
 
-Write `./tmp/planning/global-architecture.md` as a lean cross-epic map.
+Write `./planning/global-architecture.md` as a lean cross-epic map.
 
 Use this structure:
 
@@ -173,8 +173,8 @@ Ask the user to review before epic-specific planning begins.
 
 ## Success Criteria
 
-- [ ] `./tmp/planning/global-architecture.md` exists
-- [ ] `./tmp/planning/glossary.md` exists
+- [ ] `./planning/global-architecture.md` exists
+- [ ] `./planning/glossary.md` exists
 - [ ] all required inputs and followed references were validated before synthesis continued
 - [ ] the architecture file is lean and cross-epic
 - [ ] the architecture file contains a clear `Code Reuse Surface` section

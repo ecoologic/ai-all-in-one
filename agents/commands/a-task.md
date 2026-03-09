@@ -17,11 +17,11 @@ Next: user review, then another `/a-task` if needed
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list produced by `/a-story` |
-| **In** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture and constraints |
-| **In** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story context and story-level UI references when the task list alone is not enough |
-| **In/Out** | `./tmp/planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
-| **Conditional In/Out** | `./tmp/planning/global-architecture.md` | Read and update only when implementation reveals durable cross-epic structure |
+| **In** | `./planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list produced by `/a-story` |
+| **In** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture and constraints |
+| **In** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story context and story-level UI references when the task list alone is not enough |
+| **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
+| **Conditional In/Out** | `./planning/global-architecture.md` | Read and update only when implementation reveals durable cross-epic structure |
 | **Out** | codebase | Code changes, tests, and other implementation artifacts required by the selected task |
 
 ## Skills
@@ -71,11 +71,11 @@ Derive:
 - `<task-number>` from the part after the hyphen
 
 Read:
-- `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md`
-- `./tmp/planning/<epic-slug>/architecture.md`
-- `./tmp/planning/glossary.md`
+- `./planning/<epic-slug>/story-<story-number>-tasks.md`
+- `./planning/<epic-slug>/architecture.md`
+- `./planning/glossary.md`
 
-Read `./tmp/planning/<epic-slug>/story-<story-number>.md` if any of these are true:
+Read `./planning/<epic-slug>/story-<story-number>.md` if any of these are true:
 - the task description is too brief to understand the user-facing outcome
 - the task acceptance criteria refer to UX or flows not fully described in the task file
 - the task changes UI, interaction behavior, or presentation details
@@ -204,9 +204,9 @@ If no automated validation exists, say so explicitly and perform a manual accept
 Update planning artifacts only when implementation reveals durable knowledge worth preserving for later work.
 
 Allowed updates:
-- update `./tmp/planning/<epic-slug>/architecture.md` when implementation reveals epic-specific technical truth that later tasks should inherit
-- update `./tmp/planning/glossary.md` when a durable domain term, code name, source, or status is confirmed
-- update `./tmp/planning/global-architecture.md` only when implementation reveals durable cross-epic structure, boundaries, contracts, or communication paths
+- update `./planning/<epic-slug>/architecture.md` when implementation reveals epic-specific technical truth that later tasks should inherit
+- update `./planning/glossary.md` when a durable domain term, code name, source, or status is confirmed
+- update `./planning/global-architecture.md` only when implementation reveals durable cross-epic structure, boundaries, contracts, or communication paths
 
 Do not:
 - push temporary debugging notes into planning artifacts

@@ -16,12 +16,12 @@ a-epic -> a-architecture -> a-story(s) -> a-task(s)
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./tmp/planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
-| **In** | `./tmp/planning/<epic-slug>/epic.md` | Story list from `/a-epic` |
-| **In** | `./tmp/planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
-| **In/Out** | `./tmp/planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
-| **In/Out** | `./tmp/planning/global-architecture.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure |
-| **Out** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping |
+| **In** | `./planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
+| **In** | `./planning/<epic-slug>/epic.md` | Story list from `/a-epic` |
+| **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
+| **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
+| **In/Out** | `./planning/global-architecture.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure |
+| **Out** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping |
 
 ## Purpose
 
@@ -46,7 +46,7 @@ Use these skills when relevant:
 
 ## Rules
 
-- NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
+- NEVER write or modify application code, create commits, or write files outside `./planning/`
 - NEVER start with broad codebase exploration before understanding the epic inputs
 - NEVER silently trust a prototype or UI-shaped data model
 - NEVER define synonyms; glossary terms stay canonical unless the user explicitly approves a rename
@@ -62,11 +62,11 @@ Use these skills when relevant:
 If `<epic-slug>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
 
 Read:
-- `./tmp/planning/<epic-slug>/idea.md`
-- `./tmp/planning/<epic-slug>/epic.md`
-- `./tmp/planning/<epic-slug>/personas.md`
-- `./tmp/planning/glossary.md`
-- `./tmp/planning/global-architecture.md`
+- `./planning/<epic-slug>/idea.md`
+- `./planning/<epic-slug>/epic.md`
+- `./planning/<epic-slug>/personas.md`
+- `./planning/glossary.md`
+- `./planning/global-architecture.md`
 
 If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact missing path. The expected producer is `/a-epic`.
 
@@ -114,7 +114,7 @@ If a contradiction materially changes the architecture recommendation, ask the u
 
 ## Step 3: Load shared repo context
 
-Read `./tmp/planning/global-architecture.md` and use it to narrow exploration.
+Read `./planning/global-architecture.md` and use it to narrow exploration.
 
 If it is stale or too weak:
 - do targeted structural exploration or invoke `architecture-blueprint-generator`
@@ -233,14 +233,14 @@ List every new or modified artifact that later story and task work will depend o
 
 ## Step 8: Write `architecture.md`
 
-Write `./tmp/planning/<epic-slug>/architecture.md` with this structure:
+Write `./planning/<epic-slug>/architecture.md` with this structure:
 
 ```md
 # <Epic Name> — Architecture
 > Epic: <epic-slug>
 > Generated: <date>
-> Stories: `./tmp/planning/<epic-slug>/epic.md`
-> Personas: `./tmp/planning/<epic-slug>/personas.md`
+> Stories: `./planning/<epic-slug>/epic.md`
+> Personas: `./planning/<epic-slug>/personas.md`
 
 ## Epic Summary
 ## Input Review
@@ -289,7 +289,7 @@ List contradictions, missing inputs, and weak assumptions explicitly. Discuss th
 
 ### 9a. Update glossary
 
-Update `./tmp/planning/glossary.md` in this command when the findings are durable and safe:
+Update `./planning/glossary.md` in this command when the findings are durable and safe:
 - add new terms
 - enrich existing rows with confirmed code names, sources, or statuses
 
@@ -300,7 +300,7 @@ Do not:
 
 ### 9b. Update global architecture
 
-Update `./tmp/planning/global-architecture.md` only with durable cross-epic structure such as:
+Update `./planning/global-architecture.md` only with durable cross-epic structure such as:
 - stable modules and boundaries
 - major responsibilities
 - communication paths

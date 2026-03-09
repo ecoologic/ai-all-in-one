@@ -17,13 +17,13 @@ Next: `/a-task` consumes the task list produced by this command
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./tmp/planning/<epic-slug>/epic.md` | User stories and epic-level UI references from `/a-epic` |
-| **In** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture` |
-| **In** | `./tmp/planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
-| **In/Out** | `./tmp/planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
-| **In/Out** | `./tmp/planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
-| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-relevant UI references |
-| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list that `/a-task` reads |
+| **In** | `./planning/<epic-slug>/epic.md` | User stories and epic-level UI references from `/a-epic` |
+| **In** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture` |
+| **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
+| **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
+| **In/Out** | `./planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
+| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-relevant UI references |
+| **Out** | `./planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list that `/a-task` reads |
 
 ## Skills
 
@@ -43,7 +43,7 @@ Break one story into a concrete, code-informed implementation plan without writi
 
 ## Rules
 
-- NEVER write or modify application code, create commits, or write files outside `./tmp/planning/`
+- NEVER write or modify application code, create commits, or write files outside `./planning/`
 - NEVER skip codebase investigation; task planning must be grounded in the real codebase
 - NEVER define synonyms; if a term exists in the glossary, use its canonical name
 - NEVER abbreviate new names
@@ -58,11 +58,11 @@ Break one story into a concrete, code-informed implementation plan without writi
 If either `<epic-slug>` or `<story-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
 
 Read:
-- `./tmp/planning/<epic-slug>/epic.md`
-- `./tmp/planning/<epic-slug>/architecture.md`
-- `./tmp/planning/<epic-slug>/personas.md`
-- `./tmp/planning/glossary.md`
-- `./tmp/planning/global-architecture.md`
+- `./planning/<epic-slug>/epic.md`
+- `./planning/<epic-slug>/architecture.md`
+- `./planning/<epic-slug>/personas.md`
+- `./planning/glossary.md`
+- `./planning/global-architecture.md`
 
 If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
@@ -168,14 +168,14 @@ Summarize every such update in the output.
 
 ## Step 7: Write `story-<story-number>.md`
 
-Write `./tmp/planning/<epic-slug>/story-<story-number>.md` with this structure:
+Write `./planning/<epic-slug>/story-<story-number>.md` with this structure:
 
 ```md
 # Story <story-number>: <title>
 
 > Epic: <epic name>
 > Generated: <date>
-> Source Story: `./tmp/planning/<epic-slug>/epic.md`
+> Source Story: `./planning/<epic-slug>/epic.md`
 
 _As a_ [role], _I want_ [action], _so that_ [benefit].
 
@@ -229,13 +229,13 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - ...
 
 ## References
-- `./tmp/planning/<epic-slug>/architecture.md`
-- `./tmp/planning/global-architecture.md`
+- `./planning/<epic-slug>/architecture.md`
+- `./planning/global-architecture.md`
 ```
 
 ## Step 8: Write `story-<story-number>-tasks.md`
 
-Write `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` as the single source of truth for `/a-task`.
+Write `./planning/<epic-slug>/story-<story-number>-tasks.md` as the single source of truth for `/a-task`.
 
 Use this structure:
 
@@ -243,7 +243,7 @@ Use this structure:
 # Story <story-number> Tasks: <title>
 
 > Epic: <epic name>
-> Story: `./tmp/planning/<epic-slug>/story-<story-number>.md`
+> Story: `./planning/<epic-slug>/story-<story-number>.md`
 > Generated: <date>
 
 ## Task 1: <imperative title>
