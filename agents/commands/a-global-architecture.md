@@ -52,6 +52,10 @@ Use these skills when relevant:
 
 ## Step 1: Explore the repo-wide structure
 
+Before synthesizing the shared map, assemble the stable repo docs and specs you will rely on for this run, such as `README.md`, ADRs, architecture docs, integration specs, or machine-readable contracts.
+
+Treat each selected doc or spec, and each followed reference from it, as required input for this run. If any selected input or followed reference cannot be found, accessed, or read, stop and report the exact path or reference instead of skipping it.
+
 Inspect the codebase and stable docs to identify:
 - major apps, services, packages, and modules
 - shared or common reuse areas, including packages and reusable folders
@@ -59,6 +63,8 @@ Inspect the codebase and stable docs to identify:
 - responsibilities and ownership boundaries
 - communication paths between major parts
 - stable integrations and infrastructure touchpoints
+- OpenAPI files, generated API clients, and other machine-readable API contracts
+- external API integrations and the durable docs or specs that describe them
 - durable shared contracts
 - whether shared building blocks live in packages, folders, or both
 - cross-epic domain language already present in docs or code
@@ -147,6 +153,8 @@ If reusable code lives in general folders instead of packages, name those folder
 
 The `Code Reuse Surface` section must be easy to scan and must explicitly list the most reusable folders or packages in the repo, not just describe reuse abstractly.
 
+If the repo contains OpenAPI files, generated clients, or integrations to external APIs, call them out in `Stable Contracts And Integrations` and include the relevant source docs or specs in `References`.
+
 Do not include:
 - current epic goals
 - story-specific design detail
@@ -167,16 +175,20 @@ Ask the user to review before epic-specific planning begins.
 
 - [ ] `./tmp/planning/global-architecture.md` exists
 - [ ] `./tmp/planning/glossary.md` exists
+- [ ] all required inputs and followed references were validated before synthesis continued
 - [ ] the architecture file is lean and cross-epic
 - [ ] the architecture file contains a clear `Code Reuse Surface` section
 - [ ] reusable areas such as a `common` package or reusable folders are explicit when they exist
 - [ ] common reusable folders such as `types/`, `components/`, `utils/`, or equivalents are listed when they exist
+- [ ] OpenAPI files and external API integrations are named when they exist
+- [ ] relevant API docs or specs are linked in `References` when those contracts or integrations exist
 - [ ] the glossary is domain-based and canonical
 - [ ] no synonyms were introduced
 - [ ] the user reviewed the shared artifacts before moving on
 
 ## Error Handling
 
+- **Missing or unreadable required input or followed reference** — report the exact path or reference and stop instead of skipping it
 - **No meaningful codebase structure found** — say so explicitly and produce the leanest truthful map possible
 - **Naming conflicts found** — record them as conflicts or rename requests instead of choosing silently
 - **Docs and code disagree** — prefer the codebase, record the disagreement, and surface it to the user

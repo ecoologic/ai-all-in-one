@@ -17,12 +17,12 @@ Next: `/a-task` consumes the task list produced by this command
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./tmp/planning/<epic-slug>/epic.md` | User stories from `/a-epic` |
+| **In** | `./tmp/planning/<epic-slug>/epic.md` | User stories and epic-level UI references from `/a-epic` |
 | **In** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture` |
 | **In** | `./tmp/planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./tmp/planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
 | **In/Out** | `./tmp/planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
-| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story |
+| **Out** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-relevant UI references |
 | **Out** | `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list that `/a-task` reads |
 
 ## Skills
@@ -55,6 +55,8 @@ Break one story into a concrete, code-informed implementation plan without writi
 
 `$ARGUMENTS` = `<epic-slug> <story-number>`
 
+If either `<epic-slug>` or `<story-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
+
 Read:
 - `./tmp/planning/<epic-slug>/epic.md`
 - `./tmp/planning/<epic-slug>/architecture.md`
@@ -66,14 +68,23 @@ If `glossary.md` or `global-architecture.md` is missing, stop and tell the user 
 
 If `epic.md`, `architecture.md`, or `personas.md` is missing, stop and report the exact path checked.
 
+Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
+
+When `epic.md` contains a `UI References` section, treat those references as required input for this run. Read and follow them before planning any story that has UI or depends on UI behavior.
+
 Extract the requested story section from `epic.md`. The story context includes:
 - title
 - canonical story statement
+- user context
 - acceptance criteria
-- fields
+- dependencies
+
+Also extract the epic-level sections from `epic.md` that apply across stories:
+- draft ERD
 - requirements
 - UX considerations
-- dependencies
+- UI references
+- references
 
 Output:
 ```text
@@ -81,7 +92,9 @@ Story: <title>
 Epic: <epic name>
 Architecture: loaded
 Personas: loaded
+Epic-level context: loaded
 Has UI: <yes | no>
+UI references: <list or none>
 ```
 
 ## Step 2: Investigate the codebase
@@ -121,6 +134,8 @@ If the story has UI, use `ux-laws` and define:
 - states
 - feedback
 - accessibility requirements
+
+Use the followed UI references to ground those decisions. Do not invent UI behavior that contradicts the referenced design artifacts unless the conflict is surfaced explicitly.
 
 If there is no UI, explicitly note that UX/UI sections are skipped.
 
@@ -202,6 +217,10 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 ### Component Hierarchy
 - ...
 
+## UI References
+- Story-relevant subset of the epic-level UI references, plus any story-local UI references followed during this run
+- If none exist, write `- None`
+
 ## Extractions
 | What | From/Why | Target Location | Blocks Story? |
 | ---- | -------- | --------------- | ------------- |
@@ -270,8 +289,10 @@ Ask the user to review before moving to `/a-task`.
 
 - [ ] `story-<story-number>.md` exists
 - [ ] `story-<story-number>-tasks.md` exists
+- [ ] all required inputs and followed references were validated before story planning continued
 - [ ] every task has type, files, dependencies, description, and acceptance criteria
 - [ ] task ordering is explicit
+- [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.md`
 - [ ] the user reviewed the output before the pipeline advanced
@@ -282,4 +303,5 @@ Ask the user to review before moving to `/a-task`.
 - **Story not found in `epic.md`** — list available story numbers and ask the user to pick one
 - **Missing shared repo files** — tell the user to run `/a-global-architecture` first
 - **Missing epic-specific files** — report the exact missing path and tell the user which earlier command to run
+- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **No relevant code found** — say so explicitly and treat the story as a greenfield area while still following project-wide patterns

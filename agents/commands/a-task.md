@@ -19,7 +19,7 @@ Next: user review, then another `/a-task` if needed
 | --------- | ---- | ----------- |
 | **In** | `./tmp/planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list produced by `/a-story` |
 | **In** | `./tmp/planning/<epic-slug>/architecture.md` | Epic-specific architecture and constraints |
-| **In** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story context when the task list alone is not enough |
+| **In** | `./tmp/planning/<epic-slug>/story-<story-number>.md` | Detailed story context and story-level UI references when the task list alone is not enough |
 | **In/Out** | `./tmp/planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
 | **Conditional In/Out** | `./tmp/planning/global-architecture.md` | Read and update only when implementation reveals durable cross-epic structure |
 | **Out** | codebase | Code changes, tests, and other implementation artifacts required by the selected task |
@@ -64,6 +64,8 @@ This command should:
 
 `$ARGUMENTS` = `<epic-slug> <story-number>-<task-number>`
 
+If either `<epic-slug>` or `<story-number>-<task-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
+
 Derive:
 - `<story-number>` from the part before the hyphen
 - `<task-number>` from the part after the hyphen
@@ -76,11 +78,16 @@ Read:
 Read `./tmp/planning/<epic-slug>/story-<story-number>.md` if any of these are true:
 - the task description is too brief to understand the user-facing outcome
 - the task acceptance criteria refer to UX or flows not fully described in the task file
+- the task changes UI, interaction behavior, or presentation details
 - the architecture file references story-local constraints that need clarification
 
 If `story-<story-number>-tasks.md` or `architecture.md` is missing, report the exact path checked and stop.
 
 If `glossary.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+
+Also follow references from every planning artifact read in this step, including `story-<story-number>.md` when it is loaded. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
+
+When `story-<story-number>.md` is loaded and contains a `UI References` section, treat those references as required input for this task. Read and follow them before implementing UI behavior.
 
 Extract the requested task section from `story-<story-number>-tasks.md`:
 - task title
@@ -99,6 +106,7 @@ Files: <list>
 Depends on: <none | task ids>
 Architecture: loaded
 Story context: <loaded | skipped>
+UI references: <loaded | not needed>
 ```
 
 If the task is not found, list the available task ids from the file and stop.
@@ -223,10 +231,12 @@ Ask the user to review the implementation before running another `/a-task`.
 ## Success Criteria
 
 - [ ] the selected task was located from `story-<story-number>-tasks.md`
+- [ ] all required inputs and followed references were validated before implementation continued
 - [ ] only the selected task's scope was implemented
 - [ ] changed files follow existing local patterns and canonical glossary naming
 - [ ] focused validation ran, or the lack of automation was explained explicitly
 - [ ] relevant tests were added or updated when a matching test pattern exists
+- [ ] relevant UI references were loaded before implementing UI behavior
 - [ ] any durable glossary or architecture updates were applied deliberately
 - [ ] the user reviewed the result before the pipeline advanced
 
@@ -237,6 +247,7 @@ Ask the user to review the implementation before running another `/a-task`.
 - **Missing `story-<story-number>-tasks.md`** — report the exact path checked and tell the user to run `/a-story <epic-slug> <story-number>`
 - **Missing `architecture.md`** — report the exact path checked and tell the user to run `/a-architecture <epic-slug>`
 - **Missing `glossary.md`** — tell the user to run `/a-global-architecture` first
+- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **Task not found** — list available task ids from the tasks file and ask the user to pick one
 - **Unsatisfied dependency** — report the dependency and stop before editing code
 - **Task/architecture/codebase conflict** — surface the conflict clearly and ask the user before widening scope

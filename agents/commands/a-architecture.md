@@ -59,6 +59,8 @@ Use these skills when relevant:
 
 `$ARGUMENTS` = `<epic-slug>`
 
+If `<epic-slug>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
+
 Read:
 - `./tmp/planning/<epic-slug>/idea.md`
 - `./tmp/planning/<epic-slug>/epic.md`
@@ -70,7 +72,7 @@ If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact 
 
 If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Keep an explicit list of what was read.
+Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep an explicit list of what was read.
 
 Extract:
 - epic name and slug
@@ -219,9 +221,13 @@ After critique and codebase comparison, propose the model that should guide this
 
 ### 7d. Key flow diagrams
 
-Include at least one sequence diagram for a key story flow.
+Rules:
+- cover the whole epic through its major user and system interactions
+- include more than one sequence diagram when a single flow cannot represent the epic clearly
+- map each sequence diagram back to the relevant stories
+- show the main actors, system boundaries, and handoffs
 
-### 7e. Change inventory
+### 7f. Change inventory
 
 List every new or modified artifact that later story and task work will depend on.
 
@@ -238,18 +244,17 @@ Write `./tmp/planning/<epic-slug>/architecture.md` with this structure:
 
 ## Epic Summary
 ## Input Review
-### Input Files
-### Referenced Artifacts
 ### Input Conflicts and Gaps
+
+List contradictions, missing inputs, and weak assumptions explicitly. Discuss these items with the user before finalizing the architecture.
 
 ## Terminology
 | Domain Term | Code Name | Definition | Source | Status |
 
-### Intended User Flows
 ### Key Domain Concepts
-### System Areas Likely Involved
 
 ## Current System Landscape
+
 ### <system area>
 ### Communication Paths and Boundaries
 
@@ -260,10 +265,10 @@ Write `./tmp/planning/<epic-slug>/architecture.md` with this structure:
 | Area | What Exists | What Changes | Decision | Rationale |
 
 ## Diagrams and Model Review
-### Inferred ERD from Inputs
-### Architectural Critique of the Inferred ERD
+
 ### Recommended Domain Model
-### Key Flows
+### Epic Class Diagram
+### Epic Sequence Diagrams
 
 ## Change Inventory
 | Type | Name | Action | Story | Details |
@@ -323,18 +328,25 @@ Ask the user to review and approve before moving to `/a-story`.
 ## Success Criteria
 
 - [ ] `architecture.md` exists with the required sections
+- [ ] all required inputs and followed references were validated before architecture work continued
 - [ ] every story appears in Story Mapping and Change Inventory
 - [ ] the inferred ERD is included or explicitly unavailable
 - [ ] the inferred ERD is criticized, not just described
 - [ ] the recommended domain model is explicit
+- [ ] the epic-wide class diagram is included
+- [ ] the epic-wide sequence diagrams are included
 - [ ] any safe durable glossary updates were applied
 - [ ] any `global-architecture.md` updates are lean and cross-epic
 - [ ] the user reviewed the result before the pipeline advanced
 
 ## Error Handling
 
+- **Empty arguments** — ask the user to provide `<epic-slug>` and stop
 - **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
-- **Missing or weak `global-architecture.md`** — continue, perform minimal structural mapping, and keep the shared file lean
+- **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`
+- **Missing `glossary.md` or `global-architecture.md`** — stop and tell the user to run `/a-global-architecture`
+- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
+- **Weak `global-architecture.md`** — continue, perform targeted structural mapping, and keep the shared file lean
 - **Empty or new codebase** — say so explicitly and focus on greenfield decisions
 - **Inputs too weak for an ERD** — record the gap instead of fabricating certainty
 - **Conflicting input artifacts** — surface the conflict and ask the user before finalizing
