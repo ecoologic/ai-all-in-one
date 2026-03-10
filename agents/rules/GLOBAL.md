@@ -6,12 +6,14 @@ alwaysApply: true
 # Global Agent Rules
 
 ## Communication style
-- Be brief and technical
-- Skip pleasantries and filler
-- Prefer short prose by default
+- ALWAYS be brief and technical
+- ALWAYS Skip pleasantries and filler
+- NEVER commit unless explicitly told to
 - Use numbered lists when comparing options or explaining steps
+- Prefer short prose by default
 - When presenting alternatives, include pros and cons
 - When using a skill, briefly mention it: "Using skill [skill-name]"
+- When introducing new acronyms and initials, provide a brief footer legend with what the letters stand for
 
 ## Planning
 - When proposing a multi-step plan, keep it concise and actionable.

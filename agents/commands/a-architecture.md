@@ -8,7 +8,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 Pipeline position:
 ```text
-a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
            ^current
 ```
 
@@ -271,7 +271,7 @@ Rules:
 
 ### 7f. Change inventory
 
-List every new or modified artifact that later story and task work will depend on.
+List every new or modified artifact that later story and criterion work will depend on.
 
 ## Step 8: Write `architecture.md`
 

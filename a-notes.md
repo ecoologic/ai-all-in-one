@@ -2,7 +2,7 @@
 
 ### QA ideas
 
-`a-task` (and any steps after it) may discover bugs in code **we wrote** (i.e. code produced by earlier `a-task` runs in the same or a previous epic). Ignore issues from features not yet implemented.
+`a-criterion` (and any steps after it) may discover bugs in code **we wrote** (i.e. code produced by earlier `a-criterion` runs in the same or a previous epic). Ignore issues from features not yet implemented.
 
 When a bug is found, append it to `./planning/<epic-slug>/qa-ideas.md`:
 

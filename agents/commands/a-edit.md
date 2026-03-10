@@ -8,7 +8,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 
 This command revises an existing planning artifact after user feedback:
 ```text
-a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                     \______________________________________________/
                                   a-edit can revisit any planning artifact
 ```
@@ -38,14 +38,13 @@ Use this command to correct or refine an artifact that already exists. Do not re
 | `stretch-goals`       | `<epic-slug>`                | `/a-epic`                | `./planning/<epic-slug>/stretch-goals.md`              |
 | `architecture`        | `<epic-slug>`                | `/a-architecture`        | `./planning/<epic-slug>/architecture.md`               |
 | `story`               | `<epic-slug> <story-number>` | `/a-story`               | `./planning/<epic-slug>/story-<story-number>.md`       |
-| `story-tasks`         | `<epic-slug> <story-number>` | `/a-story`               | `./planning/<epic-slug>/story-<story-number>-tasks.md` |
 
 ## Skills
 
 Invoke the same skills the owner command would have used when the revision touches the same concerns.
 
 Common examples:
-- `explore` for targeted codebase investigation when revising `architecture`, `story`, or `story-tasks`
+- `explore` for targeted codebase investigation when revising `architecture` or `story`
 - `ux-laws` when revising user-facing story or epic framing
 - `react-best-practices` and `typescript-best-practices` only when the owner contract requires code-informed UI investigation
 - `mermaid-diagrams` when a diagram change materially improves the revised artifact
@@ -72,6 +71,7 @@ This command should:
 - NEVER write or modify application code
 - NEVER write files outside `./planning/`
 - NEVER widen scope into unrelated cleanup or speculative improvements
+- For `story`, acceptance-criterion and implementation-task revisions still target the single `story-<story-number>.md` artifact
 - Preserve still-correct content; revise only the sections needed to address the feedback
 - If the requested change implies broader planning drift, summarize the affected artifacts and suggest reruns instead of silently rewriting everything
 - Allow glossary or global-architecture promotion updates only when the owner command for the target artifact would have allowed them
@@ -97,11 +97,10 @@ Resolve target context in this precedence order:
 Use the visible artifact to fill in omitted target details only when that fill is unambiguous. Examples:
 - infer `epic data-partners` from an open file at `./planning/data-partners/epic.md`
 - infer `story data-partners 7` from an open file at `./planning/data-partners/story-7.md`
-- infer `story-tasks data-partners 7` from an open file at `./planning/data-partners/story-7-tasks.md`
 
 Examples:
 - `/a-edit architecture billing-reconciliation "You missed the webhook retry flow"`
-- `/a-edit story billing-reconciliation 2 "The acceptance criteria do not cover authorization failures"`
+- `/a-edit story billing-reconciliation 2 "Acceptance criterion 2 does not cover authorization failures"`
 - `/a-edit glossary "Use Subscription, not Plan, for the billing object"`
 - `/a-edit epic "Split billing and activity into separate stories"` while `./planning/data-partners/epic.md` is open
 
@@ -176,7 +175,7 @@ Minimum required inputs by target:
   - `./planning/glossary.md`
   - `./planning/global-architecture.md`
   - targeted codebase areas needed to validate the feedback
-- `story` or `story-tasks`
+- `story`
   - `./planning/<epic-slug>/epic.md`
   - `./planning/<epic-slug>/architecture.md`
   - `./planning/<epic-slug>/personas.md`
@@ -235,12 +234,11 @@ After editing, determine which downstream artifacts may now be stale.
 Use these defaults unless the specific change proves otherwise:
 - editing `global-architecture.md` may affect every epic-specific artifact
 - editing `glossary.md` may affect every artifact that uses the renamed or corrected term
-- editing `epic.md` may affect `personas.md`, `architecture.md`, `story-*.md`, and `story-*-tasks.md` for that epic
-- editing `personas.md` may affect `architecture.md`, `story-*.md`, and `story-*-tasks.md` for that epic
+- editing `epic.md` may affect `personas.md`, `architecture.md`, and `story-*.md` for that epic
+- editing `personas.md` may affect `architecture.md` and `story-*.md` for that epic
 - editing `stretch-goals.md` usually has no downstream effect on the active pipeline unless a now-work vs later-work boundary changed
-- editing `architecture.md` may affect `story-*.md`, `story-*-tasks.md`, and future `/a-task` runs for that epic
-- editing `story-<story-number>.md` may affect `story-<story-number>-tasks.md` and related `/a-task` runs
-- editing `story-<story-number>-tasks.md` may affect future `/a-task` runs for that story
+- editing `architecture.md` may affect `story-*.md` and future `/a-criterion` runs for that epic
+- editing `story-<story-number>.md` may affect future `/a-criterion` runs for that story
 
 Do not silently rewrite those downstream artifacts in the same run unless the owner rules explicitly require a minimal promotion update.
 

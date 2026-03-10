@@ -7,7 +7,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 This command creates and maintains the shared planning context used by all epic-specific commands:
 ```text
-a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 ^current
 ```
 

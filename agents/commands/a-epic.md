@@ -8,7 +8,7 @@ allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 
 This command is a single step of a longer pipeline:
 ```text
-a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 ^current
 ```
 Next: `/a-architecture`

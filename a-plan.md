@@ -11,12 +11,12 @@
 
 ## Goal
 
-Create a set of `a-` commands that progressively turn an idea into small implementation tasks with strong naming, architecture, and review discipline. AI does the drafting work, but the user reviews and approves each stage before the pipeline advances.
+Create a set of `a-` commands that progressively turn an idea into small implementation slices with strong naming, architecture, and review discipline. AI does the drafting work, but the user reviews and approves each stage before the pipeline advances.
 
 ## Default Flow
 
 ```text
-a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 ```
 
 ## Revision Companion
@@ -50,7 +50,6 @@ Plans live in the project root under `planning/`. Gitignore it or make it a sepa
   - `planning/<epic-slug>/stretch-goals.md`
   - `planning/<epic-slug>/architecture.md`
   - `planning/<epic-slug>/story-<n>.md`
-  - `planning/<epic-slug>/story-<n>-tasks.md`
 
 The `epic-slug` is part of the command input and must match the folder under `planning/`.
 
@@ -124,7 +123,7 @@ Notes:
 
 ### `/a-story <epic-slug> <story-number>`
 
-Break down a single story into a detailed implementation plan and task list.
+Break down a single story into a detailed implementation plan organized by acceptance criterion.
 
 Reads:
 - `planning/<epic-slug>/epic.md`
@@ -136,7 +135,6 @@ Reads:
 
 Writes:
 - `planning/<epic-slug>/story-<story-number>.md`
-- `planning/<epic-slug>/story-<story-number>-tasks.md`
 
 Edits:
 - `planning/<epic-slug>/epic.md` when detailed story work sharpens the story definition
@@ -146,14 +144,18 @@ Updates:
 - `planning/glossary.md` when investigation reveals durable names or source mappings worth preserving
 - `planning/global-architecture.md` only when story work reveals durable cross-epic structure
 
-### `/a-task <epic-slug> <story-number>-<task-number>`
+Notes:
+- `story-<story-number>.md` is the single source of truth for the story's context, numbered acceptance criteria, and implementation-plan tasks.
+- implementation tasks stay grouped under the acceptance criterion they serve.
+- task lists should be practical and story-coherent, not artificially split by technology layer or isolation for its own sake.
+
+### `/a-criterion <epic-slug> <story-number>-<criterion-number>`
 
 We're finally coding. Now we know what and how to build.
 
 Reads:
-- `planning/<epic-slug>/story-<story-number>-tasks.md`
+- `planning/<epic-slug>/story-<story-number>.md`
 - `planning/<epic-slug>/architecture.md`
-- `planning/<epic-slug>/story-<story-number>.md` if needed
 - `planning/glossary.md`
 - codebase
 
@@ -162,6 +164,11 @@ Writes:
 
 Edits:
 - planning artifacts only when implementation reveals durable knowledge that should be captured for future work
+
+Notes:
+- the selector format stays `<story-number>-<criterion-number>`, but the second number is the numbered acceptance criterion, not an implementation task id.
+- internal implementation tasks remain inside `story-<story-number>.md` as execution guidance under each criterion.
+- each run completes one acceptance criterion, then stops unless the user explicitly asks to continue.
 
 ### `/a-edit <artifact-type> [selector...] <feedback>`
 
@@ -184,7 +191,7 @@ Notes:
 - `a-edit` is a feedback-driven companion command, not a new pipeline stage
 - it must read the original owner command contract before editing
 - it must edit exactly one primary planning artifact per run
-- supported artifact types are `global-architecture`, `glossary`, `epic`, `personas`, `stretch-goals`, `architecture`, `story`, and `story-tasks`
+- supported artifact types are `global-architecture`, `glossary`, `epic`, `personas`, `stretch-goals`, `architecture`, and `story`
 - if feedback is broad enough that a constrained revision would be misleading, rerun the owner command instead
 
 ## Shared Rules
@@ -208,8 +215,7 @@ Every planning artifact has a primary owner command:
 - `a-epic` owns `planning/<epic-slug>/stretch-goals.md`
 - `a-architecture` owns `planning/<epic-slug>/architecture.md`
 - `a-story` owns `planning/<epic-slug>/story-<story-number>.md`
-- `a-story` owns `planning/<epic-slug>/story-<story-number>-tasks.md`
-- `a-task` owns code changes
+- `a-criterion` owns code changes
 - `a-edit` owns no artifacts; it revises an existing artifact using its owner command's contract
 
 Later commands may refine higher-level artifacts when they discover durable knowledge. This is an allowed part of the workflow, not an exception.
@@ -217,7 +223,7 @@ Later commands may refine higher-level artifacts when they discover durable know
 Allowed promotion targets:
 
 - update `epic.md` when deeper work sharpens story wording, boundaries, sequencing, or prerequisites
-- update `architecture.md` when story or task work reveals epic-specific technical truth that other stories should inherit
+- update `architecture.md` when story or criterion work reveals epic-specific technical truth that other stories should inherit
 - update `glossary.md` when a durable domain term, code name, source, or status is confirmed
 - update `global-architecture.md` only when work reveals durable cross-epic structure, boundaries, contracts, or communication paths
 
@@ -240,7 +246,7 @@ Rules:
 - `a-edit` edits one primary artifact per run
 - `a-edit` should preserve valid existing content and make the smallest durable correction that addresses the feedback
 - `a-edit` may update `glossary.md` or `global-architecture.md` only when the owner command for the selected artifact would have allowed that promotion
-- `a-edit` must not be used to rewrite the codebase; code changes stay in `a-task`
+- `a-edit` must not be used to rewrite the codebase; code changes stay in `a-criterion`
 - when a constrained revision would be misleading because the artifact is broadly stale or the feedback changes the stage's core output, rerun the owner command instead
 
 ### Source Of Truth Hierarchy
@@ -286,10 +292,10 @@ It must not accumulate:
 
 ### Scope Boundaries
 
-- No planning command before `a-task` may write or modify application code.
+- No planning command before `a-criterion` may write or modify application code.
 - No planning artifact may be written outside `planning/`.
-- `a-task` is the only command that may write to the codebase.
-- `a-task` may run only after the user has approved the relevant planning artifacts.
+- `a-criterion` is the only command that may write to the codebase.
+- `a-criterion` may run only after the user has approved the relevant planning artifacts.
 - Never propose extractions for hypothetical future use (YAGNI).
 
 ### Upward Propagation
@@ -299,8 +305,8 @@ Detailed work is allowed to refine higher-level artifacts when it uncovers durab
 Allowed examples:
 - `a-story` discovers the current story should be split differently and updates `epic.md`
 - `a-story` discovers architecture details that belong in `architecture.md` for other stories to use
-- `a-story` or `a-task` discovers durable domain names that belong in `glossary.md`
-- `a-architecture`, `a-story`, or `a-task` discovers durable high-level cross-epic structure that belongs in `global-architecture.md` (particularly when the code proves the file is outdated)
+- `a-story` or `a-criterion` discovers durable domain names that belong in `glossary.md`
+- `a-architecture`, `a-story`, or `a-criterion` discovers durable high-level cross-epic structure that belongs in `global-architecture.md` (particularly when the code proves the file is outdated)
 
 Not allowed:
 - pushing temporary task-level implementation noise into shared artifacts
@@ -313,12 +319,11 @@ When a planning artifact is revised, later artifacts may become stale even if th
 Default impact rules:
 - editing `global-architecture.md` may affect all epic-specific artifacts
 - editing `glossary.md` may affect every artifact that uses the corrected term
-- editing `epic.md` may affect `personas.md`, `architecture.md`, `story-<n>.md`, and `story-<n>-tasks.md` for that epic
-- editing `personas.md` may affect `architecture.md`, `story-<n>.md`, and `story-<n>-tasks.md` for that epic
+- editing `epic.md` may affect `personas.md`, `architecture.md`, and `story-<n>.md` for that epic
+- editing `personas.md` may affect `architecture.md` and `story-<n>.md` for that epic
 - editing `stretch-goals.md` usually does not affect the active pipeline unless now-work vs later-work boundaries changed
-- editing `architecture.md` may affect `story-<n>.md`, `story-<n>-tasks.md`, and future `a-task` runs for that epic
-- editing `story-<n>.md` may affect `story-<n>-tasks.md` and future `a-task` runs for that story
-- editing `story-<n>-tasks.md` may affect future `a-task` runs for that story
+- editing `architecture.md` may affect `story-<n>.md` and future `a-criterion` runs for that epic
+- editing `story-<n>.md` may affect future `a-criterion` runs for that story
 
 Every `a-edit` run must include an `Affected artifacts / suggested reruns` summary before the pipeline advances.
 

@@ -1,5 +1,5 @@
 ---
-description: Break down a single story into a detailed implementation plan and task list
+description: Break down a single story into a detailed implementation plan organized by acceptance criterion
 argument-hint: <epic-slug> <story-number>
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
@@ -8,10 +8,10 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 
 This command is a single step of a longer pipeline:
 ```text
-a-epic -> a-architecture -> a-story(s) -> a-task(s)
+a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                          ^current
 ```
-Next: `/a-task` consumes the task list produced by this command
+Next: `/a-criterion` consumes the numbered acceptance criteria and implementation plan produced by this command
 
 ### Pipeline I/O
 
@@ -22,8 +22,7 @@ Next: `/a-task` consumes the task list produced by this command
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
 | **In/Out** | `./planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
-| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-relevant UI references |
-| **Out** | `./planning/<epic-slug>/story-<story-number>-tasks.md` | Ordered task list that `/a-task` reads |
+| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including numbered acceptance criteria, story-relevant UI references, and the implementation plan that `/a-criterion` reads |
 
 ## Skills
 
@@ -39,7 +38,7 @@ Break one story into a concrete, code-informed implementation plan without writi
 - investigate the current codebase
 - define reuse opportunities and constraints
 - refine story-level details when needed
-- produce a clean task list for `/a-task`
+- produce a single story artifact with numbered acceptance criteria and implementation-plan tasks for `/a-criterion`
 
 ## Rules
 
@@ -48,7 +47,9 @@ Break one story into a concrete, code-informed implementation plan without writi
 - NEVER define synonyms; if a term exists in the glossary, use its canonical name
 - NEVER abbreviate new names
 - NEVER propose extractions for hypothetical future use
-- NEVER produce multi-concern tasks; each task should have one primary concern
+- NEVER write unnumbered acceptance criteria; `/a-criterion` depends on stable criterion numbers
+- NEVER let implementation tasks float without a clear acceptance-criterion parent
+- NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
 
 ## Step 1: Resolve required inputs
@@ -99,7 +100,7 @@ UI references: <list or none>
 
 ## Step 2: Investigate the codebase
 
-Use `global-architecture.md` and `architecture.md` to scope targeted code exploration.
+Use `global-architecture.md` and `architecture.md` to scope targeted code exploration to achieve the story acceptance criteria.
 
 Use targeted search and explore agents to gather:
 1. related existing code
@@ -170,6 +171,8 @@ Summarize every such update in the output.
 
 Write `./planning/<epic-slug>/story-<story-number>.md` with this structure:
 
+This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, justified extractions, numbered acceptance criteria, and the implementation plan that `/a-criterion` reads.
+
 ```md
 # Story <story-number>: <title>
 
@@ -184,6 +187,7 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 
 ## Acceptance Criteria
 1. [ ] ...
+2. [ ] ...
 
 ## Codebase Context
 ### Related Code
@@ -225,6 +229,41 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 | What | From/Why | Target Location | Blocks Story? |
 | ---- | -------- | --------------- | ------------- |
 
+## Implementation Plan
+### Acceptance Criterion 1
+> Selector: `/a-criterion <epic-slug> <story-number>-1`
+
+#### Outcome
+- Describe what must be true when this criterion is complete
+
+#### Files Likely To Change
+- `path/a`
+
+#### Dependencies
+- none
+
+#### Implementation Tasks
+- [ ] Task 1.1: <imperative title>
+  **Type**: [component | hook | service | api | model | migration | test | config | refactor]
+  **Files**: `path/a`, `path/b`
+  **Description**: ...
+  **Notes**: ...
+
+### Acceptance Criterion 2
+> Selector: `/a-criterion <epic-slug> <story-number>-2`
+
+#### Outcome
+- ...
+
+#### Files Likely To Change
+- ...
+
+#### Dependencies
+- `1` | `Story <other-story-number>` | none
+
+#### Implementation Tasks
+- [ ] Task 2.1: ...
+
 ## Upstream Updates Applied
 - ...
 
@@ -233,65 +272,34 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - `./planning/global-architecture.md`
 ```
 
-## Step 8: Write `story-<story-number>-tasks.md`
+Rules for the implementation plan:
+- acceptance criteria must stay explicitly numbered, because `/a-criterion` selects by criterion number
+- every `### Acceptance Criterion N` section must match an item in `## Acceptance Criteria`
+- implementation tasks must be nested under their acceptance criterion and must never be mistaken for command selectors
+- implementation tasks may be story-coherent rather than artificially isolated
+- if a criterion needs a new table, include all fields needed for that story slice in that criterion's tasks
+- if a criterion needs a new type, validation, or helper to satisfy the slice, include it there instead of splitting it into a separate pseudo-task by default
 
-Write `./planning/<epic-slug>/story-<story-number>-tasks.md` as the single source of truth for `/a-task`.
-
-Use this structure:
-
-```md
-# Story <story-number> Tasks: <title>
-
-> Epic: <epic name>
-> Story: `./planning/<epic-slug>/story-<story-number>.md`
-> Generated: <date>
-
-## Task 1: <imperative title>
-
-**Type**: [component | hook | service | api | model | migration | test | config | refactor]
-**Files**: `path/a`, `path/b`
-**Depends on**: none
-
-**Description**:
-...
-
-**Acceptance Criteria**:
-- [ ] ...
-
-**Notes**:
-- ...
-
-## Task 2: <imperative title>
-...
-```
-
-Task ordering guidelines:
-1. shared types and contracts
-2. data layer and migrations
-3. business logic
-4. UI components
-5. integration and wiring
-6. tests
-
-## Step 9: Present to user
+## Step 8: Present to user
 
 Summarize:
-1. number of tasks
+1. number of acceptance criteria
 2. critical path
 3. reuse opportunities
 4. upstream updates applied
 5. risks and open questions
-6. recommended starting task
+6. recommended starting criterion
 
-Ask the user to review before moving to `/a-task`.
+Ask the user to review before moving to `/a-criterion`.
 
 ## Success Criteria
 
 - [ ] `story-<story-number>.md` exists
-- [ ] `story-<story-number>-tasks.md` exists
 - [ ] all required inputs and followed references were validated before story planning continued
-- [ ] every task has type, files, dependencies, description, and acceptance criteria
-- [ ] task ordering is explicit
+- [ ] `story-<story-number>.md` contains numbered acceptance criteria
+- [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Implementation Plan`
+- [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector
+- [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.md`
