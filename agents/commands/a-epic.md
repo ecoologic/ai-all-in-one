@@ -46,7 +46,13 @@ For downstream commands, the source of truth shifts to the packet produced here:
 3. UI-facing design artifacts and references preserved near the top of `epic.md`
 4. `idea.md` as the raw upstream input
 
-If these sources materially conflict, or if a later stage finds an ambiguity that would change scope, behavior, or architecture, it must stop and ask the user instead of choosing silently.
+Use this hierarchy per question, not per file. Do not resolve a whole run by deciding that one file wins globally.
+
+Treat each inconsistency independently:
+1. identify the exact statement, assumption, or requirement that conflicts
+2. determine which source is stronger for that specific question
+3. record the chosen interpretation and the rejected alternative
+4. if the hierarchy does not clearly resolve it, or if the difference would materially change scope, behavior, or architecture, stop and ask the user about that specific inconsistency instead of choosing silently
 
 ## Rules
 
@@ -197,6 +203,15 @@ Display the classification table before writing outputs.
 
 Before writing `epic.md`, `personas.md`, or `stretch-goals.md`, present the proposed personas, story list, classification split, and remaining assumptions to the user.
 
+If inconsistencies remain, present them one by one. For each one, show:
+- what conflicts
+- option A
+- option B
+- which option the hierarchy favors
+- why it matters to story shape or scope
+
+Persist every resolved inconsistency in `epic.md` under the same section structure described below so later stages can learn from prior decisions instead of re-litigating them.
+
 Ask the user to confirm or adjust this proposed scope before continuing to the write steps.
 
 Treat `Nice to have` stories as stretch goals. Do not include them in the main story list in `epic.md`.
@@ -214,6 +229,17 @@ Write `./planning/<epic-slug>/epic.md` with this structure:
 - Every UI-facing reference later stages should read directly, with its type (eg: Lovable), exact path or URL plus a brief note about what it covers.
 - If there is a primary design file, list it first and label it clearly
 - If none exist, write `- None`
+
+## Resolved Source-of-Truth Decisions
+- Use this section only for inconsistencies that were actually resolved during this step
+- Record each resolved inconsistency as its own item using this shape:
+  - Question: ...
+  - Option A: ...
+  - Option B: ...
+  - Chosen: ...
+  - Basis: which source won for this specific question, and why
+  - Impact: how the decision changed story scope, boundaries, or wording
+- If no inconsistencies were resolved, write `- None`
 
 ## Story 1: <title>
 
@@ -262,6 +288,7 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 Include only `Actionable` and `Blocked` stories in `epic.md`. Exclude all `Nice to have` stories from this file.
 When UI references exist, include all of them in `epic.md`, even if only some stories use each reference.
 Place the `## UI Design References` section immediately after the epic summary so the main design link is visible near the top of the document.
+Place `## Resolved Source-of-Truth Decisions` immediately after `## UI Design References` so later stages can reuse the conflict decisions before reading the stories.
 
 ## Step 6: Write `stretch-goals.md`
 
@@ -333,6 +360,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
 - [ ] `Nice to have` stories, if any, were written only to `stretch-goals.md`
 - [ ] UI-facing references from the inputs were preserved near the top of `epic.md` in `## UI Design References`, or `- None` was written explicitly
+- [ ] resolved inconsistencies, if any, were persisted in `epic.md` under `## Resolved Source-of-Truth Decisions`, or `- None` was written explicitly
 - [ ] any durable new terms were added to `./planning/glossary.md`
 - [ ] no synonyms were introduced
 - [ ] the user reviewed the proposed story set and remaining assumptions before outputs were written

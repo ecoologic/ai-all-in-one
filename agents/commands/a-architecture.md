@@ -44,7 +44,14 @@ For product intent and scope, trust sources in this order:
 
 For implementation reality, trust existing code and established conventions over prototype structure or inferred models.
 
-If trusted planning artifacts conflict with each other, or if a planning artifact conflicts with the codebase in a way that materially changes the architecture recommendation, stop immediately and ask the user before continuing.
+Use the hierarchy per inconsistency, not as a blanket rule that one file wins for the whole run.
+
+For every inconsistency:
+1. isolate the exact claim or assumption in conflict
+2. classify what kind of question it is, such as scope, actor intent, interaction detail, terminology, or implementation reality
+3. apply the hierarchy only for that question
+4. record both the preferred interpretation and the rejected alternative
+5. if the hierarchy is not decisive, or if the difference materially changes the architecture recommendation, stop immediately and ask the user about that specific inconsistency before continuing
 
 ## Skills
 
@@ -117,7 +124,7 @@ If evidence is weak:
 
 ### 2b. Apply source-of-truth hierarchy
 
-When sources disagree, apply the hierarchy above instead of falling back to `idea.md` or guesswork.
+When sources disagree, apply the hierarchy above per inconsistency instead of falling back to `idea.md` or guesswork.
 
 Specifically:
 1. `epic.md` beats `personas.md` only for explicit epic scope and story definition
@@ -127,7 +134,9 @@ Specifically:
 5. existing code and established conventions beat prototype structure for implementation decisions
 6. the inferred ERD remains a hypothesis until validated
 
-If a contradiction materially changes the architecture recommendation, stop, surface it immediately, and resolve it with the user before continuing.
+Do not decide "the conflict is in `epic.md`" or "the conflict is in `idea.md`" as a bulk conclusion. Resolve each differing statement on its own merits.
+
+If a contradiction materially changes the architecture recommendation, stop, surface that exact contradiction immediately, and resolve it with the user before continuing.
 
 ## Step 3: Load shared repo context
 
@@ -210,10 +219,14 @@ If a decision has meaningful tradeoffs, present options with pros and cons and r
 Before writing `architecture.md` or updating shared artifacts, present the current architecture direction to the user.
 
 Include:
-- input conflicts and gaps
+- input conflicts and gaps, listed one by one
 - terminology conflicts and rename requests
 - decisions with meaningful tradeoffs
 - any weak assumptions that affect the recommended model
+
+For each conflict or tradeoff, present explicit options, state which option the hierarchy or codebase evidence favors, and explain the downstream impact.
+
+Persist every resolved source-of-truth inconsistency in `architecture.md` under the same section structure described below so later stages inherit the decision history instead of re-opening the same conflict.
 
 Pause for user feedback on these items before continuing to the write steps.
 
@@ -272,9 +285,20 @@ Write `./planning/<epic-slug>/architecture.md` with this structure:
 > Personas: `./planning/<epic-slug>/personas.md`
 
 ## Epic Summary
+## Resolved Source-of-Truth Decisions
+- Use this section only for inconsistencies that were actually resolved during this step
+- Record each resolved inconsistency as its own item using this shape:
+  - Question: ...
+  - Option A: ...
+  - Option B: ...
+  - Chosen: ...
+  - Basis: which source or evidence won for this specific question, and why
+  - Impact: how the decision changed architecture, terminology, reuse, or boundaries
+- If no inconsistencies were resolved, write `- None`
+
 ### Remaining Input Conflicts and Gaps
 
-List only the contradictions, missing inputs, and weak assumptions that still remain after discussion with the user. This section records items explicitly left open by user choice or still awaiting later resolution.
+List only the contradictions, missing inputs, and weak assumptions that still remain after discussion with the user. Record them as individual items, not bulk file-level conflict notes. This section records items explicitly left open by user choice or still awaiting later resolution.
 
 ## Terminology
 | Domain Term | Code Name | Definition | Source | Status |
@@ -363,6 +387,7 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 - [ ] the recommended domain model is explicit
 - [ ] the epic-wide class diagram is included
 - [ ] the epic-wide sequence diagrams are included
+- [ ] resolved inconsistencies, if any, were persisted in `architecture.md` under `## Resolved Source-of-Truth Decisions`, or `- None` was written explicitly
 - [ ] any safe durable glossary updates were applied
 - [ ] any `global-architecture.md` updates are lean and cross-epic
 - [ ] blocking conflicts, tradeoffs, and weak assumptions were reviewed with the user before files were written
