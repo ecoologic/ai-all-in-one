@@ -17,7 +17,7 @@ Next: user review, then another `/a-criterion` if requested
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, numbered acceptance criteria, and implementation-plan tasks produced by `/a-story` |
+| **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, story-level completion status, numbered acceptance criteria, and implementation-plan tasks produced by `/a-story`; `/a-criterion` updates only the selected criterion's completion state in this file |
 | **In** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture and constraints |
 | **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
 | **Conditional In/Out** | `./planning/global-architecture.md` | Read and update only when implementation reveals durable cross-epic structure |
@@ -43,6 +43,7 @@ This command should:
 - investigate only the code areas needed to implement that criterion safely
 - make the smallest coherent code change that satisfies the criterion
 - validate the result with focused checks
+- write completion state back to the matching `story-<story-number>.md` file once the selected criterion is done
 - stop after the selected criterion unless the user explicitly asks to continue
 - promote durable findings back into planning artifacts only when they will help future work
 
@@ -55,6 +56,7 @@ This command should:
 - NEVER define synonyms; if a glossary term exists, use its canonical name
 - NEVER propose speculative abstractions or extractions for future use
 - NEVER rewrite planning artifacts without a durable reason
+- NEVER update any story file except `./planning/<epic-slug>/story-<story-number>.md`
 - NEVER create commits or auto-chain into the next criterion
 - Prefer existing code patterns, file placement conventions, and interfaces over inventing new ones
 - Internal implementation tasks are execution guidance inside the selected criterion, not separate command entrypoints
@@ -88,6 +90,7 @@ Also follow references from every planning artifact read in this step. Treat eac
 When `story-<story-number>.md` contains a `UI References` section, treat those references as required input for this criterion. Read and follow them before implementing UI behavior.
 
 Extract from `story-<story-number>.md`:
+- the `## Status` section and current story completion marker
 - the numbered acceptance criterion ` <criterion-number>. [ ] ...`
 - the matching `### Acceptance Criterion <criterion-number>` section from `## Implementation Plan`
 - the criterion outcome
@@ -199,7 +202,32 @@ If a validation failure is clearly unrelated or pre-existing:
 
 If no automated validation exists, say so explicitly and perform a manual acceptance-criteria review against the changed code.
 
-## Step 6: Apply durable planning updates
+## Step 6: Update story progress
+
+After focused validation passes, update only `./planning/<epic-slug>/story-<story-number>.md`.
+
+Apply these completion updates:
+1. in `## Acceptance Criteria`, change only the selected ` <criterion-number>. [ ] ...` entry to checked
+2. in `## Implementation Plan`, check only the completed task items under `### Acceptance Criterion <criterion-number>`
+3. do not check tasks under any other acceptance criterion
+
+Story-level completion rule:
+1. use the `## Acceptance Criteria` checklist as the source of truth for overall story completion
+2. if every acceptance criterion in `story-<story-number>.md` is checked after this run, set `## Status` to `- [x] Story complete`
+3. otherwise, ensure `## Status` remains `- [ ] Story complete`
+
+If `## Status` is missing, add this canonical section near the top of `story-<story-number>.md` before applying the final story-level state:
+
+```md
+## Status
+- [ ] Story complete
+```
+
+Do not mark the selected criterion or its tasks complete if validation is still failing or the implementation is only partial.
+
+Summarize the exact progress updates before finishing.
+
+## Step 7: Apply durable planning updates
 
 Update planning artifacts only when implementation reveals durable knowledge worth preserving for later work.
 
@@ -216,15 +244,16 @@ Do not:
 
 Summarize every planning-artifact update before finishing.
 
-## Step 7: Present the result to the user
+## Step 8: Present the result to the user
 
 Summarize:
 1. files changed
 2. acceptance criterion covered
 3. validation run and result
-4. planning updates applied
-5. remaining blockers, follow-ups, or risks
-6. whether another criterion is now unblocked
+4. story progress updates applied in `story-<story-number>.md`
+5. planning updates applied
+6. remaining blockers, follow-ups, or risks
+7. whether another criterion is now unblocked
 
 Ask the user to review the implementation before running another `/a-criterion`.
 
@@ -239,6 +268,8 @@ Ask the user to review the implementation before running another `/a-criterion`.
 - [ ] relevant tests were added or updated when a matching test pattern exists
 - [ ] relevant UI references were loaded before implementing UI behavior
 - [ ] internal implementation tasks were treated as guidance for the selected criterion, not as separate command targets
+- [ ] the selected criterion's checklist state was updated only in `story-<story-number>.md`
+- [ ] the story-level completion marker was checked only if every acceptance criterion in `story-<story-number>.md` is complete
 - [ ] any durable glossary or architecture updates were applied deliberately
 - [ ] the user reviewed the result before the pipeline advanced
 
@@ -252,6 +283,7 @@ Ask the user to review the implementation before running another `/a-criterion`.
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **Acceptance criterion not found** — list available acceptance-criterion numbers from the story file and ask the user to pick one
 - **Malformed criterion plan** — report that the selected acceptance criterion in `story-<story-number>.md` is missing its required implementation-plan structure instead of reconstructing it from surrounding prose
+- **Missing story status marker** — add the canonical `## Status` section to `story-<story-number>.md` before writing the final completion state
 - **Unsatisfied dependency** — report the dependency and stop before editing code
 - **Criterion/architecture/codebase conflict** — surface the conflict clearly and ask the user before widening scope
 - **Validation blocked by unrelated existing failure** — report the exact command, the failure, and why it is out of scope

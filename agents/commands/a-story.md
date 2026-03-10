@@ -22,7 +22,7 @@ Next: `/a-criterion` consumes the numbered acceptance criteria and implementatio
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
 | **In/Out** | `./planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
-| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including numbered acceptance criteria, story-relevant UI references, and the implementation plan that `/a-criterion` reads |
+| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-level completion status, numbered acceptance criteria, story-relevant UI references, and the implementation plan that `/a-criterion` reads and updates |
 
 ## Skills
 
@@ -171,7 +171,7 @@ Summarize every such update in the output.
 
 Write `./planning/<epic-slug>/story-<story-number>.md` with this structure:
 
-This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, justified extractions, numbered acceptance criteria, and the implementation plan that `/a-criterion` reads.
+This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, justified extractions, a story-level completion marker, numbered acceptance criteria, and the implementation plan that `/a-criterion` reads and updates.
 
 ```md
 # Story <story-number>: <title>
@@ -181,6 +181,9 @@ This file is the single source of truth for the story. It captures story context
 > Source Story: `./planning/<epic-slug>/epic.md`
 
 _As a_ [role], _I want_ [action], _so that_ [benefit].
+
+## Status
+- [ ] Story complete
 
 ## User Context
 - ...
@@ -274,6 +277,7 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 
 Rules for the implementation plan:
 - acceptance criteria must stay explicitly numbered, because `/a-criterion` selects by criterion number
+- include a `## Status` section with `- [ ] Story complete`; `/a-criterion` owns updating it after implementation runs
 - every `### Acceptance Criterion N` section must match an item in `## Acceptance Criteria`
 - implementation tasks must be nested under their acceptance criterion and must never be mistaken for command selectors
 - implementation tasks may be story-coherent rather than artificially isolated
@@ -297,6 +301,7 @@ Ask the user to review before moving to `/a-criterion`.
 - [ ] `story-<story-number>.md` exists
 - [ ] all required inputs and followed references were validated before story planning continued
 - [ ] `story-<story-number>.md` contains numbered acceptance criteria
+- [ ] `story-<story-number>.md` contains a `## Status` section with `- [ ] Story complete`
 - [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Implementation Plan`
 - [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
