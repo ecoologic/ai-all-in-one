@@ -14,14 +14,14 @@ a-epic -> a-architecture -> a-story(s) -> a-task(s)
 
 ### Pipeline I/O
 
-| Direction | File | Description |
-| --------- | ---- | ----------- |
-| **In** | `./planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
-| **In** | `./planning/<epic-slug>/epic.md` | Story list from `/a-epic` |
-| **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
-| **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
-| **In/Out** | `./planning/global-architecture.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure |
-| **Out** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping |
+| Direction  | File                                     | Description                                                                                       |
+| ---------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **In**     | `./planning/<epic-slug>/idea.md`         | Raw epic idea and links to supporting artifacts                                                   |
+| **In**     | `./planning/<epic-slug>/epic.md`         | Story list from `/a-epic`                                                                         |
+| **In**     | `./planning/<epic-slug>/personas.md`     | Personas from `/a-epic`                                                                           |
+| **In/Out** | `./planning/glossary.md`                 | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
+| **In/Out** | `./planning/global-architecture.md`      | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure      |
+| **Out**    | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping                                          |
 
 ## Purpose
 
@@ -33,6 +33,18 @@ This command must clearly separate:
 - what architecture is recommended for this epic
 
 It is the first epic-specific step that may inspect the codebase.
+
+## Source Of Truth
+
+For product intent and scope, trust sources in this order:
+1. `./planning/<epic-slug>/epic.md`
+2. `./planning/<epic-slug>/personas.md`
+3. UI-facing design artifacts and references preserved by `epic.md`
+4. `./planning/<epic-slug>/idea.md`
+
+For implementation reality, trust existing code and established conventions over prototype structure or inferred models.
+
+If trusted planning artifacts conflict with each other, or if a planning artifact conflicts with the codebase in a way that materially changes the architecture recommendation, stop immediately and ask the user before continuing.
 
 ## Skills
 
@@ -105,12 +117,17 @@ If evidence is weak:
 
 ### 2b. Apply source-of-truth hierarchy
 
-When sources disagree, use this order:
-1. input files and referenced artifacts beat guesswork
-2. existing code and established conventions beat prototype structure
-3. the inferred ERD remains a hypothesis until validated
+When sources disagree, apply the hierarchy above instead of falling back to `idea.md` or guesswork.
 
-If a contradiction materially changes the architecture recommendation, ask the user before finalizing.
+Specifically:
+1. `epic.md` beats `personas.md` only for explicit epic scope and story definition
+2. `personas.md` sharpens actor intent and context when `epic.md` is less specific
+3. preserved UI design artifacts clarify interaction details, but do not silently override epic scope
+4. `idea.md` is background context once the epic packet exists
+5. existing code and established conventions beat prototype structure for implementation decisions
+6. the inferred ERD remains a hypothesis until validated
+
+If a contradiction materially changes the architecture recommendation, stop, surface it immediately, and resolve it with the user before continuing.
 
 ## Step 3: Load shared repo context
 
@@ -166,7 +183,7 @@ Rules:
 - existing glossary terms remain canonical unless the user approves a change
 - add safe new glossary rows and safe enrichments to `glossary.md` in this command
 - do not silently rename existing glossary terms
-- keep conflicts and rename requests explicit in `architecture.md` and ask the user
+- keep conflicts and rename requests explicit in `architecture.md` and review them with the user before writing outputs
 
 ## Step 6: Make architecture decisions
 
@@ -186,7 +203,19 @@ Ground decisions in:
 2. current system structure
 3. project conventions already present in the codebase
 
-If a decision has meaningful tradeoffs, present options with pros and cons and ask the user before locking it in.
+If a decision has meaningful tradeoffs, present options with pros and cons and resolve them with the user before writing outputs.
+
+### 6a. Review open questions before writing
+
+Before writing `architecture.md` or updating shared artifacts, present the current architecture direction to the user.
+
+Include:
+- input conflicts and gaps
+- terminology conflicts and rename requests
+- decisions with meaningful tradeoffs
+- any weak assumptions that affect the recommended model
+
+Pause for user feedback on these items before continuing to the write steps.
 
 ## Step 7: Critique the inferred model
 
@@ -243,10 +272,9 @@ Write `./planning/<epic-slug>/architecture.md` with this structure:
 > Personas: `./planning/<epic-slug>/personas.md`
 
 ## Epic Summary
-## Input Review
-### Input Conflicts and Gaps
+### Remaining Input Conflicts and Gaps
 
-List contradictions, missing inputs, and weak assumptions explicitly. Discuss these items with the user before finalizing the architecture.
+List only the contradictions, missing inputs, and weak assumptions that still remain after discussion with the user. This section records items explicitly left open by user choice or still awaiting later resolution.
 
 ## Terminology
 | Domain Term | Code Name | Definition | Source | Status |
@@ -323,7 +351,7 @@ Summarize:
 - global architecture updates applied
 - risks and open questions
 
-Ask the user to review and approve before moving to `/a-story`.
+Invite final feedback or corrections before moving to `/a-story`. Do not use this step as the primary discussion gate for conflicts or tradeoffs.
 
 ## Success Criteria
 
@@ -337,7 +365,7 @@ Ask the user to review and approve before moving to `/a-story`.
 - [ ] the epic-wide sequence diagrams are included
 - [ ] any safe durable glossary updates were applied
 - [ ] any `global-architecture.md` updates are lean and cross-epic
-- [ ] the user reviewed the result before the pipeline advanced
+- [ ] blocking conflicts, tradeoffs, and weak assumptions were reviewed with the user before files were written
 
 ## Error Handling
 
@@ -349,4 +377,4 @@ Ask the user to review and approve before moving to `/a-story`.
 - **Weak `global-architecture.md`** — continue, perform targeted structural mapping, and keep the shared file lean
 - **Empty or new codebase** — say so explicitly and focus on greenfield decisions
 - **Inputs too weak for an ERD** — record the gap instead of fabricating certainty
-- **Conflicting input artifacts** — surface the conflict and ask the user before finalizing
+- **Conflicting input artifacts** — surface the conflict immediately and pause for user direction before continuing

@@ -20,7 +20,7 @@ Next: `/a-architecture`
 | **In**     | `./planning/<epic-slug>/idea.md`          | Raw epic idea and links to supporting artifacts                                                                  |
 | **In/Out** | `./planning/glossary.md`                  | Shared domain glossary created by `/a-global-architecture`                                                       |
 | **In**     | `./planning/global-architecture.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
-| **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and UI references for later stages |
+| **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and a top-of-file UI design reference section for later stages |
 | **Out**    | `./planning/<epic-slug>/personas.md`      | Personas, actors, and usage context for later stages                                                             |
 | **Out**    | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path                                   |
 
@@ -34,11 +34,19 @@ Invoke these skills during execution via `Skill` when relevant:
 
 Turn a rough idea into a high-quality epic packet for the rest of the pipeline:
 - `epic.md` defines the current story list and the shape of the work
-- `epic.md` preserves UI references that later stages must read directly when the epic has UI
+- `epic.md` preserves UI references near the top of the file so later stages can find and follow them immediately when the epic has UI
 - `personas.md` captures the actors, goals, and contexts that later commands must inherit
 - `stretch-goals.md` captures worthwhile later-scope ideas that no one needs to read for now
 
 This command produces planning artifacts only. It must not investigate the codebase or write implementation code.
+
+For downstream commands, the source of truth shifts to the packet produced here:
+1. `epic.md`
+2. `personas.md`
+3. UI-facing design artifacts and references preserved near the top of `epic.md`
+4. `idea.md` as the raw upstream input
+
+If these sources materially conflict, or if a later stage finds an ambiguity that would change scope, behavior, or architecture, it must stop and ask the user instead of choosing silently.
 
 ## Rules
 
@@ -103,7 +111,7 @@ Ask these questions:
 
 It is OK to return to the same UI in a later story to add another field, interaction, or linked destination.
 
-When several reasonable splits exist, prefer the smallest user-visible slice and ask the user to choose if the tradeoff is ambiguous.
+When several reasonable splits exist, prefer the smallest user-visible slice and ask the user to choose before writing outputs if the tradeoff is ambiguous.
 
 ## Step 0: Load glossary
 
@@ -176,7 +184,7 @@ Split the work into minimal, user-facing stories. For each story:
 - include requirements only when they are truly part of the user-facing outcome
 - assess prerequisites or dependencies between stories
 
-Before writing files, display each story title and canonical statement.
+Before writing files, display each story title and canonical statement. Use this as an early discussion point for ambiguous story boundaries or assumptions.
 
 ## Step 4: Classify the stories
 
@@ -186,6 +194,10 @@ Classify each story as:
 3. **Nice to have** — valid but not essential for the epic's first valuable iteration
 
 Display the classification table before writing outputs.
+
+Before writing `epic.md`, `personas.md`, or `stretch-goals.md`, present the proposed personas, story list, classification split, and remaining assumptions to the user.
+
+Ask the user to confirm or adjust this proposed scope before continuing to the write steps.
 
 Treat `Nice to have` stories as stretch goals. Do not include them in the main story list in `epic.md`.
 
@@ -197,6 +209,11 @@ Write `./planning/<epic-slug>/epic.md` with this structure:
 # <Epic Name> (<epic-slug>)
 
 > Epic: <summary>
+
+## UI Design References
+- Every UI-facing reference later stages should read directly, with its type (eg: Lovable), exact path or URL plus a brief note about what it covers.
+- If there is a primary design file, list it first and label it clearly
+- If none exist, write `- None`
 
 ## Story 1: <title>
 
@@ -234,9 +251,9 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 ## UX Considerations
 - Epic-level UX constraints or interaction expectations shared across stories
 
-## UI References
-- Every UI-facing reference later stages should read directly, with exact path or URL plus a brief note about what it covers
-- If none exist, write `- None`
+## Remaining Assumptions and Open Questions
+- Capture only unresolved scope questions, ambiguous splits, or weak assumptions that remain after discussion with the user
+- If none remain, write `- None`
 
 ## References
 - ...
@@ -244,6 +261,7 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 
 Include only `Actionable` and `Blocked` stories in `epic.md`. Exclude all `Nice to have` stories from this file.
 When UI references exist, include all of them in `epic.md`, even if only some stories use each reference.
+Place the `## UI Design References` section immediately after the epic summary so the main design link is visible near the top of the document.
 
 ## Step 6: Write `stretch-goals.md`
 
@@ -295,12 +313,12 @@ Summarize:
 2. recommended starting story
 3. personas created
 4. whether `stretch-goals.md` was created and how many items it contains
-5. assumptions and open questions
+5. remaining assumptions and open questions
 6. any glossary entries added
 
 Tell the user that the main review path is `epic.md` plus `personas.md`, and that `stretch-goals.md` is optional for now.
 
-Ask the user to review and approve before moving to `/a-architecture`.
+Invite final feedback on the generated artifacts before moving to `/a-architecture`. Do not use this step as the primary scope discussion gate.
 
 ## Success Criteria
 
@@ -314,10 +332,10 @@ Ask the user to review and approve before moving to `/a-architecture`.
 - [ ] acceptance criteria cover errors, failures and security
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
 - [ ] `Nice to have` stories, if any, were written only to `stretch-goals.md`
-- [ ] UI-facing references from the inputs were preserved in `epic.md`, or `- None` was written explicitly
+- [ ] UI-facing references from the inputs were preserved near the top of `epic.md` in `## UI Design References`, or `- None` was written explicitly
 - [ ] any durable new terms were added to `./planning/glossary.md`
 - [ ] no synonyms were introduced
-- [ ] the user reviewed the output before the pipeline advanced
+- [ ] the user reviewed the proposed story set and remaining assumptions before outputs were written
 
 ## Error Handling
 
