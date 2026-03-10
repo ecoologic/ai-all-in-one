@@ -15,14 +15,14 @@ Next: `/a-architecture`
 
 ### Pipeline I/O
 
-| Direction | File | Description |
-| --------- | ---- | ----------- |
-| **In** | `./planning/<epic-slug>/idea.md` | Raw epic idea and links to supporting artifacts |
-| **In/Out** | `./planning/glossary.md` | Shared domain glossary created by `/a-global-architecture` |
-| **In** | `./planning/global-architecture.md` | Shared repo-wide context created by `/a-global-architecture` |
-| **Out** | `./planning/<epic-slug>/epic.md` | Structured now-work story list plus epic-level ERD, requirements, UX framing, and UI references for later stages |
-| **Out** | `./planning/<epic-slug>/personas.md` | Personas, actors, and usage context for later stages |
-| **Out** | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path |
+| Direction  | File                                      | Description                                                                                                      |
+| ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **In**     | `./planning/<epic-slug>/idea.md`          | Raw epic idea and links to supporting artifacts                                                                  |
+| **In/Out** | `./planning/glossary.md`                  | Shared domain glossary created by `/a-global-architecture`                                                       |
+| **In**     | `./planning/global-architecture.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
+| **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and UI references for later stages |
+| **Out**    | `./planning/<epic-slug>/personas.md`      | Personas, actors, and usage context for later stages                                                             |
+| **Out**    | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path                                   |
 
 ## Skills
 
@@ -311,6 +311,7 @@ Ask the user to review and approve before moving to `/a-architecture`.
 - [ ] every story uses canonical _As a / I want / so that_ format
 - [ ] every story has numbered acceptance criteria in _Given / When / Then_ form
 - [ ] stories are sliced by user value, not by tech layer
+- [ ] acceptance criteria cover errors, failures and security
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
 - [ ] `Nice to have` stories, if any, were written only to `stretch-goals.md`
 - [ ] UI-facing references from the inputs were preserved in `epic.md`, or `- None` was written explicitly
