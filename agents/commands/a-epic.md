@@ -19,7 +19,7 @@ Next: `/a-architecture`
 | ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **In**     | `./planning/<epic-slug>/idea.md`          | Raw epic idea and links to supporting artifacts                                                                  |
 | **In/Out** | `./planning/glossary.md`                  | Shared domain glossary created by `/a-global-architecture`                                                       |
-| **In**     | `./planning/global-architecture.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
+| **In**     | `./planning/global-architecture.plan.md`  | Shared repo-wide context created by `/a-global-architecture`                                                     |
 | **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and a top-of-file UI design reference section for later stages |
 | **Out**    | `./planning/<epic-slug>/personas.md`      | Personas, actors, and usage context for later stages                                                             |
 | **Out**    | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path                                   |
@@ -123,7 +123,7 @@ When several reasonable splits exist, prefer the smallest user-visible slice and
 
 Read:
 - `./planning/glossary.md`
-- `./planning/global-architecture.md`
+- `./planning/global-architecture.plan.md`
 
 Use the glossary terms consistently. Never introduce an alternative name for an existing concept.
 

@@ -24,19 +24,19 @@ Use this command to correct or refine an artifact that already exists. Do not re
 | **In**                 | original command inputs             | The same planning inputs the owner command requires for that artifact type                               |
 | **Conditional In**     | codebase                            | Read only when the owner command for the target artifact is code-informed                                |
 | **Conditional In/Out** | `./planning/glossary.md`            | Update only when the owner command would have allowed a durable terminology promotion                    |
-| **Conditional In/Out** | `./planning/global-architecture.md` | Update only when the owner command would have allowed a durable cross-epic promotion                     |
+| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Update only when the owner command would have allowed a durable cross-epic promotion                     |
 | **Out**                | target planning artifact            | Revised artifact that addresses the user's feedback without discarding valid existing content            |
 
 ## Supported Targets
 
 | Artifact Type         | Selector                     | Owner Command            | Target Artifact                                        |
 | --------------------- | ---------------------------- | ------------------------ | ------------------------------------------------------ |
-| `global-architecture` | none                         | `/a-global-architecture` | `./planning/global-architecture.md`                    |
+| `global-architecture` | none                         | `/a-global-architecture` | `./planning/global-architecture.plan.md`               |
 | `glossary`            | none                         | `/a-global-architecture` | `./planning/glossary.md`                               |
 | `epic`                | `<epic-slug>`                | `/a-epic`                | `./planning/<epic-slug>/epic.md`                       |
 | `personas`            | `<epic-slug>`                | `/a-epic`                | `./planning/<epic-slug>/personas.md`                   |
 | `stretch-goals`       | `<epic-slug>`                | `/a-epic`                | `./planning/<epic-slug>/stretch-goals.md`              |
-| `architecture`        | `<epic-slug>`                | `/a-architecture`        | `./planning/<epic-slug>/architecture.md`               |
+| `architecture`        | `<epic-slug>`                | `/a-architecture`        | `./planning/<epic-slug>/architecture.plan.md`          |
 | `story`               | `<epic-slug> <story-number>` | `/a-story`               | `./planning/<epic-slug>/story-<story-number>.md`       |
 
 ## Skills
@@ -167,20 +167,20 @@ Minimum required inputs by target:
 - `epic`, `personas`, or `stretch-goals`
   - `./planning/<epic-slug>/idea.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.md`
+  - `./planning/global-architecture.plan.md`
 - `architecture`
   - `./planning/<epic-slug>/idea.md`
   - `./planning/<epic-slug>/epic.md`
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.md`
+  - `./planning/global-architecture.plan.md`
   - targeted codebase areas needed to validate the feedback
 - `story`
   - `./planning/<epic-slug>/epic.md`
-  - `./planning/<epic-slug>/architecture.md`
+  - `./planning/<epic-slug>/architecture.plan.md`
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.md`
+  - `./planning/global-architecture.plan.md`
   - targeted codebase areas needed to validate the feedback
 
 Also follow any references that the owner command says are required for that target. If any required input or followed reference is missing or unreadable, stop and report the exact path or reference.
@@ -223,7 +223,7 @@ When revising:
 
 Allowed promotion updates:
 - update `./planning/glossary.md` only when the owner command for the target artifact would have allowed a durable terminology update
-- update `./planning/global-architecture.md` only when the owner command for the target artifact would have allowed a durable cross-epic update
+- update `./planning/global-architecture.plan.md` only when the owner command for the target artifact would have allowed a durable cross-epic update
 
 If a promotion update is needed, keep it minimal and summarize it separately from the primary artifact revision.
 
@@ -232,12 +232,12 @@ If a promotion update is needed, keep it minimal and summarize it separately fro
 After editing, determine which downstream artifacts may now be stale.
 
 Use these defaults unless the specific change proves otherwise:
-- editing `global-architecture.md` may affect every epic-specific artifact
+- editing `global-architecture.plan.md` may affect every epic-specific artifact
 - editing `glossary.md` may affect every artifact that uses the renamed or corrected term
-- editing `epic.md` may affect `personas.md`, `architecture.md`, and `story-*.md` for that epic
-- editing `personas.md` may affect `architecture.md` and `story-*.md` for that epic
+- editing `epic.md` may affect `personas.md`, `architecture.plan.md`, and `story-*.md` for that epic
+- editing `personas.md` may affect `architecture.plan.md` and `story-*.md` for that epic
 - editing `stretch-goals.md` usually has no downstream effect on the active pipeline unless a now-work vs later-work boundary changed
-- editing `architecture.md` may affect `story-*.md` and future `/a-criterion` runs for that epic
+- editing `architecture.plan.md` may affect `story-*.md` and future `/a-criterion` runs for that epic
 - editing `story-<story-number>.md` may affect future `/a-criterion` runs for that story
 
 Do not silently rewrite those downstream artifacts in the same run unless the owner rules explicitly require a minimal promotion update.

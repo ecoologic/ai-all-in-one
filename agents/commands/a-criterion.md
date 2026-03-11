@@ -18,9 +18,9 @@ Next: user review, then another `/a-criterion` if requested
 | Direction | File | Description |
 | --------- | ---- | ----------- |
 | **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, story-level completion status, numbered acceptance criteria, and implementation-plan tasks produced by `/a-story`; `/a-criterion` updates only the selected criterion's completion state in this file |
-| **In** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture and constraints |
+| **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture and constraints |
 | **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
-| **Conditional In/Out** | `./planning/global-architecture.md` | Read and update only when implementation reveals durable cross-epic structure |
+| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Read and update only when implementation reveals durable cross-epic structure |
 | **Out** | codebase | Code changes, tests, and other implementation artifacts required by the selected acceptance criterion |
 
 ## Skills
@@ -76,12 +76,12 @@ Derive:
 
 Read:
 - `./planning/<epic-slug>/story-<story-number>.md`
-- `./planning/<epic-slug>/architecture.md`
+- `./planning/<epic-slug>/architecture.plan.md`
 - `./planning/glossary.md`
 
 Treat `story-<story-number>.md` as the single planning contract for this command.
 
-If `story-<story-number>.md` or `architecture.md` is missing, report the exact path checked and stop.
+If `story-<story-number>.md` or `architecture.plan.md` is missing, report the exact path checked and stop.
 
 If `glossary.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
@@ -232,9 +232,9 @@ Summarize the exact progress updates before finishing.
 Update planning artifacts only when implementation reveals durable knowledge worth preserving for later work.
 
 Allowed updates:
-- update `./planning/<epic-slug>/architecture.md` when implementation reveals epic-specific technical truth that later criteria should inherit
+- update `./planning/<epic-slug>/architecture.plan.md` when implementation reveals epic-specific technical truth that later criteria should inherit
 - update `./planning/glossary.md` when a durable domain term, code name, source, or status is confirmed
-- update `./planning/global-architecture.md` only when implementation reveals durable cross-epic structure, boundaries, contracts, or communication paths
+- update `./planning/global-architecture.plan.md` only when implementation reveals durable cross-epic structure, boundaries, contracts, or communication paths
 
 Do not:
 - push temporary debugging notes into planning artifacts
@@ -278,7 +278,7 @@ Ask the user to review the implementation before running another `/a-criterion`.
 - **Empty arguments** — ask the user to provide both `<epic-slug>` and `<story-number>-<criterion-number>`
 - **Invalid selector format** — explain the expected format `<story-number>-<criterion-number>` and stop
 - **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <epic-slug> <story-number>`
-- **Missing `architecture.md`** — report the exact path checked and tell the user to run `/a-architecture <epic-slug>`
+- **Missing `architecture.plan.md`** — report the exact path checked and tell the user to run `/a-architecture <epic-slug>`
 - **Missing `glossary.md`** — tell the user to run `/a-global-architecture` first
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **Acceptance criterion not found** — list available acceptance-criterion numbers from the story file and ask the user to pick one

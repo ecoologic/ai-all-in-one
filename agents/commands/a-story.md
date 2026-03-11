@@ -18,10 +18,10 @@ Next: `/a-criterion` consumes the numbered acceptance criteria and implementatio
 | Direction | File | Description |
 | --------- | ---- | ----------- |
 | **In** | `./planning/<epic-slug>/epic.md` | User stories and epic-level UI references from `/a-epic` |
-| **In** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture` |
+| **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture from `/a-architecture` |
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
-| **In/Out** | `./planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
+| **In/Out** | `./planning/global-architecture.plan.md` | Shared repo-wide architecture from `/a-global-architecture` |
 | **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-level completion status, numbered acceptance criteria, story-relevant UI references, and the implementation plan that `/a-criterion` reads and updates |
 
 ## Skills
@@ -60,14 +60,14 @@ If either `<epic-slug>` or `<story-number>` is empty or missing, stop and ask th
 
 Read:
 - `./planning/<epic-slug>/epic.md`
-- `./planning/<epic-slug>/architecture.md`
+- `./planning/<epic-slug>/architecture.plan.md`
 - `./planning/<epic-slug>/personas.md`
 - `./planning/glossary.md`
-- `./planning/global-architecture.md`
+- `./planning/global-architecture.plan.md`
 
-If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-If `epic.md`, `architecture.md`, or `personas.md` is missing, stop and report the exact path checked.
+If `epic.md`, `architecture.plan.md`, or `personas.md` is missing, stop and report the exact path checked.
 
 Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
 
@@ -100,7 +100,7 @@ UI references: <list or none>
 
 ## Step 2: Investigate the codebase
 
-Use `global-architecture.md` and `architecture.md` to scope targeted code exploration to achieve the story acceptance criteria.
+Use `global-architecture.plan.md` and `architecture.plan.md` to scope targeted code exploration to achieve the story acceptance criteria.
 
 Use targeted search and explore agents to gather:
 1. related existing code
@@ -161,9 +161,9 @@ Only include extractions that are clearly warranted by this story.
 
 This command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
 - update `epic.md` when the story wording, boundaries, sequencing, or dependencies need correction
-- update `architecture.md` when story work reveals epic-specific technical details other stories should inherit
+- update `architecture.plan.md` when story work reveals epic-specific technical details other stories should inherit
 - update `glossary.md` when durable domain names, code names, sources, or statuses are confirmed
-- update `global-architecture.md` only when the work reveals durable cross-epic structure
+- update `global-architecture.plan.md` only when the work reveals durable cross-epic structure
 
 Summarize every such update in the output.
 
@@ -271,8 +271,8 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - ...
 
 ## References
-- `./planning/<epic-slug>/architecture.md`
-- `./planning/global-architecture.md`
+- `./planning/<epic-slug>/architecture.plan.md`
+- `./planning/global-architecture.plan.md`
 ```
 
 Rules for the implementation plan:
@@ -307,7 +307,7 @@ Ask the user to review before moving to `/a-criterion`.
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
 - [ ] any durable naming updates were propagated to `glossary.md`
-- [ ] any durable cross-epic structure updates were propagated to `global-architecture.md`
+- [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
 - [ ] the user reviewed the output before the pipeline advanced
 
 ## Error Handling
