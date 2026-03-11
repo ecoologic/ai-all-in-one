@@ -117,6 +117,10 @@ if (!users.length) // ...
 
 - NEVER expose raw code errors and internals to the use, neither in UIs or APIs
 
+## API
+
+- ALWAYS apply RESTful architecture for new "regular" endpoints (no GraphQL, RCP)
+
 ## Domain Layer Independence
 
 - Domain layer has **zero dependencies** on infrastructure (no imports from DB, HTTP, or framework)

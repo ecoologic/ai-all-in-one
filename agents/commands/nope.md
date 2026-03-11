@@ -6,11 +6,15 @@ allowed-tools: [Read, Glob, Grep]
 
 # Nope — Rule Violation Audit
 
-Audit the most recent response (immediately before `/nope`) against every instruction loaded in this conversation. If $ARGUMENTS is provided, treat it as a hint about what the user suspects went wrong.
+Audit the most recent response (immediately before `/nope`, including if you were stopped mid-thinking) against every instruction loaded in this conversation. If $ARGUMENTS is provided, treat it as a hint about what the user suspects went wrong.
+
+## Goal
+
+Determine not just **which** instructions were violated, but **why** they were not followed and **how the instructions should be amended** so the same failure is less likely to happen again.
 
 ## Step 1: Capture the response under review
 
-Re-read the last assistant response verbatim. Identify and quote:
+Re-read the last prompt and assistant response verbatim (note this request might come mid-ai-thinking). Identify and quote:
 
 1. **Key decisions** made (tool choices, structure, tone, format)
 2. **Omissions** — anything conspicuously absent (missing sections, skipped steps)
@@ -40,7 +44,7 @@ Instruction sources:
 ...
 ```
 
-## Step 3: Extract rules and cross-check against the response
+## Step 3: Extract rules, cross-check, and diagnose root cause
 
 For **each** instruction source from Step 2, perform the following:
 
@@ -48,12 +52,24 @@ For **each** instruction source from Step 2, perform the following:
 2. Compare each rule against the response summary from Step 1
 3. Check $ARGUMENTS for additional clues about suspected violations
 4. Flag any rule that was violated, partially followed, or ignored
+5. For each flagged issue, determine the **most likely reason** it happened
+
+When diagnosing the reason, check for these failure modes first:
+
+- **Instruction conflict** — two sources pushed in different directions and the response appears to have satisfied one by violating another
+- **Priority ambiguity** — the source did not make clear which rule should win
+- **Ambiguous wording** — the rule exists, but the wording leaves room for a reasonable misread
+- **Missing command guidance** — the command did not explicitly require a step, output section, or check that the user expected
+- **Low-salience instruction** — the rule was present but buried, easy to miss, or not reinforced at the moment it mattered
+- **Execution drift** — the response appears to have prioritized convenience, habit, or momentum over the written instructions
+
+Do not invent certainty. If the cause is not clear from the evidence, say `unclear` and list the top 1-2 plausible explanations.
 
 For each violation found, record:
 
-| # | Source | Rule (quoted) | What went wrong | Severity |
-|---|--------|---------------|-----------------|----------|
-| 1 | Source #N | `"<exact quote>"` | <specific failure> | high/medium/low |
+| # | Source | Rule (quoted) | What went wrong | Likely cause | Severity |
+|---|--------|---------------|-----------------|--------------|----------|
+| 1 | Source #N | `"<exact quote>"` | <specific failure> | <conflict / ambiguity / missing guidance / low salience / execution drift / unclear> | high/medium/low |
 
 Severity guide:
 - **high** — directly contradicts an explicit MUST/NEVER/ALWAYS directive
@@ -76,9 +92,24 @@ Output the final report in this format:
 
 [table from Step 3]
 
-### Summary
+### Why This Happened
 
-[One sentence: what category of rules was most violated and why]
+[1 short paragraph: identify the main failure pattern. Call out whether this looks like a true instruction conflict, a priority mistake, ambiguous wording, or a gap in the command itself.]
+
+### Suggestions
+
+- [specific amendment to an instruction or command]
+- [specific wording change, ordering change, or required checkpoint]
+- [only include suggestions that directly reduce the chance of this exact failure happening again]
+
+Suggestion rules:
+- Don't say something "just because", ONLY provide suggestions that are grounded in _facts_; We don't want to keep altering rules for no gain
+- Focus on **improving the instructions**, not fixing the audited response
+- Tie each suggestion to one or more violations above
+- Prefer changes like: clarifying precedence, making a step explicit, requiring a section in the output, adding a stop/checkpoint, or rewriting ambiguous wording
+- If the problem was a genuine conflict, suggest the exact priority rule that should be added
+- If you "forgot", why could that have happened, context slop? something else?
+- Provide a confidence score on your suggestions and order them from most-likely
 ```
 
 If no violations are found, say so explicitly:
@@ -94,5 +125,6 @@ re-invoke with a specific hint: /nope "the tone was wrong"
 - **NEVER fabricate violations** — only flag rules with exact quotes from instruction sources
 - **NEVER skip Step 1** — reviewing the response first prevents confirmation bias when reading rules
 - **DO NOT read application code** — only read instruction/config files
-- **DO NOT suggest fixes** — this command diagnoses only; the user decides what to do next
+- **DO NOT suggest application-level fixes** — suggestions must be limited to instruction, command, or rule improvements
+- **DO explain likely causes** — especially when a conflict, ambiguity, or missing command step appears to be the reason
 - **STOP after the report** — do not take corrective action
