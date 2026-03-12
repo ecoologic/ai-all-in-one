@@ -60,7 +60,7 @@ Use these skills when relevant:
 - `architecture-blueprint-generator` when `global-architecture.plan.md` is stale or too weak to guide targeted exploration
 - `ecoologic-code` to validate naming and pattern alignment
 - `software-architecture-design` for meaningful tradeoff decisions
-- `mermaid-diagrams` for ERD and flow diagrams
+- `mermaid-diagrams` for epic class diagrams, sequence diagrams, and optional ERD review artifacts
 - `lovable` when input artifacts reference a Lovable prototype
 
 ## Rules
@@ -261,13 +261,16 @@ Say clearly:
 
 After critique and codebase comparison, propose the model that should guide this epic.
 
-### 7d. Key flow diagrams
+Represent the recommended model in an epic class diagram focused on the entities, components, boundaries, and relationships that must be added, extended, extracted, or reused for this epic.
+
+### 7d. Epic sequence diagrams for required changes
 
 Rules:
+- these are required deliverables, separate from the optional inferred ERD
 - cover the whole epic through its major user and system interactions
 - include more than one sequence diagram when a single flow cannot represent the epic clearly
 - map each sequence diagram back to the relevant stories
-- show the main actors, system boundaries, and handoffs
+- show the main actors, system boundaries, and handoffs introduced or affected by the epic
 
 ### 7f. Change inventory
 
@@ -318,9 +321,8 @@ List only the contradictions, missing inputs, and weak assumptions that still re
 
 ## Diagrams and Model Review
 
-### Recommended Domain Model
-### Epic Class Diagram
-### Epic Sequence Diagrams
+### Recommended Epic Class Diagram
+### Recommended Epic Sequence Diagrams
 
 ## Change Inventory
 | Type | Name | Action | Story | Details |
