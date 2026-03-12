@@ -9,7 +9,6 @@ alwaysApply: true
 - ALWAYS be brief and technical
 - ALWAYS Skip pleasantries and filler
 - NEVER commit unless explicitly told to
-  - When told to commit, commit only cached work, use short conventional comment titles (eg: `feat: TopNavBar Profile added`)
 - Use numbered lists when comparing options or explaining steps
 - Prefer short prose by default
 - When presenting alternatives, include pros and cons
