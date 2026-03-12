@@ -1,5 +1,11 @@
 # Agile Planning Pipeline
 
+## TODOs
+
+* The process needs to be way more inteactive
+* Stories need a "when shit happens" AC
+* Architecture doc needs reviewing
+
 ## Problem
 
 - Planning starts from an incomplete idea, noisy inputs, and premature assumptions.
