@@ -47,6 +47,7 @@ All planning artifacts use relative paths rooted at `planning/`.
 Plans live in the project root under `planning/`. Gitignore it or make it a separate repo to keep plans separate from the codebase.
 
 - Shared across epics:
+  - `planning/current.json`
   - `planning/glossary.md`
   - `planning/global-architecture.md`
 - Per epic:
@@ -57,7 +58,19 @@ Plans live in the project root under `planning/`. Gitignore it or make it a sepa
   - `planning/<epic-slug>/architecture.md`
   - `planning/<epic-slug>/story-<n>.md`
 
-The `epic-slug` is part of the command input and must match the folder under `planning/`.
+`planning/current.json` stores the active epic context for epic-scoped commands. Use this shape:
+
+```json
+{
+  "epic-slug": "<epic-slug>"
+}
+```
+
+For epic-scoped commands, resolve the epic slug in this order:
+1. explicit command argument
+2. `planning/current.json` `epic-slug`
+
+If neither is available, stop and ask the user for the epic slug. The resolved `epic-slug` must match the folder under `planning/`.
 
 ## Command Contracts
 
@@ -79,7 +92,7 @@ Notes:
 - later commands may refine those artifacts when they discover durable knowledge
 - downstream commands should assume both files exist because this command is the prerequisite that creates them
 
-### `/a-epic <epic-slug>`
+### `/a-epic [epic-slug]`
 
 The list of user stories and the personas that will be used to build the product. It's detached from the codebase, we're still defining what we want to build. No need to design architecture until we have decided what to build.
 
@@ -104,7 +117,7 @@ Notes:
 - `stretch-goals.md` captures later-scope ideas that stay outside the active pipeline reading path.
 - if the shared repo-wide artifacts are missing, run `/a-global-architecture` first
 
-### `/a-architecture <epic-slug>`
+### `/a-architecture [epic-slug]`
 
 Design the technical architecture changes for an epic based on the existing code. Tasks will read this to have a shared understanding how to build the product. And will need less repeated investigation.
 
@@ -127,7 +140,7 @@ Notes:
 - In the normal epic pipeline, `a-architecture` is the first epic-specific command that may read the codebase.
 - This does not conflict with `a-global-architecture`, which is a separate repo-wide mapping command.
 
-### `/a-story <epic-slug> <story-number>`
+### `/a-story [epic-slug] <story-number>`
 
 Break down a single story into a detailed implementation plan organized by acceptance criterion.
 
@@ -155,7 +168,7 @@ Notes:
 - implementation tasks stay grouped under the acceptance criterion they serve.
 - task lists should be practical and story-coherent, not artificially split by technology layer or isolation for its own sake.
 
-### `/a-criterion <epic-slug> <story-number>-<criterion-number>`
+### `/a-criterion [epic-slug] <story-number>-<criterion-number>`
 
 We're finally coding. Now we know what and how to build.
 
@@ -198,6 +211,7 @@ Notes:
 - it must read the original owner command contract before editing
 - it must edit exactly one primary planning artifact per run
 - supported artifact types are `global-architecture`, `glossary`, `epic`, `personas`, `stretch-goals`, `architecture`, and `story`
+- for epic-scoped artifact types, omitted epic selectors may default from `planning/current.json` `epic-slug`
 - if feedback is broad enough that a constrained revision would be misleading, rerun the owner command instead
 
 ## Shared Rules
@@ -209,6 +223,8 @@ All `a-` commands must follow these rules. Each command should inline the releva
 Each command declares a Pipeline I/O table in its header.
 
 `planning/glossary.md` is always available as `In/Out`, but it should only be updated when a command discovers a durable domain term worth standardizing.
+
+Epic-scoped commands also read `planning/current.json` as contextual input when their explicit epic selector is omitted.
 
 ### Artifact Ownership And Promotion
 

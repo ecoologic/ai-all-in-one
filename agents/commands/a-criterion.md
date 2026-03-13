@@ -1,6 +1,6 @@
 ---
 description: Implement one planned acceptance criterion in the codebase with focused validation
-argument-hint: <epic-slug> <story-number>-<criterion-number>
+argument-hint: [epic-slug] <story-number>-<criterion-number>
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Skill]
 ---
 
@@ -66,9 +66,17 @@ This command should:
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<epic-slug> <story-number>-<criterion-number>`
+`$ARGUMENTS` = `[epic-slug] <story-number>-<criterion-number>`
 
-If either `<epic-slug>` or `<story-number>-<criterion-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
+If `<story-number>-<criterion-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
+
+Resolve `<epic-slug>` in this order:
+1. explicit argument
+2. `./planning/current.json` field `epic-slug`
+
+If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+
+If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
 
 Derive:
 - `<story-number>` from the part before the hyphen
@@ -84,6 +92,8 @@ Treat `story-<story-number>.md` as the single planning contract for this command
 If `story-<story-number>.md` or `architecture.plan.md` is missing, report the exact path checked and stop.
 
 If `glossary.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+
+If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
 
 Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
 
@@ -275,7 +285,9 @@ Ask the user to review the implementation before running another `/a-criterion`.
 
 ## Error Handling
 
-- **Empty arguments** — ask the user to provide both `<epic-slug>` and `<story-number>-<criterion-number>`
+- **Missing criterion selector** — ask the user to provide `<story-number>-<criterion-number>`
+- **Empty epic argument with no usable `./planning/current.json` fallback** — ask the user to provide `<epic-slug>`
+- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Invalid selector format** — explain the expected format `<story-number>-<criterion-number>` and stop
 - **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <epic-slug> <story-number>`
 - **Missing `architecture.plan.md`** — report the exact path checked and tell the user to run `/a-architecture <epic-slug>`

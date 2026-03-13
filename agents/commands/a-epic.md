@@ -1,6 +1,6 @@
 ---
 description: Break down an idea into personas and actionable user stories
-argument-hint: <epic-slug>
+argument-hint: [epic-slug]
 allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
@@ -131,13 +131,21 @@ If either shared file is missing, stop and tell the user to run `/a-global-archi
 
 ## Step 1: Resolve inputs
 
-`$ARGUMENTS` = `<epic-slug>`
+`$ARGUMENTS` = `[epic-slug]`
 
-If `<epic-slug>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
+Resolve `<epic-slug>` in this order:
+1. explicit argument
+2. `./planning/current.json` field `epic-slug`
+
+If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+
+If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
 
 Read `./planning/<epic-slug>/idea.md`.
 
 If `idea.md` does not exist, report the exact path checked and stop. Do not fall back to another file or prompt mode.
+
+If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
 
 Also follow references from `idea.md` to supporting materials such as product notes, design files, screenshots, research, or prototype links. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep a list of what was read.
 
@@ -367,7 +375,8 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 
 ## Error Handling
 
-- **Empty arguments** — ask the user to provide an epic slug
+- **Empty arguments with no usable `./planning/current.json` fallback** — ask the user to provide an epic slug
+- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `idea.md`** — report the exact path checked and ask the user to create it first
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **Weak input** — say what is missing, keep assumptions explicit, and ask the user instead of inventing certainty

@@ -1,6 +1,6 @@
 ---
 description: Design the technical architecture for an epic from stories, personas, and the codebase
-argument-hint: <epic-slug>
+argument-hint: [epic-slug]
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 ---
 
@@ -76,9 +76,15 @@ Use these skills when relevant:
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<epic-slug>`
+`$ARGUMENTS` = `[epic-slug]`
 
-If `<epic-slug>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
+Resolve `<epic-slug>` in this order:
+1. explicit argument
+2. `./planning/current.json` field `epic-slug`
+
+If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+
+If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
 
 Read:
 - `./planning/<epic-slug>/idea.md`
@@ -90,6 +96,8 @@ Read:
 If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact missing path. The expected producer is `/a-epic`.
 
 If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+
+If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
 
 Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep an explicit list of what was read.
 
@@ -396,7 +404,8 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 
 ## Error Handling
 
-- **Empty arguments** — ask the user to provide `<epic-slug>` and stop
+- **Empty arguments with no usable `./planning/current.json` fallback** — ask the user to provide `<epic-slug>` and stop
+- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
 - **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`
 - **Missing `glossary.md` or `global-architecture.plan.md`** — stop and tell the user to run `/a-global-architecture`
