@@ -1,18 +1,23 @@
 ---
 name: explore
 license: MIT
-compatibility: "Claude Code 2.1.59+. Requires memory MCP server."
+compatibility: "Claude Code 2.1.74+. Requires memory MCP server."
 description: "explore — Deep codebase exploration with parallel agents. Use when exploring a repo, discovering architecture, finding files, or analyzing design patterns."
 argument-hint: "[topic-or-feature]"
 context: fork
-version: 2.1.0
+version: 2.2.0
 author: OrchestKit
 tags: [exploration, code-search, architecture, codebase, health-assessment]
 user-invocable: true
-allowed-tools: [AskUserQuestion, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, TaskOutput, TaskStop, mcp__memory__search_nodes, Bash]
-skills: [ascii-visualizer, architecture-decision-record, memory, architecture-patterns]
+allowed-tools: [AskUserQuestion, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, TaskOutput, TaskStop, mcp__memory__search_nodes, Bash, ToolSearch]
+skills: [ascii-visualizer, architecture-decision-record, memory, architecture-patterns, chain-patterns]
 complexity: high
 model: sonnet
+hooks:
+  PreToolUse:
+    - matcher: "Glob"
+      command: "${CLAUDE_PLUGIN_ROOT}/hooks/bin/run-hook.mjs skill/repo-structure-indexer"
+      once: true
 metadata:
   category: workflow-automation
   mcp-server: memory
@@ -63,6 +68,35 @@ AskUserQuestion(
 ---
 
 ## STEP 0b: Select Orchestration Mode
+
+### MCP Probe
+
+```python
+ToolSearch(query="select:mcp__memory__search_nodes")
+Write(".claude/chain/capabilities.json", { memory, timestamp })
+
+if capabilities.memory:
+  mcp__memory__search_nodes({ query: "architecture decisions for {path}" })
+  # Enrich exploration with past decisions
+```
+
+### Exploration Handoff
+
+After exploration completes, write results for downstream skills:
+
+```python
+Write(".claude/chain/exploration.json", JSON.stringify({
+  "phase": "explore", "skill": "explore",
+  "timestamp": now(), "status": "completed",
+  "outputs": {
+    "architecture_map": { ... },
+    "patterns_found": ["repository", "service-layer"],
+    "complexity_hotspots": ["src/auth/", "src/payments/"]
+  }
+}))
+```
+
+---
 
 Choose **Agent Teams** (mesh) or **Task tool** (star):
 
@@ -130,9 +164,9 @@ mcp__memory__search_nodes(query="architecture")
 
 ### Phase 3: Parallel Deep Exploration (4 Agents)
 
-See [Exploration Agents](rules/exploration-agents.md) for Task tool mode prompts.
+Load `Read("${CLAUDE_SKILL_DIR}/rules/exploration-agents.md")` for Task tool mode prompts.
 
-See [Agent Teams Mode](rules/agent-teams-mode.md) for Agent Teams alternative.
+Load `Read("${CLAUDE_SKILL_DIR}/rules/agent-teams-mode.md")` for Agent Teams alternative.
 
 ### Phase 4: AI System Exploration (If Applicable)
 
@@ -140,19 +174,19 @@ For AI/ML topics, add exploration of: LangGraph workflows, prompt templates, RAG
 
 ### Phase 5: Code Health Assessment
 
-See [Code Health Assessment](rules/code-health-assessment.md) for agent prompt. See [Code Health Rubric](references/code-health-rubric.md) for scoring criteria.
+Load `Read("${CLAUDE_SKILL_DIR}/rules/code-health-assessment.md")` for agent prompt. Load `Read("${CLAUDE_SKILL_DIR}/references/code-health-rubric.md")` for scoring criteria.
 
 ### Phase 6: Dependency Hotspot Map
 
-See [Dependency Hotspot Analysis](rules/dependency-hotspot-analysis.md) for agent prompt. See [Dependency Analysis](references/dependency-analysis.md) for metrics.
+Load `Read("${CLAUDE_SKILL_DIR}/rules/dependency-hotspot-analysis.md")` for agent prompt. Load `Read("${CLAUDE_SKILL_DIR}/references/dependency-analysis.md")` for metrics.
 
 ### Phase 7: Product Perspective
 
-See [Product Perspective](rules/product-perspective.md) for agent prompt. See [Findability Patterns](references/findability-patterns.md) for best practices.
+Load `Read("${CLAUDE_SKILL_DIR}/rules/product-perspective.md")` for agent prompt. Load `Read("${CLAUDE_SKILL_DIR}/references/findability-patterns.md")` for best practices.
 
 ### Phase 8: Generate Report
 
-See [Exploration Report Template](references/exploration-report-template.md).
+Load `Read("${CLAUDE_SKILL_DIR}/references/exploration-report-template.md")`.
 
 ## Common Exploration Queries
 
@@ -165,4 +199,4 @@ See [Exploration Report Template](references/exploration-report-template.md).
 - `ork:implement`: Implement after exploration
 ---
 
-**Version:** 2.1.0 (February 2026)
+**Version:** 2.2.0 (March 2026)

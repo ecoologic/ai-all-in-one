@@ -1,15 +1,32 @@
 {
-  "version": 1,
+  "version": 3,
   "skills": {
     "command-creator": {
       "source": "softaworks/agent-toolkit",
       "sourceType": "github",
-      "computedHash": "b58ae6c69fa86fe48c4745db460fc190c7661ab0371d1e719d7272a36630880c"
+      "sourceUrl": "https://github.com/softaworks/agent-toolkit.git",
+      "skillPath": "skills/command-creator/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-03T09:27:00.000Z",
+      "updatedAt": "2026-03-03T09:27:00.000Z"
     },
     "skill-authoring": {
       "source": "microsoft/github-copilot-for-azure",
       "sourceType": "github",
-      "computedHash": "44d9a366f02702ad36a962712140601d95e62a6bdd0bda931d2f10e6cff57244"
+      "sourceUrl": "https://github.com/microsoft/github-copilot-for-azure.git",
+      "skillPath": "skills/skill-authoring/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-03T09:13:00.000Z",
+      "updatedAt": "2026-03-03T09:13:00.000Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-14T00:00:00.000Z",
+      "updatedAt": "2026-03-14T00:00:00.000Z"
     }
   }
 }

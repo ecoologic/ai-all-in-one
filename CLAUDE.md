@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Read the README.md.
+This project is just to setup ai to be used in other projects. Read the README.md. NOW!
 
 ## Architecture
 
@@ -17,16 +17,24 @@ The repo is symlinked to global paths so all AI agents pick up the same skills:
 ```
 ~/dev/ai/agents  →  ~/.agents   (skill source of truth)
 ~/dev/ai/claude  →  ~/.claude   (Claude Code config + skill symlinks)
+~/dev/ai/cursor  →  ~/.cursor   (Cursor user-level config)
 ```
 
 Skills flow: GitHub repos → `npx skills add` → `agents/skills/` (actual files) + `claude/skills/` (symlinks back to `~/.agents/skills/`).
 
 ### Directory layout
 
-- **`agents/`** — Installed skills (actual code) + `.skill-lock.json` (v3, tracks sources/hashes/timestamps)
-- **`claude/`** — Claude Code config (`settings.json`) + `skills/` symlinks pointing to agents skills
-- **`kokoro/`** — Local TTS: Python hotkey listener, Swift implementation, Docker wrapper, ARM64 binary
-- **`skills-lock.json`** — Global skill lock (v1 format, separate from agents lock)
+#### Global scope (symlinked to `~`)
+
+- **`agents/`** → `~/.agents` — Installed skills (actual code) + `.skill-lock.json` (v3, tracks sources/hashes/timestamps)
+- **`claude/`** → `~/.claude` — Claude Code config (`settings.json`) + `skills/` symlinks pointing to agents skills
+- **`cursor/`** → `~/.cursor` — Cursor user-level config (separate git repo)
+
+#### Local scope (this repo only)
+
+- **`.agents/skills/`** — Repo-local skills (not symlinked globally)
+- **`skills-lock.json`** — Repo-local skill lock (v3 format, tracks `.agents/skills/`)
+- **`tts/`** — Kokoro TTS integration: hotkey listener, Docker wrapper, binary
 
 ### Skill format
 

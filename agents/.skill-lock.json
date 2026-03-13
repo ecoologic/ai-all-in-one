@@ -51,9 +51,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/yonatangross/orchestkit.git",
       "skillPath": "plugins/ork/skills/explore/SKILL.md",
-      "skillFolderHash": "d9ebd78cad711c606948ed136de4394a09fad3df",
+      "skillFolderHash": "a58dec189a598e96a17e1a0b6a88a198d427d337",
       "installedAt": "2026-03-04T02:08:01.383Z",
-      "updatedAt": "2026-03-04T02:08:01.383Z"
+      "updatedAt": "2026-03-13T23:03:46.561Z"
     },
     "lovable": {
       "source": "10k-digital/lovable-claude-code",
@@ -72,6 +72,30 @@
       "skillFolderHash": "85df2c5df09933ba0cf7b1e3b39469d4437c8d95",
       "installedAt": "2026-03-07T23:56:02.301Z",
       "updatedAt": "2026-03-07T23:56:02.301Z"
+    },
+    "conventional-commit": {
+      "source": "local",
+      "sourceType": "local",
+      "skillPath": "skills/conventional-commit/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-14T00:00:00.000Z",
+      "updatedAt": "2026-03-14T00:00:00.000Z"
+    },
+    "ecoologic-code": {
+      "source": "local",
+      "sourceType": "local",
+      "skillPath": "skills/ecoologic-code/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-14T00:00:00.000Z",
+      "updatedAt": "2026-03-14T00:00:00.000Z"
+    },
+    "ux-laws": {
+      "source": "local",
+      "sourceType": "local",
+      "skillPath": "skills/ux-laws/SKILL.md",
+      "skillFolderHash": null,
+      "installedAt": "2026-03-14T00:00:00.000Z",
+      "updatedAt": "2026-03-14T00:00:00.000Z"
     }
   },
   "dismissed": {
