@@ -10,11 +10,6 @@
       "source": "microsoft/github-copilot-for-azure",
       "sourceType": "github",
       "computedHash": "44d9a366f02702ad36a962712140601d95e62a6bdd0bda931d2f10e6cff57244"
-    },
-    "skill-review": {
-      "source": "ovachiever/droid-tings",
-      "sourceType": "github",
-      "computedHash": "e8796de344f3cd50fa3ad57a89af7a752173595d731311b67c76c66c83f062eb"
     }
   }
 }

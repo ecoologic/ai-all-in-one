@@ -79,9 +79,11 @@ Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --jso
 
 **Skip resolved threads** — only process threads where `isResolved: false`.
 
-**Skip own comments** — completely ignore any comment or thread where the only commenter is `ecoologic` (the PR author). If a thread has comments from both `ecoologic` and other reviewers, only process the comments from other reviewers. Threads where every comment is from `ecoologic` should be excluded entirely.
+Get the PR author with `gh api user --jq '.login'`.
 
-**Skip already-replied threads** — if the latest comment in a thread is from `ecoologic`, check it:
+**Skip own comments** — completely ignore any comment or thread where the only commenter is the PR author. If a thread has comments from both the PR author and other reviewers, only process the comments from other reviewers. Threads where every comment is from the PR author should be excluded entirely.
+
+**Skip already-replied threads** — if the latest comment in a thread is from the PR author, check it:
 - **Skip entirely** if the reply is semantically similar to the proposed reply (already addressed)
 - **Skip entirely** if the reply contains any emoji (indicates acknowledgement/reaction)
 - **Update the reply** otherwise — include the thread in the results so the pending review overwrites the previous reply with an improved one

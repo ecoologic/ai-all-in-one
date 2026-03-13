@@ -9,7 +9,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 This command is a single step of a longer pipeline:
 ```text
 a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-                         ^current
+                                ^current
 ```
 Next: `/a-criterion` consumes the numbered acceptance criteria and implementation plan produced by this command
 

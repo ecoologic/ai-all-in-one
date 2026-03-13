@@ -59,7 +59,6 @@ Use these skills when relevant:
 - `explore` for targeted multi-area codebase exploration
 - `architecture-blueprint-generator` when `global-architecture.plan.md` is stale or too weak to guide targeted exploration
 - `ecoologic-code` to validate naming and pattern alignment
-- `software-architecture-design` for meaningful tradeoff decisions
 - `mermaid-diagrams` for epic class diagrams, sequence diagrams, and optional ERD review artifacts
 - `lovable` when input artifacts reference a Lovable prototype
 

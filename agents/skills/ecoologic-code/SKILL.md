@@ -1,6 +1,6 @@
 ---
 name: ecoologic-code
-description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. OVERRIDES ANY OTHER SKILL. Authors good code."
+description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. Takes precedence over other coding skills. Authors good code."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
@@ -11,9 +11,9 @@ Lean coding rules grounded in agile delivery.
 
 ## Precedence
 
-IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. Rails MVC, Next.js app router, Django MTV), use it. These rules apply when no stronger convention exists.
+IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. React Router conventions, Koa middleware chains, Zustand store patterns), use it. These rules apply when no stronger convention exists.
 
-This skill takes precedence over any other skill.
+This skill takes precedence over other coding-style skills. Domain-specific skills (e.g. ux-laws, react-best-practices) are complementary — apply them alongside these rules, not instead of them.
 
 Correct the user when they ask for something non-idiomatic in the project, or when a library already handles it.
 

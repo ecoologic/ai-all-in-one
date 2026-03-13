@@ -1,72 +1,61 @@
 ---
 name: conventional-commit
-description: 'Prompt and workflow for generating conventional commit messages using a structured XML format. Guides users to create standardized, descriptive commit messages in line with the Conventional Commits specification, including instructions, examples, and validation.'
+description: 'Use when writing a git commit message for already staged changes. Only standardize the title as a conventional commit.'
 ---
 
 ### Instructions
 
-```xml
-	<description>This file contains a prompt template for generating conventional commit messages. It provides instructions, examples, and formatting guidelines to help users write standardized, descriptive commit messages in accordance with the Conventional Commits specification.</description>
-```
+Only enforce the commit title format.
+
+Use only the changes that are already staged.
+
+Do not stage, unstage, or expand the commit scope.
+
+Let the AI write the commit body and footer normally from the staged changes.
 
 ### Workflow
 
-**Follow these steps:**
-
-1. Run `git status` to review changed files.
-2. Run `git diff` or `git diff --cached` to inspect changes.
-3. Stage your changes with `git add <file>`.
-4. Construct your commit message using the following XML structure.
-5. After generating your commit message, Copilot will automatically run the following command in your integrated terminal (no confirmation needed):
-
-```bash
-git commit -m "type(scope): description"
-```
-
-6. Just execute this prompt and Copilot will handle the commit for you in the terminal.
+1. Inspect only the staged changes, for example with `git diff --cached`.
+    If no changes, STOP and tell the prompter
+2. Do not run `git add` or other commands to change the cached state.
+3. Decide the best conventional-commit `type` and the optional `scope`.
+4. Write only the first line in conventional-commit format.
+5. Keep the rest of the commit message freeform and useful.
+6. Commit
 
 ### Commit Message Structure
 
-```xml
-<commit-message>
-	<type>feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert</type>
-	<scope>()</scope>
-	<description>A short, imperative summary of the change</description>
-	<body>(optional: more detailed explanation)</body>
-	<footer>(optional: e.g. BREAKING CHANGE: details, or issue references)</footer>
-</commit-message>
+Title only:
+
+```text
+type: short summary
+```
+
+Optional:
+
+```text
+type(scope): short summary
 ```
 
 ### Examples
 
-```xml
-<examples>
-	<example>feat(parser): add ability to parse arrays</example>
-	<example>fix(ui): correct button alignment</example>
-	<example>docs: update README with usage instructions</example>
-	<example>refactor: improve performance of data processing</example>
-	<example>chore: update dependencies</example>
-	<example>feat!: send email on registration (BREAKING CHANGE: email service required)</example>
-</examples>
+```text
+refactor: userById() accepting strings
+# Note below the message is positive, less about what was broken, more about what now works. Let the body explain that
+# Note the tech level of the API endpoint
+fix(api): GET /users -> 200 when there are no users
+docs: README.md Development section
+# Note that often a small commit coincides with the addition (or change) of a method
+feat: CreateUser
 ```
 
 ### Validation
 
-```xml
-<validation>
-	<type>Must be one of the allowed types. See <reference>https://www.conventionalcommits.org/en/v1.0.0/#specification</reference></type>
-	<scope>Optional, but recommended for clarity.</scope>
-	<description>Required. Use the imperative mood (e.g., "add", not "added").</description>
-	<body>Optional. Use for additional context.</body>
-	<footer>Use for breaking changes or issue references.</footer>
-</validation>
-```
+- Use a standard type: `feat`, `fix`, `docs`, `style`, `refactor`, `rename`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
+- Keep the summary short and specific.
+- Only the title must follow this format.
+- Base the message only on already staged changes.
 
 ### Final Step
 
-```xml
-<final-step>
-	<cmd>git commit -m "type(scope): description"</cmd>
-	<note>Replace with your constructed message. Include body and footer if needed.</note>
-</final-step>
-```
+Commit exactly the changes that are already staged. Use the conventional-commit format for the first line only, then write the rest of the message however best explains those staged changes.
