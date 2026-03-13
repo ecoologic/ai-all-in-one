@@ -14,7 +14,7 @@ alwaysApply: true
 - When presenting alternatives, include pros and cons
 - When using a skill, briefly mention it: "Using skill [skill-name]"
 - When introducing new acronyms and initials, provide a brief footer legend with what the letters stand for
-- When any of the input references (eg: files, links) can't be read or processed, **STOP immediately**, do not infer or proceed
+- When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed 
 
 ## Planning
 - When proposing a multi-step plan, keep it concise and actionable.

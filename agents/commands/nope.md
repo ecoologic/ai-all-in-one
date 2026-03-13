@@ -120,6 +120,10 @@ The response appears compliant. If something still feels off,
 re-invoke with a specific hint: /nope "the tone was wrong"
 ```
 
+After the report, end the response with this exact follow-up question:
+
+`Do you want me to draft a prompt to improve that skill in the project where you keep its source?`
+
 ## Important Notes
 
 - **NEVER fabricate violations** — only flag rules with exact quotes from instruction sources

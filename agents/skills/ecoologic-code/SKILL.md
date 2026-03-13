@@ -1,6 +1,6 @@
 ---
 name: ecoologic-code
-description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. OVERRIDES ANY OTHER RULE. Authors good code."
+description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. OVERRIDES ANY OTHER SKILL. Authors good code."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
@@ -12,6 +12,8 @@ Lean coding rules grounded in agile delivery.
 ## Precedence
 
 IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. Rails MVC, Next.js app router, Django MTV), use it. These rules apply when no stronger convention exists.
+
+This skill takes precedence over any other skill.
 
 Correct the user when they ask for something non-idiomatic in the project, or when a library already handles it.
 
@@ -29,6 +31,7 @@ This skill covers architecture and design — not language syntax or framework A
 - React → `react-best-practices` (covers hooks, effects, refs, component design)
 
 Do not duplicate patterns already covered by those skills.
+If those skills contain relevant structure guidance (for example: colocating by feature, keeping hooks/components focused, or grouping files by feature rather than type), explicitly apply that guidance when reviewing or introducing modules. Do not judge an extraction only by abstraction quality while ignoring file ownership or placement.
 
 ## When to use
 
@@ -55,7 +58,9 @@ Do not duplicate patterns already covered by those skills.
 - Prefer maps over `switch` statements (always prefer declarative code!)
 - Favour `const fn = () => {}` over `function fn() {}`
 - Use TypeScript type guards when possible `function isNumber(value: unknown): value is number {`
-  Note that these have high changes of reusability and should be stored closed to the type they assert
+  Note that these have high chances of reusability and should be stored closed to the type they assert
+- Try to avoid optional types (eg: `active?: boolean`), there's probably a better way to type or code to write more confident code
+- NEVER create new magic numbers, extract to const for clarity
 
 ## Style
 
@@ -92,18 +97,54 @@ const doc = makeDoc(o);
 
 </example>
 
+## Shared code and module boundaries
+
+- Evaluate extracted or shared code across five axes: domain meaning, locality, ownership/location, dependency direction, and YAGNI/abstraction cost
+- Distinguish two different problems:
+  - the abstraction is bad
+  - the abstraction is fine, but the module boundary or file location is bad
+- Code should usually be grouped by feature, bounded context, or clear owner, not by technical shape such as `constants/`, `types/`, unless the project already has a stronger convention
+  - `helpers` might be a good exception to extract tech jargon in one location
+- Prefer colocating code with the hook, component, feature, or domain object that gives it meaning. Move it to a broader shared location only when multiple peers with the same owner truly need it
+- Shared constants can be good when they remove arbitrary magic numbers, encode consistent UX defaults, or make behavior easier to tune. They still need a meaningful owner and should not be dumped into a global junk-drawer module
+- Dependency direction still matters after extraction: avoid creating "shared" modules that pull lower-level code upward or cause unrelated features to depend on a vague common bucket
+- In reviews and refactors, call out the real smell precisely. If the value is useful but the placement is wrong, say that explicitly instead of rejecting the extraction wholesale
+- Mandatory checkpoint for every new shared file or module:
+  - Who owns this?
+  - Why does it live here?
+  - Is this grouped by feature or by tech type?
+  - Would colocating it with the hook or feature be clearer?
+
+## Positive Code
+
+- Avoid negative-named variables (`inactive`, `disabled`, `notFound`). Name variables for the positive case — negation of a positive reads naturally, double-negation of a negative doesn't
+
+<example>
+
+```typescript
+// Bad — negative variable forces double-negative checks
+const inactive = !user.lastLoginAt;
+if (!inactive) { grantAccess(); }
+
+// Good — positive variable, reads naturally
+const active = !!user.lastLoginAt;
+if (active) { grantAccess(); }
+```
+
+</example>
+
 ## Elegance
 
 - Use POSIX standards like always having a new line at EOF
-- Write "positive" code, eg: `if(active)`, not `if(!inactive)`
+- Prefer idiomatic falsy/truthy checks over verbose comparisons
 - Strive to write elegant code that reads like English
 
 <example>
 
 ```typescript
-// Bad
+// Bad — verbose comparison
 if (users.length === 0) // ...
-// Good
+// Good — idiomatic falsy check
 if (!users.length) // ...
 ```
 
@@ -115,11 +156,11 @@ if (!users.length) // ...
 
 ## Security
 
-- NEVER expose raw code errors and internals to the use, neither in UIs or APIs
+- NEVER expose raw code errors and internals to the user, neither in UIs or APIs
 
 ## API
 
-- ALWAYS apply RESTful architecture for new "regular" endpoints (no GraphQL, RCP)
+- ALWAYS apply RESTful architecture for new "regular" endpoints (no GraphQL, RPC)
 
 ## Domain Layer Independence
 

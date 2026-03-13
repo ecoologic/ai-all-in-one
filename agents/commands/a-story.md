@@ -38,6 +38,7 @@ Break one story into a concrete, code-informed implementation plan without writi
 - investigate the current codebase
 - define reuse opportunities and constraints
 - refine story-level details when needed
+- capture schema-impact context when the story changes persisted data
 - produce a single story artifact with numbered acceptance criteria and implementation-plan tasks for `/a-criterion`
 
 ## Rules
@@ -123,6 +124,12 @@ Each investigation result should report:
 - patterns to follow
 - reusable components, services, types, or utilities
 - naming matches or conflicts with the glossary
+
+If the story affects persisted schema, also identify:
+- affected entities or tables
+- relationships relevant to the story
+- fields that are new, changed, or deleted
+- unchanged fields that are still relevant to the story's implementation or review
 
 Display the findings before proceeding.
 
@@ -238,6 +245,23 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - Story-relevant subset of the epic-level UI references, plus any story-local UI references followed during this run
 - If none exist, write `- None`
 
+## Database Changes
+- If the story changes persisted schema, include a Mermaid `classDiagram` that shows only the story-relevant entities/tables, their relationships, and the fields needed for implementation review
+- In the diagram, explicitly mark changed fields inline using `[new]`, `[changed]`, or `[deleted]`
+- Include unchanged fields only when they are relevant for understanding the story
+- If the story does not change persisted schema, write `- None`
+
+```mermaid
+classDiagram
+    class ExampleEntity {
+        id: uuid
+        existing_field: text
+        new_field [new]: text
+        renamed_field [changed]: text
+        legacy_field [deleted]: text
+    }
+```
+
 ## Extractions
 | What | From/Why | Target Location | Blocks Story? |
 | ---- | -------- | --------------- | ------------- |
@@ -291,8 +315,8 @@ Rules for the implementation plan:
 - every `### Acceptance Criterion N` section must match an item in `## Acceptance Criteria`
 - implementation tasks must be nested under their acceptance criterion and must never be mistaken for command selectors
 - implementation tasks may be story-coherent rather than artificially isolated
-- if a criterion needs a new table, include all fields needed for that story slice in that criterion's tasks
 - if a criterion needs a new type, validation, or helper to satisfy the slice, include it there instead of splitting it into a separate pseudo-task by default
+- keep schema details in `## Database Changes`, not scattered across implementation-task prose, unless a task needs to call out a migration-specific nuance
 
 ## Step 8: Present to user
 
@@ -316,6 +340,7 @@ Ask the user to review before moving to `/a-criterion`.
 - [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
+- [ ] when the story changes persisted schema, `story-<story-number>.md` contains a `## Database Changes` section with a Mermaid `classDiagram` covering the story-relevant entities and field-level `[new]`, `[changed]`, and `[deleted]` markers
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
 - [ ] the user reviewed the output before the pipeline advanced
