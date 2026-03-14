@@ -352,3 +352,23 @@ Every `a-edit` run must include an `Affected artifacts / suggested reruns` summa
 ### User Checkpoints
 
 Every `a-` command must present results to the user and get confirmation before the pipeline moves to the next step. No command auto-chains into the next.
+
+## Future: QA Pipeline
+
+`a-criterion` (and any steps after it) may discover bugs in code **we wrote** (i.e. code produced by earlier `a-criterion` runs in the same or a previous epic). Ignore issues from features not yet implemented.
+
+When a bug is found, append it to `./planning/<epic-slug>/qa-ideas.md`:
+
+```markdown
+- [ ] **<short title>** — <description of the bug and where it was found> (`<file-path>:<line>`)
+```
+
+Create the file if it doesn't exist. Never remove existing entries.
+
+Possible dedicated QA commands (not yet implemented):
+
+```
+a-unhappy-path -> a-security -> a-bug -> a-qa
+```
+
+Or a single `/a-review` that covers all QA aspects.

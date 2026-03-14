@@ -5,17 +5,14 @@ This project is just to setup AI to be used in other projects. It works based on
 All in one folder. Then linked to global scope with:
 
 ```sh
-# Make sure all these folder don't already exist, or you might get double-nesting
+# Make sure these folders don't already exist, or you might get double-nesting
 ln -s ~/dev/ai/agents ~/.agents
 ln -s ~/dev/ai/claude ~/.claude
 ln -s ~/dev/ai/cursor ~/.cursor
 
-ln -s ~/dev/ai/agents/commands ~/.claude/commands
-ln -s ~/dev/ai/agents/commands ~/.cursor/commands
-
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.claude/CLAUDE.md
-# NOTE: Cursor .mdc symlinks don't work reliably — use Cursor Settings > User Rules instead
-# ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
+# NOTE: Cursor .mdc symlinks don't work reliably — use Cursor Settings > User Rules if you have a problem
+ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
 ```
 
 ## Global scope files
