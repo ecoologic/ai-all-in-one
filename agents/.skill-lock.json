@@ -73,10 +73,10 @@
       "installedAt": "2026-03-07T23:56:02.301Z",
       "updatedAt": "2026-03-07T23:56:02.301Z"
     },
-    "conventional-commit": {
+    "commit": {
       "source": "local",
       "sourceType": "local",
-      "skillPath": "skills/conventional-commit/SKILL.md",
+      "skillPath": "skills/commit/SKILL.md",
       "skillFolderHash": null,
       "installedAt": "2026-03-14T00:00:00.000Z",
       "updatedAt": "2026-03-14T00:00:00.000Z"

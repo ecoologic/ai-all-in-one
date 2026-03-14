@@ -1,5 +1,5 @@
 ---
-name: conventional-commit
+name: commit
 description: 'Use when writing a git commit message for already staged changes. Only standardize the title as a conventional commit.'
 ---
 

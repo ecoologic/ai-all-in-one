@@ -1,10 +1,10 @@
 ---
-description: Fetch PR review comments, classify them, auto-reply as a pending review, and resolve outdated threads
+description: Triage unresolved PR review comments, verify them, and present an ordered action list
 ---
 
-# Get PR Review Comments & Auto-Reply
+# Triage PR Review Comments
 
-Fetch all unresolved review comments for a PR, group them by similarity, classify each, create a pending review with appropriate replies, and auto-resolve outdated threads. The pending review is only visible to you until submitted.
+Fetch unresolved PR review comments from reviewers, verify whether each comment is valid, dedupe repeated feedback, and present the results in code order as an action list for the user.
 
 Argument: $ARGUMENTS
 
@@ -20,35 +20,27 @@ gh pr view --json number,url
 
 If no PR is found, report the error and stop.
 
-### 1b. Check for Existing Results
-
-Check if a previous results file exists at `tmp/pr-comments-{pr-number}-round-*.md` using Glob. If one or more exist:
-
-1. Read the latest round file (highest round number)
-2. Present its contents to the user
-3. Ask: **"Found previous round. Continue from here, or start fresh?"**
-   - If continue: increment the round number for the new file
-   - If fresh: start from round 1
-
-If no previous file exists, proceed normally with round 1.
-
 ### 2. Fetch Review Comments (GraphQL)
 
-Use GraphQL to get unresolved review threads with full context. **Include `id` fields for PR and threads** — these are needed for creating the pending review later. Run:
+Use GraphQL to fetch the PR author, file order, and unresolved review threads, including each review comment URL. Run:
 
 ```bash
 gh api graphql -f query='
 query($owner: String!, $repo: String!, $pr: Int!) {
   repository(owner: $owner, name: $repo) {
     pullRequest(number: $pr) {
-      id
       title
       url
+      author { login }
+      files(first: 100) {
+        nodes {
+          path
+        }
+      }
       reviewThreads(first: 100) {
         nodes {
           id
           isResolved
-          isOutdated
           path
           line
           startLine
@@ -56,18 +48,12 @@ query($owner: String!, $repo: String!, $pr: Int!) {
           comments(first: 10) {
             nodes {
               id
+              url
               body
               author { login }
               createdAt
             }
           }
-        }
-      }
-      comments(first: 50) {
-        nodes {
-          body
-          author { login }
-          createdAt
         }
       }
     }
@@ -77,190 +63,175 @@ query($owner: String!, $repo: String!, $pr: Int!) {
 
 Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --json owner,name` and the PR number from step 1.
 
-**Skip resolved threads** — only process threads where `isResolved: false`.
+Only process threads where `isResolved: false`.
 
-Get the PR author with `gh api user --jq '.login'`.
+**Important:** the PR author is `pullRequest.author.login`, not the current authenticated GitHub user.
 
-**Skip own comments** — completely ignore any comment or thread where the only commenter is the PR author. If a thread has comments from both the PR author and other reviewers, only process the comments from other reviewers. Threads where every comment is from the PR author should be excluded entirely.
+Ignore comments written by the PR author. If a thread contains both reviewer comments and PR author replies, only keep the reviewer comments for presentation, but read the PR author's replies as rebuttal context. If a thread has no reviewer comments left after filtering, drop it entirely.
 
-**Skip already-replied threads** — if the latest comment in a thread is from the PR author, check it:
-- **Skip entirely** if the reply is semantically similar to the proposed reply (already addressed)
-- **Skip entirely** if the reply contains any emoji (indicates acknowledgement/reaction)
-- **Update the reply** otherwise — include the thread in the results so the pending review overwrites the previous reply with an improved one
+Do not create or post replies in GitHub. This command is analysis and presentation only.
 
-### 3. Group Comments by Similarity
+When building links for the final output, convert it to the Changes tab form: `.../pull/<n>/changes#r<id>`.
 
-Analyze all unresolved comments and group them semantically:
+### 3. Expand the Review Set
 
-- **Same feedback repeated across files** (e.g., multiple "add types", "rename this", "missing error handling")
-- **Related concerns** (e.g., several comments about the same architectural issue)
-- **Standalone comments** get their own group
+For each remaining reviewer comment:
 
-Each group gets a short label describing the theme (e.g., "Type safety", "Naming", "Error handling", "Missing tests").
+1. Read the referenced file and the surrounding code near `line` or `startLine`.
+2. If needed, inspect nearby symbols, related files, or tests.
+3. If the comment makes a broader claim like "this pattern is wrong everywhere" or "this logic is duplicated", search the repo to verify that claim before deciding.
+4. Keep notes on what the comment is asking for, whether it is actually correct, and roughly how much work it would take to address within this PR.
 
-### 4. Order Groups by Diff Position
+Be skeptical but fair. Verify against the code before deciding.
 
-Sort groups by their earliest occurrence in the diff (top-to-bottom as seen in GitHub's Changes tab):
+### 4. Classify Each Comment
 
-1. **Each group's position** = the earliest `(path, line)` of any comment in that group
-2. **Order by file appearance** in the diff first, then by line number within that file
-3. **Groups with only general comments** ignore
+#### Skills to Load for Validation and Code Changes
 
-### 5. Classify Each Comment
+Load the relevant skills below when they help validate whether a comment is actually correct, and also load them before proposing or making code changes for valid comments. Mention the relevant loaded skills again in the closing recommendation when code changes are needed.
 
-For each comment, read the surrounding code context if needed and classify into one of three categories:
+- Always load `ecoologic-code` for implementation work.
+- If the valid comments touch `.ts`, `.tsx`, `.js`, or `.jsx` files, also load `typescript-best-practices`.
+- If the valid comments touch React components or hooks, also load `react-best-practices`.
+- If the valid comments are about UI, UX, layout, accessibility, or interaction design, also load `ux-laws`.
+- If the valid comments are specifically a UI review, design quality, or accessibility audit, also load `web-design-guidelines`.
 
-**Category A — Invalid / Not Actionable**: The comment is incorrect, based on a misunderstanding, not applicable, is praise, or is a question that doesn't require code changes. Examples:
-- Reviewer misread the code
-- The suggestion would break functionality
-- It's a compliment or neutral observation
+#### Process
 
-**Category B — Valid**: The comment is a legitimate, actionable request for this PR.
+Each comment must end up in exactly one category:
 
-**Category C — NOOP (Pre-existing)**: The comment points at something that is valid but is a pre-existing pattern already used elsewhere in the codebase. To verify this, search the repo for similar patterns using Grep. Only classify as NOOP if you find clear evidence.
+- `VALID[quick]`: the reviewer is correct and the fix should be small, local, and low-risk
+- `VALID[mid]`: the reviewer is correct and the fix needs a moderate code change, touches a couple of call sites, or needs careful adjustment
+- `VALID[long]`: the reviewer is correct but the fix is broader, cross-cutting, or requires meaningful refactoring / follow-up work
+- `INVALID`: the reviewer is mistaken, outdated, based on a misunderstanding, or is not actually asking for an actionable change
 
-### 6. Present Results
+When uncertain between `VALID[...]` and `INVALID`, default to `VALID[...]` with the best effort estimate.
 
-Within each group, list comments in diff order. Include the classification and planned reply.
+If the PR author already replied explaining that the reviewer comment is wholly or partly based on a misunderstanding, stale assumption, or incorrect reading of the code, bias the classification toward `INVALID`. Treat the author's reply as evidence to verify against the code, not as automatic proof. When this is the deciding factor, explicitly include `author reviewed` in the `INVALID` explanation.
 
-Output format:
+### 5. Dedupe Repeated Feedback
 
-```
+Group comments only when they are effectively the same issue and would receive the same reasoning and same fix. Use a high bar for dedupe.
+
+Examples that should usually dedupe:
+
+- The same missing null check called out in several files
+- The same naming issue repeated across multiple call sites
+- The same architectural concern repeated on multiple hunks
+
+Examples that should usually stay separate:
+
+- Similar wording but materially different fixes
+- Same theme, different root cause
+- Same reviewer concern, but one instance is valid and another is invalid
+
+For each deduped issue:
+
+- Keep the first comment as the canonical entry
+- Record every display number that belongs to that repeated issue
+- Preserve only the first comment's text in the final output
+- Use the canonical comment's GitHub review comment URL to derive a Changes tab link as the display link target
+- Mention all matching numbers together, like `2, 5, 8.`
+
+### 6. Order Issues by Code Position
+
+Present issues in the order they appear in the PR diff:
+
+1. Use `pullRequest.files.nodes[].path` to determine file order.
+2. Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
+3. For deduped issues, use the canonical comment's position.
+
+### 7. Present Results to the User
+
+Start with:
+
+```text
 ## PR #<number>: <title>
 <url>
-
-### 1. [GROUP: <Label>] (<N> comments)
-
-- `path/to/file.ts:42` [VALID] [OUTDATED] ← first in group
-  `const foo = bar()` <- (the code line from the diff hunk, trimmed)
-  > Comment text here -- @author
-  **Reply**: VALID: I'll address this (#1).
-
-- `path/to/file2.ts:99` [VALID] ← same issue, different location
-  `const baz = bar()`
-  > Same feedback again -- @author
-  **Reply**: VALID: See https://github.com/owner/repo/pull/123#discussion_r1234 (link to first comment's thread)
-
-- `path/to/other.ts:15` [NOOP]
-  `function doThing() {`
-  > Another comment in the same group -- @author
-  **Reply**: NOOP: Pre-existing behaviour, I'm happy to take charge of this, but if we want to fix these, we should do that as a separate PR, so we can properly extract the logic.
-
-- `path/to/another.ts:88` [INVALID]
-  `return result`
-  > This should use early return -- @author
-  **Reply**: INVALID: This is actually already using early return -- the `result` variable is computed above and this is the only return path.
-
-### General Comments (PR-level, not in a review thread)
-
-Classify the same way (VALID/NOOP/INVALID) but **do not auto-reply** — these are issue-style comments with no pending review mechanism. Display for awareness only.
-
-- > Comment body -- @author [VALID]
-- > Another comment -- @author [NOOP]
-- > Yet another -- @author [INVALID]
 ```
 
-### 7. Ask for Confirmation
+Then list each deduped issue in order using exactly this shape:
 
-Present the full list with proposed replies. Ask:
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
+> <comment text truncated to one paragraph>
 
-**"Review the proposed replies above. Reply `go` to create the pending review, or point out any replies you want me to change."**
-
-Also mention how many outdated threads will be auto-resolved:
-
-**"<n> outdated threads will be auto-resolved immediately."**
-
-### 8. Create Pending Review with Replies
-
-Once confirmed, create a pending review and post all replies.
-
-**Step 8a — Create the pending review:**
-
-```bash
-gh api graphql -f query='
-mutation($prId: ID!) {
-  addPullRequestReview(input: {pullRequestId: $prId}) {
-    pullRequestReview {
-      id
-    }
-  }
-}' -f prId='{pullRequestNodeId}'
+VALID[quick|mid|long]
+<brief paragraph explaining why this is valid and what makes it quick, mid, or long>
 ```
 
-Save the returned `pullRequestReview.id` as `REVIEW_ID`.
+Or:
 
-**Step 8b — Reply to each review thread:**
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
+> <comment text truncated to one paragraph>
 
-For each review thread (not general PR comments) that has a reply (all three categories get replies), run:
-
-```bash
-gh api graphql -f query='
-mutation($threadId: ID!, $reviewId: ID!, $body: String!) {
-  addPullRequestReviewThreadReply(input: {
-    pullRequestReviewThreadId: $threadId
-    pullRequestReviewId: $reviewId
-    body: $body
-  }) {
-    comment {
-      id
-    }
-  }
-}' -f threadId='{threadNodeId}' -f reviewId='{REVIEW_ID}' -f body='{replyText}'
+INVALID
+<brief paragraph explaining why the comment is not correct or not actionable>
 ```
 
-All replies MUST be prefixed with the classification tag. For duplicate comments within a group (same issue, different location), reply with a short reference to the first comment's thread URL instead of repeating the full reply.
+Presentation rules:
 
-Reply templates:
-- **VALID** (first occurrence): `VALID: I'll address this (#<n>).` — where `<n>` is a sequential counter across all VALID first-occurrence replies (1, 2, 3, ...)
-- **VALID** (duplicate in group): `VALID: See <link to first comment's thread>` — use the GitHub discussion URL of the first comment in the group
-- **NOOP**: `NOOP: Pre-existing behaviour, I'm happy to take charge of this, but if we want to fix these, we should do that as a separate PR. So we can extract and re-use the logic. Keeps this PR small and cohesive.`
-- **NOOP** (duplicate in group): `NOOP: See <link to first comment's thread>`
-- **INVALID**: `INVALID: <specific explanation>` (brief and clear, 1-2 sentences max, add an example if it's short and easy to read)
-- **INVALID** (duplicate in group): `INVALID: See <link to first comment's thread>`
+- Number every raw reviewer comment first, in code order, before deduping. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
+- Render `path:line` as a markdown link to the canonical PR review comment's Changes tab URL, for example `https://github.com/owner/repo/pull/326/changes#r2929596414`.
+- Truncate the quoted reviewer text to a single paragraph. Remove extra blank lines and shorten if needed, but preserve the substance.
+- Do not include planned GitHub reply text.
+- Do not include storage paths or persistence details in the main triage list itself.
+- Do not include general PR comments outside review threads.
+- Keep explanations concise but specific to the code.
 
-**DO NOT submit the review.** Leave it pending so only you can see it.
+### 8. Close with a Clear Next Step
 
-**Step 8c — Resolve outdated threads:**
+After the numbered list, close with:
 
-For each unresolved thread where `isOutdated: true`, resolve it immediately:
+1. An offer to address the valid comments in order, starting from the top.
+2. If any valid comment requires code changes, mention the relevant skills loaded from the section above.
+3. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
 
-```bash
-gh api graphql -f query='
-mutation($threadId: ID!) {
-  resolveReviewThread(input: {threadId: $threadId}) {
-    thread {
-      isResolved
-    }
-  }
-}' -f threadId='{threadNodeId}'
+Example closing line:
+
+```text
+I can address the valid items in order, starting with #<first-valid-comment-number>.
+
+Loaded relevant skills: `ecoologic-code`, `typescript-best-practices`
+
+Reply `write` if you want me to store this triage as `./tmp/pr-<number>.md`
 ```
 
-**Note:** This takes effect immediately (not pending). The thread will be marked as resolved and visible to everyone right away.
+The prompter will use the comment numbers to address the various comments.
 
-### 9. Summary
+### 9. Optional Handoff File
 
-After posting all replies:
+If the user replies `write`, store the triage result in `./tmp/pr-<number>.md`.
 
-```
-**Pending review created** with <total> replies:
-- <n> VALID (will address)
-- <n> NOOP (pre-existing, separate PR)
-- <n> INVALID (explained)
+Requirements for that file:
 
-**<n> outdated threads resolved** (immediate, visible to everyone).
+- Make it self-contained so a fresh agent can understand the context with no prior chat history.
+- Start by stating that this document is the current PR comment triage and that the next step is to address the valid PR comments by their numbers.
+- Include the PR number, title, and URL.
+- Include the same numbered deduped issue list that was shown to the user, preserving numbering exactly.
+- Preserve each issue's reviewer login, linked `path:line`, comment excerpt, and `VALID[quick|mid|long]` or `INVALID` reasoning.
+- Preserve duplicate-number groupings such as `2, 5, 8.`
+- Preserve important context such as `author reviewed` when it was part of the reasoning.
+- Include the relevant loaded skills if code changes are expected.
+- Explicitly instruct the next agent to use those skills while validating and addressing the valid comments.
+- End with a short instruction that the next agent should address the valid comments in numeric order unless told otherwise.
 
-The review is pending and only visible to you. Submit it from GitHub when ready.
-```
+When writing this file:
 
-Offer to store the results in `tmp/pr-comments-{pr-number}-round-{n}.md`. Use the round number sequential to the last existing one.
+- Reuse the already-produced triage output rather than regenerating it from scratch.
+- Ensure `./tmp` exists first.
+- After writing, tell the user the exact file path that was created.
 
 ## Reply Guidelines
 
-- **Be brief and respectful** in all replies
-- **Invalid explanations** must be specific and factual — reference the actual code, not vague dismissals. Keep to 1-2 sentences.
-- **Never be dismissive or rude** — even when a comment is wrong, explain clearly why
-- When in doubt between VALID and PRE-EXISTING, check the codebase with Grep. If evidence is unclear, default to VALID.
-- When in doubt between VALID and INVALID, default to VALID.
+- Validate comments against the actual code before deciding.
+- Do not invent certainty. If the code is ambiguous, say why, then choose the most defensible classification.
+- Use the response you already produced
+- Treat repeated comments as one issue only when they genuinely share the same fix and reasoning.
+- When in doubt between `VALID[...]` and `INVALID`, default to `VALID[...]`.
 
 ## Error Handling
 
