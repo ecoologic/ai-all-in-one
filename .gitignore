@@ -13,10 +13,12 @@ claude/mcp-needs-auth-cache.json
 claude/plans/
 claude/plugins/
 claude/projects/
+claude/sessions/
 claude/session-env/
 claude/shell-snapshots/
 claude/tasks/
 claude/ide/
+claude/.mcp.json
 
 # Agent nested installs (prevent accidents in subdirs)
 **/.agent/
