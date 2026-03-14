@@ -37,6 +37,8 @@ Optional:
 type(scope): short summary
 ```
 
+When the staged change centers on one specific code element, prefer naming that element directly over restating it in prose. Good summaries often use a file name without the full path or extension, an object or type name, a method name, an endpoint, or another concrete identifier. Avoid duplicating the same idea twice, for example `feat: createUser` instead of `feat: createUser create a new user`.
+
 ### Examples
 
 ```text
@@ -44,7 +46,8 @@ refactor: userById() accepting strings
 # Note below the message is positive, less about what was broken, more about what now works. Let the body explain that
 # Note the tech level of the API endpoint
 fix(api): GET /users -> 200 when there are no users
-docs: README.md Development section
+docs: README new Development section
+docs: README Development section with server URLs
 # Note that often a small commit coincides with the addition (or change) of a method
 feat: CreateUser
 ```
