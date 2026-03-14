@@ -1,6 +1,6 @@
 ---
 description: Break down an idea into personas and actionable user stories
-argument-hint: [epic-slug]
+argument-hint: none
 allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
@@ -131,21 +131,21 @@ If either shared file is missing, stop and tell the user to run `/a-global-archi
 
 ## Step 1: Resolve inputs
 
-`$ARGUMENTS` = `[epic-slug]`
+`$ARGUMENTS` = none
 
-Resolve `<epic-slug>` in this order:
-1. explicit argument
-2. `./planning/current.json` field `epic-slug`
+This command does not accept an epic slug argument.
 
-If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+If any explicit argument is provided, report that `/a-epic` always uses the active epic from `./planning/current.json` and stop.
 
-If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
+Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
+
+If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
 
 Read `./planning/<epic-slug>/idea.md`.
 
 If `idea.md` does not exist, report the exact path checked and stop. Do not fall back to another file or prompt mode.
 
-If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
+If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 Also follow references from `idea.md` to supporting materials such as product notes, design files, screenshots, research, or prototype links. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep a list of what was read.
 
@@ -375,7 +375,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 
 ## Error Handling
 
-- **Empty arguments with no usable `./planning/current.json` fallback** — ask the user to provide an epic slug
+- **Unexpected arguments** — explain that `/a-epic` does not accept an epic slug argument and always uses `./planning/current.json`
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `idea.md`** — report the exact path checked and ask the user to create it first
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it

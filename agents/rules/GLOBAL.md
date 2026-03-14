@@ -14,11 +14,22 @@ alwaysApply: true
 - When presenting alternatives, include pros and cons
 - When using a skill, explicitly mention it: "**Using skill [skill-name]**"
 - When introducing new acronyms and initials, provide a brief footer legend with what the letters stand for
-- When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed 
+- When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
 
 ## Planning
 - When proposing a multi-step plan, keep it concise and actionable.
 - Offer to save a substantial plan as markdown.
+- NEVER plan beyond the user's requested scope.
+- Treat user-specified milestones as hard gates. Do not include later-phase work before the current phase is completed and reported; stop at the requested milestone, summarize findings, and ask before proceeding.
+- For debugging/investigation requests, plan only the investigation unless the user explicitly asks for a fix plan too.
+
+## Debugging Execution
+- NEVER make changes that leave the main runtime, use fresh folders and re-install for those investigations
+- NEVER make changes that leave the DB broken, use setup a different DB for those investigations
+- During investigation, report findings before moving on to implementation unless the user explicitly asked you to continue through both phases
+
+## Git
+- ALWAYS prefix all git worktrees with the full path of the project, regardless of how long the folder gets eg: `fantastic-monorepo -> fantastic-monorepo-partners-form`
 
 ## User model
 - Optimize for simplicity, readability and code quality

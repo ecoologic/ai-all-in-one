@@ -56,11 +56,11 @@ If those skills contain relevant structure guidance (for example: colocating by 
 - DO NOT CREATE any new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
 - Use `as const` where possible
 - Prefer maps over `switch` statements (always prefer declarative code!)
-- Favour `const fn = () => {}` over `function fn() {}`
 - Use TypeScript type guards when possible `function isNumber(value: unknown): value is number {`
   Note that these have high chances of reusability and should be stored closed to the type they assert
 - Try to avoid optional types (eg: `active?: boolean`), there's probably a better way to type or code to write more confident code
 - NEVER create new magic numbers, extract to const for clarity
+- NEVER call a time `Xdate`, even if JS class is `Date`, a `date` is the day only, and `time` is a date _with time_
 
 ## Style
 
@@ -71,12 +71,12 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - Context for naming is king: Name specificity matches scope: global = specific (`calculateShippingCost`), local = short (`cost`, and shipping can be inferred from context)
 - Once a name is set, do not shorten it when used as pre/postfixes eg: `DataPartner -> DataPartnerExtractionConfig` not just `PartnerExtractionConfig`
+- The name depends and indicates what the value is. So, for example, `billingChoice` is always the object, NEVER the id, that would be `billingChoiceId` and `company` is a terrible name for `companyName`, eg: `site -> siteUrl`
 - One word in English, one word in code: `separateEachWord`, NEVER `jamwordstogether`
 - Use the domain's exact terms. If the business says "Shipment", code `Shipment`, not `Delivery`
 - Avoid synonyms, don't cheat when: you already have a name and you need a new one, the solution might be to make the older name more specific, and use the same level of specificity for the new name
 - Avoid hungarian notation like `userArray`, prefer common language, domain oriented, like `users`
 - Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`, `statusSet -> possibleStatuses`, `seatingSet -> seatingOptions`
-- The name depends and indicates what the value is. So, for example, `billingChoice` is always the object, NEVER the id, that would be `billingChoiceId` and `company` is a terrible name for `companyName`, eg: `site -> siteUrl`
 - Maps can be precisely expressed by how they are accessed, eg: `userById = { '<id>': { name: "Erik" }}` and `usersByName = { 'Erik': [{ name: "Erik" }]}` clearly indicates the return type is a list
 - Avoid generics like `data, map, time` when possible, be precise
 - Be consistent with naming, eg: `{ bad: { relatedCompanyName: 'x', companyId: 1 }, good: { relatedCompanyName: 'x', relatedCompanyId: 1 }, better: { company: { id: 1, name: 'x' } } }`

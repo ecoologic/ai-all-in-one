@@ -1,6 +1,6 @@
 ---
 description: Design the technical architecture for an epic from stories, personas, and the codebase
-argument-hint: [epic-slug]
+argument-hint: none
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 ---
 
@@ -75,15 +75,15 @@ Use these skills when relevant:
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `[epic-slug]`
+`$ARGUMENTS` = none
 
-Resolve `<epic-slug>` in this order:
-1. explicit argument
-2. `./planning/current.json` field `epic-slug`
+This command does not accept an epic slug argument.
 
-If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+If any explicit argument is provided, report that `/a-architecture` always uses the active epic from `./planning/current.json` and stop.
 
-If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
+Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
+
+If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
 
 Read:
 - `./planning/<epic-slug>/idea.md`
@@ -96,7 +96,7 @@ If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact 
 
 If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
+If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep an explicit list of what was read.
 
@@ -403,7 +403,7 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 
 ## Error Handling
 
-- **Empty arguments with no usable `./planning/current.json` fallback** — ask the user to provide `<epic-slug>` and stop
+- **Unexpected arguments** — explain that `/a-architecture` does not accept an epic slug argument and always uses `./planning/current.json`
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
 - **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`

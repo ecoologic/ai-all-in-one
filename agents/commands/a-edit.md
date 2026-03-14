@@ -33,11 +33,11 @@ Use this command to correct or refine an artifact that already exists. Do not re
 | --------------------- | ---------------------------- | ------------------------ | ------------------------------------------------------ |
 | `global-architecture` | none                         | `/a-global-architecture` | `./planning/global-architecture.plan.md`               |
 | `glossary`            | none                         | `/a-global-architecture` | `./planning/glossary.md`                               |
-| `epic`                | `[epic-slug]`                | `/a-epic`                | `./planning/<epic-slug>/epic.md`                       |
-| `personas`            | `[epic-slug]`                | `/a-epic`                | `./planning/<epic-slug>/personas.md`                   |
-| `stretch-goals`       | `[epic-slug]`                | `/a-epic`                | `./planning/<epic-slug>/stretch-goals.md`              |
-| `architecture`        | `[epic-slug]`                | `/a-architecture`        | `./planning/<epic-slug>/architecture.plan.md`          |
-| `story`               | `[epic-slug] <story-number>` | `/a-story`               | `./planning/<epic-slug>/story-<story-number>.md`       |
+| `epic`                | none                         | `/a-epic`                | `./planning/<epic-slug>/epic.md`                       |
+| `personas`            | none                         | `/a-epic`                | `./planning/<epic-slug>/personas.md`                   |
+| `stretch-goals`       | none                         | `/a-epic`                | `./planning/<epic-slug>/stretch-goals.md`              |
+| `architecture`        | none                         | `/a-architecture`        | `./planning/<epic-slug>/architecture.plan.md`          |
+| `story`               | `<story-number>`             | `/a-story`               | `./planning/<epic-slug>/story-<story-number>.md`       |
 
 ## Skills
 
@@ -87,23 +87,28 @@ Parse explicit arguments from left to right:
 2. middle arguments are the selector required by that artifact type
 3. final argument is the feedback text and should usually be quoted
 
+Interpret selector shapes like this:
+- epic selection is not accepted as a command argument for any `a-*` command
+- for `story`, the only selector token is `<story-number>`
+- for `epic`, `personas`, `stretch-goals`, and `architecture`, no selector token is accepted
+
 Also inspect the currently open or visible planning artifact when that context is available. Treat it as a candidate target only if its path maps cleanly to one of the supported targets in this command.
 
 Resolve target context in this precedence order:
 1. explicit command arguments
 2. currently open or visible planning artifact
-3. `./planning/current.json` field `epic-slug` for epic-scoped targets with an omitted epic selector
+3. `./planning/current.json` field `epic-slug` for epic-scoped targets
 4. supported target table inference from the remaining context
 
 Use the visible artifact to fill in omitted target details only when that fill is unambiguous. Examples:
-- infer `epic data-partners` from an open file at `./planning/data-partners/epic.md`
-- infer `story data-partners 7` from an open file at `./planning/data-partners/story-7.md`
+- infer `epic` from an open file at `./planning/data-partners/epic.md`
+- infer `story 7` from an open file at `./planning/data-partners/story-7.md`
 
-For epic-scoped targets (`epic`, `personas`, `stretch-goals`, `architecture`, and `story`), if the epic selector is still missing after checking visible context, read `./planning/current.json` and use its `epic-slug` value when present.
+For epic-scoped targets (`epic`, `personas`, `stretch-goals`, `architecture`, and `story`), read `./planning/current.json` and use its `epic-slug` value.
 
 Examples:
-- `/a-edit architecture billing-reconciliation "You missed the webhook retry flow"`
-- `/a-edit story billing-reconciliation 2 "Acceptance criterion 2 does not cover authorization failures"`
+- `/a-edit architecture "You missed the webhook retry flow"`
+- `/a-edit story 2 "Acceptance criterion 2 does not cover authorization failures"` -> use the current epic and story `2`
 - `/a-edit glossary "Use Subscription, not Plan, for the billing object"`
 - `/a-edit epic "Split billing and activity into separate stories"` while `./planning/data-partners/epic.md` is open
 
@@ -113,13 +118,13 @@ If `artifact-type` is missing but the visible planning artifact cleanly identifi
 
 If `artifact-type` is present but the selector is missing, use the visible planning artifact to fill the selector only when the mapping is exact and conflict-free.
 
-If the selector is still incomplete for an epic-scoped target after using visible context, use `./planning/current.json` only when its `epic-slug` field resolves the missing epic selector exactly and conflict-free.
+If the selector is still incomplete for an epic-scoped target after using visible context, use `./planning/current.json` only when its `epic-slug` field resolves the epic context exactly and conflict-free.
 
 If `artifact-type` is missing, unsupported, or still does not have the required selector after applying the precedence rules, stop and show the supported target table.
 
 If feedback is empty or missing, stop and ask the user to provide the issue to address.
 
-If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
+If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 ## Step 2: Resolve the owner contract and target files
 
@@ -284,6 +289,7 @@ Ask the user to review the revision before advancing the pipeline again.
 
 - **Unsupported `artifact-type`** — show the supported targets table and stop
 - **Missing selector for the chosen target** — explain the required selector shape and stop
+- **Unexpected epic selector** — explain that epic-scoped `/a-edit` targets always use `./planning/current.json` and do not accept an epic slug argument
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing feedback text** — ask the user to provide the issue to address
 - **Explicit target conflicts with visible planning artifact** — show both resolutions and ask the user which target to revise

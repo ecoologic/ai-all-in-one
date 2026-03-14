@@ -2,9 +2,13 @@
 
 ## TODOs
 
-* The process needs to be way more inteactive
-* Stories need a "when shit happens" AC
-* Architecture doc needs reviewing
+- The process needs to be way more inteactive
+- Stories need "when shit happens" ACs
+- Consider extra architecture docs in `./planning/architecture/`
+- No `.plan.md`, just `.md`
+- Criterion ultimate line of defence for reviewing architecture and ui
+- New `a-board` to update the board using `./planning/current.json` (don't touch worked on stories)
+- GLOBAL: extract skills
 
 ## Problem
 
@@ -66,11 +70,15 @@ Plans live in the project root under `planning/`. Gitignore it or make it a sepa
 }
 ```
 
-For epic-scoped commands, resolve the epic slug in this order:
-1. explicit command argument
-2. `planning/current.json` `epic-slug`
+For epic-scoped commands, always resolve the epic slug from `planning/current.json` `epic-slug`.
 
-If neither is available, stop and ask the user for the epic slug. The resolved `epic-slug` must match the folder under `planning/`.
+Argument-shape rules:
+- epic selection is not accepted as a command argument for any `a-*` command
+- `/a-story <number>` means "story `<number>` in the current epic"
+- `/a-criterion <story-number> <criterion-number>` means "criterion `<criterion-number>` in story `<story-number>` for the current epic"
+- `/a-edit story <number> <feedback>` means "edit story `<number>` in the current epic"
+
+If `planning/current.json` is missing, unreadable, malformed, or missing `epic-slug`, stop and report that exact problem. The resolved `epic-slug` must match the folder under `planning/`.
 
 ## Command Contracts
 
@@ -92,7 +100,7 @@ Notes:
 - later commands may refine those artifacts when they discover durable knowledge
 - downstream commands should assume both files exist because this command is the prerequisite that creates them
 
-### `/a-epic [epic-slug]`
+### `/a-epic`
 
 The list of user stories and the personas that will be used to build the product. It's detached from the codebase, we're still defining what we want to build. No need to design architecture until we have decided what to build.
 
@@ -117,7 +125,7 @@ Notes:
 - `stretch-goals.md` captures later-scope ideas that stay outside the active pipeline reading path.
 - if the shared repo-wide artifacts are missing, run `/a-global-architecture` first
 
-### `/a-architecture [epic-slug]`
+### `/a-architecture`
 
 Design the technical architecture changes for an epic based on the existing code. Tasks will read this to have a shared understanding how to build the product. And will need less repeated investigation.
 
@@ -140,7 +148,7 @@ Notes:
 - In the normal epic pipeline, `a-architecture` is the first epic-specific command that may read the codebase.
 - This does not conflict with `a-global-architecture`, which is a separate repo-wide mapping command.
 
-### `/a-story [epic-slug] <story-number>`
+### `/a-story <story-number>`
 
 Break down a single story into a detailed implementation plan organized by acceptance criterion.
 
@@ -167,8 +175,9 @@ Notes:
 - `story-<story-number>.md` is the single source of truth for the story's context, numbered acceptance criteria, and implementation-plan tasks.
 - implementation tasks stay grouped under the acceptance criterion they serve.
 - task lists should be practical and story-coherent, not artificially split by technology layer or isolation for its own sake.
+- `/a-story 2` uses the current epic and story `2`
 
-### `/a-criterion [epic-slug] <story-number>-<criterion-number>`
+### `/a-criterion <story-number> <criterion-number>`
 
 We're finally coding. Now we know what and how to build.
 
@@ -185,7 +194,7 @@ Edits:
 - planning artifacts only when implementation reveals durable knowledge that should be captured for future work
 
 Notes:
-- the selector format stays `<story-number>-<criterion-number>`, but the second number is the numbered acceptance criterion, not an implementation task id.
+- the selector format stays `<story-number> <criterion-number>`, and the second number is the numbered acceptance criterion, not an implementation task id.
 - internal implementation tasks remain inside `story-<story-number>.md` as execution guidance under each criterion.
 - each run completes one acceptance criterion, then stops unless the user explicitly asks to continue.
 
@@ -211,7 +220,8 @@ Notes:
 - it must read the original owner command contract before editing
 - it must edit exactly one primary planning artifact per run
 - supported artifact types are `global-architecture`, `glossary`, `epic`, `personas`, `stretch-goals`, `architecture`, and `story`
-- for epic-scoped artifact types, omitted epic selectors may default from `planning/current.json` `epic-slug`
+- epic-scoped artifact types always use `planning/current.json` `epic-slug`
+- for `story`, `/a-edit story 2 "..."` uses the current epic and story `2`
 - if feedback is broad enough that a constrained revision would be misleading, rerun the owner command instead
 
 ## Shared Rules
@@ -224,7 +234,7 @@ Each command declares a Pipeline I/O table in its header.
 
 `planning/glossary.md` is always available as `In/Out`, but it should only be updated when a command discovers a durable domain term worth standardizing.
 
-Epic-scoped commands also read `planning/current.json` as contextual input when their explicit epic selector is omitted.
+Epic-scoped commands read `planning/current.json` as a required input to resolve the active epic.
 
 ### Artifact Ownership And Promotion
 

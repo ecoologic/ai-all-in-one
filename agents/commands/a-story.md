@@ -1,6 +1,6 @@
 ---
 description: Break down a single story into a detailed implementation plan organized by acceptance criterion
-argument-hint: [epic-slug] <story-number>
+argument-hint: <story-number>
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
 
@@ -55,17 +55,22 @@ Break one story into a concrete, code-informed implementation plan without writi
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `[epic-slug] <story-number>`
+`$ARGUMENTS` = `<story-number>`
+
+Interpret argument shapes like this:
+- this command accepts exactly one explicit argument: `<story-number>`
+- epic selection is not accepted as a command argument
+
+Examples:
+- `/a-story 2` -> use the current epic and story `2`
 
 If `<story-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
 
-Resolve `<epic-slug>` in this order:
-1. explicit argument
-2. `./planning/current.json` field `epic-slug`
+If extra arguments are provided, report that `/a-story` only accepts `<story-number>` and always uses `./planning/current.json` for the epic context.
 
-If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
-If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
+If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
 
 Read:
 - `./planning/<epic-slug>/epic.md`
@@ -78,7 +83,7 @@ If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the 
 
 If `epic.md`, `architecture.plan.md`, or `personas.md` is missing, stop and report the exact path checked.
 
-If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
+If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
 
@@ -268,7 +273,7 @@ classDiagram
 
 ## Implementation Plan
 ### Acceptance Criterion 1
-> Selector: `/a-criterion <epic-slug> <story-number>-1`
+> Selector: `/a-criterion <story-number> 1`
 
 #### Outcome
 - Describe what must be true when this criterion is complete
@@ -287,7 +292,7 @@ classDiagram
   **Notes**: ...
 
 ### Acceptance Criterion 2
-> Selector: `/a-criterion <epic-slug> <story-number>-2`
+> Selector: `/a-criterion <story-number> 2`
 
 #### Outcome
 - ...
@@ -348,7 +353,7 @@ Ask the user to review before moving to `/a-criterion`.
 ## Error Handling
 
 - **Missing story number** — ask the user to provide a story number
-- **Empty epic argument with no usable `./planning/current.json` fallback** — ask the user to provide an epic slug
+- **Unexpected arguments** — explain that `/a-story` only accepts `<story-number>` and always uses `./planning/current.json` for the epic context
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Story not found in `epic.md`** — list available story numbers and ask the user to pick one
 - **Missing shared repo files** — tell the user to run `/a-global-architecture` first

@@ -1,6 +1,6 @@
 ---
 description: Implement one planned acceptance criterion in the codebase with focused validation
-argument-hint: [epic-slug] <story-number>-<criterion-number>
+argument-hint: <story-number> <criterion-number>
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Skill]
 ---
 
@@ -66,17 +66,23 @@ This command should:
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `[epic-slug] <story-number>-<criterion-number>`
+`$ARGUMENTS` = `<story-number> <criterion-number>`
 
-If `<story-number>-<criterion-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
+Interpret argument shapes like this:
+- this command accepts exactly two explicit numeric arguments: `<story-number> <criterion-number>`
+- epic selection is not accepted as a command argument
 
-Resolve `<epic-slug>` in this order:
-1. explicit argument
-2. `./planning/current.json` field `epic-slug`
+Examples:
+- `/a-criterion 2 1` -> use the current epic and criterion `2-1`
+- `/a-criterion 6 2` -> use the current epic and criterion `6-2`
 
-If the explicit argument is empty or missing, read `./planning/current.json` and use its `epic-slug` value when present.
+If either `<story-number>` or `<criterion-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
 
-If neither source provides `<epic-slug>`, stop and ask the user to provide it. Do not guess or continue with partial context.
+If extra arguments are provided, report that `/a-criterion` only accepts `<story-number> <criterion-number>` and always uses `./planning/current.json` for the epic context.
+
+Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
+
+If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
 
 Derive:
 - `<story-number>` from the part before the hyphen
@@ -93,7 +99,7 @@ If `story-<story-number>.md` or `architecture.plan.md` is missing, report the ex
 
 If `glossary.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-If `./planning/current.json` exists but is unreadable, malformed, or missing `epic-slug` when needed for fallback, report that exact problem and stop.
+If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
 
@@ -285,12 +291,12 @@ Ask the user to review the implementation before running another `/a-criterion`.
 
 ## Error Handling
 
-- **Missing criterion selector** — ask the user to provide `<story-number>-<criterion-number>`
-- **Empty epic argument with no usable `./planning/current.json` fallback** — ask the user to provide `<epic-slug>`
+- **Missing criterion selector** — ask the user to provide both `<story-number>` and `<criterion-number>`
+- **Unexpected arguments** — explain that `/a-criterion` only accepts `<story-number> <criterion-number>` and always uses `./planning/current.json` for the epic context
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Invalid selector format** — explain the expected format `<story-number>-<criterion-number>` and stop
-- **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <epic-slug> <story-number>`
-- **Missing `architecture.plan.md`** — report the exact path checked and tell the user to run `/a-architecture <epic-slug>`
+- **Invalid selector format** — explain the expected format `<story-number> <criterion-number>` and stop
+- **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <story-number>`
+- **Missing `architecture.plan.md`** — report the exact path checked and tell the user to run `/a-architecture`
 - **Missing `glossary.md`** — tell the user to run `/a-global-architecture` first
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **Acceptance criterion not found** — list available acceptance-criterion numbers from the story file and ask the user to pick one

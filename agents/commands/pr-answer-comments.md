@@ -22,7 +22,7 @@ If no PR is found, report the error and stop.
 
 ### 2. Fetch Review Comments (GraphQL)
 
-Use GraphQL to fetch the PR author, file order, and unresolved review threads, including each review comment URL. Run:
+Use GraphQL to fetch the PR author, file order, and unresolved review threads, not outdated, including each review comment URL. Run:
 
 ```bash
 gh api graphql -f query='
@@ -69,7 +69,7 @@ Only process threads where `isResolved: false`.
 
 Ignore comments written by the PR author. If a thread contains both reviewer comments and PR author replies, only keep the reviewer comments for presentation, but read the PR author's replies as rebuttal context. If a thread has no reviewer comments left after filtering, drop it entirely.
 
-Do not create or post replies in GitHub. This command is analysis and presentation only.
+Do not create or post replies in GitHub. Do not draft or post approval text unless the user explicitly asks in a separate follow-up. This command is analysis and presentation only.
 
 When building links for the final output, convert it to the Changes tab form: `.../pull/<n>/changes#r<id>`.
 
@@ -86,15 +86,15 @@ Be skeptical but fair. Verify against the code before deciding.
 
 ### 4. Classify Each Comment
 
-#### Skills to Load for Validation and Code Changes
+#### Skills to Load for Validation and Follow-Up Work
 
-Load the relevant skills below when they help validate whether a comment is actually correct, and also load them before proposing or making code changes for valid comments. Mention the relevant loaded skills again in the closing recommendation when code changes are needed.
+Load the relevant skills below when they help validate whether a comment is actually correct. If valid comments would likely require code changes in a later follow-up, mention the relevant skills in the closing recommendation so the next step is clear, but do not start fixing anything in this command.
 
-- Always load `ecoologic-code` for implementation work.
-- If the valid comments touch `.ts`, `.tsx`, `.js`, or `.jsx` files, also load `typescript-best-practices`.
-- If the valid comments touch React components or hooks, also load `react-best-practices`.
-- If the valid comments are about UI, UX, layout, accessibility, or interaction design, also load `ux-laws`.
-- If the valid comments are specifically a UI review, design quality, or accessibility audit, also load `web-design-guidelines`.
+- If a later follow-up will involve implementation work, load `ecoologic-code`.
+- If that later follow-up would touch `.ts`, `.tsx`, `.js`, or `.jsx` files, also load `typescript-best-practices`.
+- If that later follow-up would touch React components or hooks, also load `react-best-practices`.
+- If the valid comments are about UI, UX, layout, accessibility, or interaction design, also load `ux-laws` for that later follow-up.
+- If the valid comments are specifically a UI review, design quality, or accessibility audit, also load `web-design-guidelines` for that later follow-up.
 
 #### Process
 
@@ -186,19 +186,22 @@ Presentation rules:
 
 After the numbered list, close with:
 
-1. An offer to address the valid comments in order, starting from the top.
-2. If any valid comment requires code changes, mention the relevant skills loaded from the section above.
-3. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
-4. If all valid comments have already been addressed, or once they are all addressed, explicitly suggest pushing the branch.
+1. Make it explicit that this command only triages comments and does not start fixes, post GitHub replies, or push anything.
+2. Offer to address the valid comments in order only if the user explicitly asks in a follow-up message.
+3. If any valid comment would require code changes in that later follow-up, mention the relevant skills loaded from the section above.
+4. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
+5. If all valid comments have already been addressed, say the branch may be ready to push, but do not push anything as part of this command, until told, and if so, also resolve all outdated comments.
 
 Example closing line:
 
 ```text
-I can address the valid items in order, starting with #<first-valid-comment-number>.
+This command only triages the unresolved review comments. It does not start fixes, post GitHub replies, or push the branch.
+
+If you want, I can address the valid items in order in a follow-up message, starting with #<first-valid-comment-number>.
 
 Loaded relevant skills: `ecoologic-code`, `typescript-best-practices`
 
-Once all valid items are addressed, I’ll suggest pushing the branch.
+If all valid items are already addressed, the branch may be ready to push.
 
 Reply `write` if you want me to store this triage as `./tmp/pr-<number>.md`
 ```
@@ -235,6 +238,7 @@ When writing this file:
 - Use the response you already produced
 - Treat repeated comments as one issue only when they genuinely share the same fix and reasoning.
 - When in doubt between `VALID[...]` and `INVALID`, default to `VALID[...]`.
+- Do not start fixing files, posting GitHub comments, or pushing the branch as part of this command.
 
 ## Error Handling
 
