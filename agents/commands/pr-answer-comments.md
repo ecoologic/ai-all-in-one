@@ -189,6 +189,7 @@ After the numbered list, close with:
 1. An offer to address the valid comments in order, starting from the top.
 2. If any valid comment requires code changes, mention the relevant skills loaded from the section above.
 3. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
+4. If all valid comments have already been addressed, or once they are all addressed, explicitly suggest pushing the branch.
 
 Example closing line:
 
@@ -196,6 +197,8 @@ Example closing line:
 I can address the valid items in order, starting with #<first-valid-comment-number>.
 
 Loaded relevant skills: `ecoologic-code`, `typescript-best-practices`
+
+Once all valid items are addressed, I’ll suggest pushing the branch.
 
 Reply `write` if you want me to store this triage as `./tmp/pr-<number>.md`
 ```
