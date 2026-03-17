@@ -51,6 +51,11 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - List the files including the word architecture in `./planning/` to see if there's any that by the name might be relevant to our goal. If so, read the sections that seem relevant.
 
+## Testing
+
+- For test-writing and test-review guidance, load `ecoologic-test`
+- Keep this skill focused on application and domain code rules
+
 ## TypeScript
 
 - DO NOT CREATE any new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
@@ -66,6 +71,7 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - Prefer declarative style over imperative
 - Avoid declaring function inside other functions, prefer root functions when possible
+- We strictly control for quality and security entering the system; Once in, we assume information is correct, eg: Do not re-validate data in the DB
 
 ## Readability
 

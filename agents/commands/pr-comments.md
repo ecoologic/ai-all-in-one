@@ -105,7 +105,11 @@ Each comment must end up in exactly one category:
 - `VALID[t:quick][s:<severity>]`: the reviewer is correct and the fix should be small, local, and low-risk
 - `VALID[t:mid][s:<severity>]`: the reviewer is correct and the fix needs a moderate code change, touches a couple of call sites, or needs careful adjustment
 - `VALID[t:long][s:<severity>]`: the reviewer is correct but the fix is broader, cross-cutting, or requires meaningful refactoring / follow-up work
-- `INVALID`: the reviewer is mistaken, outdated, based on a misunderstanding, or is not actually asking for an actionable change
+- `INVALID`: when:
+  - The reviewer is mistaken
+  - The reviewer is asking to complicate the logic for little benefit
+  - The reviewer is asking for checks that provide little benefit
+  - The comment is based on a misunderstanding or outdated information
 
 Severity: `low|mid|high`
 
@@ -138,14 +142,14 @@ For each deduped issue:
 - Mention all matching numbers together, like `2, 5, 8.`
 - Mark every non-canonical duplicate thread for resolution after classification is complete
 
-### 6. Resolve Duplicate and Stale Threads
+### 6. Cleanup conversations
 
 After classification and dedupe are complete, resolve review threads in GitHub when any of these is true:
 
 - The thread is a non-canonical duplicate of another issue
 - The thread is classified `VALID[done][<severity>]` because the fix is already present
 - The thread is classified `INVALID` because it is outdated or already addressed
-- Cursor and Copilot general outdated general comments, leave only the latest for each, delete the previous ones
+- For Cursor (message: "Cursor Bugbot has reviewed your changes...") and Copilot (title: "Pull request overview") general comments, leave only the latest for each, "hide" reason "outdated" all previous one
 
 In which case, leave a short explanation reply before closing.
 
@@ -173,6 +177,8 @@ Track which raw comment numbers were resolved automatically and why:
 - `author reviewed`
 
 If a thread should be auto-resolved but the mutation fails, report the failing command and stop instead of continuing with partial state.
+
+NOTE: If the prompter asks to "cleanup the conversation", these above are the rules.
 
 ### 7. Order Issues by Code Position
 
