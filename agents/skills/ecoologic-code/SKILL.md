@@ -49,7 +49,7 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 ## Context
 
-- List the files from the docs folder to see if there's any that by the name might be useful (eg: architecture.md). If so, read them to confirm and keep in mind the bits relevant to the work we're doing
+- List the files including the word architecture in `./planning/` to see if there's any that by the name might be relevant to our goal. If so, read the sections that seem relevant.
 
 ## TypeScript
 
@@ -62,7 +62,7 @@ If those skills contain relevant structure guidance (for example: colocating by 
 - NEVER create new magic numbers, extract to const for clarity
 - NEVER call a time `Xdate`, even if JS class is `Date`, a `date` is the day only, and `time` is a date _with time_
 
-## Style
+## Code Style
 
 - Prefer declarative style over imperative
 - Avoid declaring function inside other functions, prefer root functions when possible
@@ -86,13 +86,12 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 ```typescript
 // Good: domain terms, clear scope
-function cancelOrder(orderId: OrderId): void { ... }
+const cancelOrder = (orderId: OrderId): void => { ... }
 const shippingLabel = createShippingLabel(order);
 
 // Bad: invented jargon, vague names
-function reversePurchaseTransaction(txId: string): void { ... }
+const reversePurchaseTransaction = (txId: string): void => { ... }
 const doc = makeDoc(o);
-
 ```
 
 </example>

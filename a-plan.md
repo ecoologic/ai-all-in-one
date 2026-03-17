@@ -3,11 +3,14 @@
 ## TODOs
 
 - The process needs to be way more inteactive
+- The process needs more "self-review"
 - Stories need "when shit happens" ACs
 - Consider extra architecture docs in `./planning/architecture/`
 - No `.plan.md`, just `.md`
 - Criterion ultimate line of defence for reviewing architecture and ui
 - New `a-board` to update the board using `./planning/current.json` (don't touch worked on stories)
+- a-plan add? https://skills.sh/oimiragieo/agent-studio/spec-critique (needs customisation)
+- General: USE extended thinking
 - GLOBAL: extract skills
 
 ## Problem

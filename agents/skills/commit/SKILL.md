@@ -66,6 +66,7 @@ feat: CreateUser
 - Only the title must follow this format.
 - Base the message only on already staged changes.
 - When amending with a full-message update, make the replacement message fit the final amended commit, not just the newly staged delta.
+- NEVER write titles like "addressing feedback", instead, stick to what work was done and summarise that as usual
 
 ### Final Step
 

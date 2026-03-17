@@ -16,6 +16,7 @@ Answer the question provided in `$ARGUMENTS` with **maximum brevity**.
    - Numeric question → answer with the number only
    - "Which" / "What" → answer with the name/value only
    - "Where" → answer with the path/location only
+   - "This or that?" → response: this
 4. **Answer only what was asked.** Do not answer adjacent questions, do not add context, do not caveat.
 5. **acronyms or initials** If in the question or answer, provide a legend list
    1. eg: - NASA: National Aeronautics and Space Administration

@@ -28,8 +28,11 @@ alwaysApply: true
 - NEVER make changes that leave the DB broken, use setup a different DB for those investigations
 - During investigation, report findings before moving on to implementation unless the user explicitly asked you to continue through both phases
 
-## Git
-- ALWAYS prefix all git worktrees with the full path of the project, regardless of how long the folder gets eg: `fantastic-monorepo -> fantastic-monorepo-partners-form`
+## Git worktrees
+- ALWAYS prefix all git worktrees with the full path of the project, regardless of how long the folder gets eg: `~/dev/fantastic-monorepo -> ~/dev/fantastic-monorepo-partners-form`
+- ALWAYS symlink `./planning/` and `./tmp/` so all branches share the same
+- ALWAYS create the worktree as a sibling of the project folder, ie: `~/dev/<project>` and `~/dev/<project>-<worktree>`
+- ALWAYS name the worktree like the folder without the project name, ie: `~/dev/<project>-<worktree>` and `<worktree>` branch
 
 ## User model
 - Optimize for simplicity, readability and code quality
@@ -40,3 +43,4 @@ alwaysApply: true
 - Obsessed with readability and code quality
 - email: `echo $MY_EMAIL`
 - GitHub user: `gh api user --jq '.login'`
+- Worktree or `wt` refert to a Git worktree

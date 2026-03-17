@@ -1,10 +1,10 @@
 ---
-description: Triage unresolved PR review comments, verify them, and present an ordered action list
+description: Triage PR review comments, resolve stale ones, and present the remaining action list
 ---
 
 # Triage PR Review Comments
 
-Fetch unresolved PR review comments from reviewers, verify whether each comment is valid, dedupe repeated feedback, and present the results in code order as an action list for the user.
+Fetch unresolved PR review comments from reviewers, verify whether each comment is valid, resolve duplicated, outdated, or already-addressed threads, and present the remaining actionable results in code order as an action list for the user.
 
 Argument: $ARGUMENTS
 
@@ -69,7 +69,7 @@ Only process threads where `isResolved: false`.
 
 Ignore comments written by the PR author. If a thread contains both reviewer comments and PR author replies, only keep the reviewer comments for presentation, but read the PR author's replies as rebuttal context. If a thread has no reviewer comments left after filtering, drop it entirely.
 
-Do not create or post replies in GitHub. Do not draft or post approval text unless the user explicitly asks in a separate follow-up. This command is analysis and presentation only.
+Do not create or post replies in GitHub. Do not draft or post approval text unless the user explicitly asks in a separate follow-up. This command may resolve duplicate or outdated review threads, but it must not post discussion text.
 
 When building links for the final output, convert it to the Changes tab form: `.../pull/<n>/changes#r<id>`.
 
@@ -86,9 +86,9 @@ Be skeptical but fair. Verify against the code before deciding.
 
 ### 4. Classify Each Comment
 
-#### Skills to Load for Validation and Follow-Up Work
+#### Required skills for Validation and Follow-Up Work
 
-Load the relevant skills below when they help validate whether a comment is actually correct. If valid comments would likely require code changes in a later follow-up, mention the relevant skills in the closing recommendation so the next step is clear, but do not start fixing anything in this command.
+Load the relevant skills below when they help validate whether a comment is actually correct in the context of the work we're doing. If valid comments would likely require code changes in a later follow-up, mention the relevant skills in the closing recommendation so the next step is clear, but do not start fixing anything in this command.
 
 - If a later follow-up will involve implementation work, load `ecoologic-code`.
 - If that later follow-up would touch `.ts`, `.tsx`, `.js`, or `.jsx` files, also load `typescript-best-practices`.
@@ -100,10 +100,14 @@ Load the relevant skills below when they help validate whether a comment is actu
 
 Each comment must end up in exactly one category:
 
-- `VALID[quick]`: the reviewer is correct and the fix should be small, local, and low-risk
-- `VALID[mid]`: the reviewer is correct and the fix needs a moderate code change, touches a couple of call sites, or needs careful adjustment
-- `VALID[long]`: the reviewer is correct but the fix is broader, cross-cutting, or requires meaningful refactoring / follow-up work
+- `VALID[done]`: the reviewer is correct but the fix has already been applied
+- `VALID[dup]`: the reviewer is correct but the fix will be made together with fixing a preceeding comment
+- `VALID[t:quick][s:<severity>]`: the reviewer is correct and the fix should be small, local, and low-risk
+- `VALID[t:mid][s:<severity>]`: the reviewer is correct and the fix needs a moderate code change, touches a couple of call sites, or needs careful adjustment
+- `VALID[t:long][s:<severity>]`: the reviewer is correct but the fix is broader, cross-cutting, or requires meaningful refactoring / follow-up work
 - `INVALID`: the reviewer is mistaken, outdated, based on a misunderstanding, or is not actually asking for an actionable change
+
+Severity: `low|mid|high`
 
 When uncertain between `VALID[...]` and `INVALID`, default to `VALID[...]` with the best effort estimate.
 
@@ -132,8 +136,45 @@ For each deduped issue:
 - Preserve only the first comment's text in the final output
 - Use the canonical comment's GitHub review comment URL to derive a Changes tab link as the display link target
 - Mention all matching numbers together, like `2, 5, 8.`
+- Mark every non-canonical duplicate thread for resolution after classification is complete
 
-### 6. Order Issues by Code Position
+### 6. Resolve Duplicate and Stale Threads
+
+After classification and dedupe are complete, resolve review threads in GitHub when any of these is true:
+
+- The thread is a non-canonical duplicate of another issue
+- The thread is classified `VALID[done][<severity>]` because the fix is already present
+- The thread is classified `INVALID` because it is outdated or already addressed
+- Cursor and Copilot general outdated general comments, leave only the latest for each, delete the previous ones
+
+In which case, leave a short explanation reply before closing.
+
+Do not resolve the canonical thread for a still-valid issue. Do not resolve a thread just because it is low severity.
+
+Use the GraphQL mutation below once per thread that should be resolved:
+
+```bash
+gh api graphql -f query='
+mutation($threadId: ID!) {
+  resolveReviewThread(input: {threadId: $threadId}) {
+    thread {
+      id
+      isResolved
+    }
+  }
+}' -f threadId='{threadId}'
+```
+
+Track which raw comment numbers were resolved automatically and why:
+
+- `duplicate of #<canonical-number>`
+- `outdated`
+- `already addressed`
+- `author reviewed`
+
+If a thread should be auto-resolved but the mutation fails, report the failing command and stop instead of continuing with partial state.
+
+### 7. Order Issues by Code Position
 
 Present issues in the order they appear in the PR diff:
 
@@ -141,7 +182,7 @@ Present issues in the order they appear in the PR diff:
 2. Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
 3. For deduped issues, use the canonical comment's position.
 
-### 7. Present Results to the User
+### 8. Present Results to the User
 
 Start with:
 
@@ -150,7 +191,16 @@ Start with:
 <url>
 ```
 
-Then list each deduped issue in order using exactly this shape:
+Then, if any threads were auto-resolved, include this section before the actionable issue list:
+
+```text
+Resolved automatically:
+- <n>. duplicate of #<canonical-number>
+- <n>. outdated
+- <n>. already addressed
+```
+
+Then list each remaining deduped issue in order using exactly this shape:
 
 ```text
 <n>[, <n2>, <n3>]. @<reviewer login>
@@ -175,6 +225,7 @@ INVALID
 Presentation rules:
 
 - Number every raw reviewer comment first, in code order, before deduping. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
+- Do not include auto-resolved duplicate, outdated, or already-addressed threads in the actionable issue list. Mention them only in `Resolved automatically`.
 - Render `path:line` as a markdown link to the canonical PR review comment's Changes tab URL, for example `https://github.com/owner/repo/pull/326/changes#r2929596414`.
 - Truncate the quoted reviewer text to a single paragraph. Remove extra blank lines and shorten if needed, but preserve the substance.
 - Do not include planned GitHub reply text.
@@ -182,20 +233,20 @@ Presentation rules:
 - Do not include general PR comments outside review threads.
 - Keep explanations concise but specific to the code.
 
-### 8. Close with a Clear Next Step
+### 9. Close with a Clear Next Step
 
 After the numbered list, close with:
 
-1. Make it explicit that this command only triages comments and does not start fixes, post GitHub replies, or push anything.
+1. Make it explicit that this command triages comments and may resolve duplicate, outdated, or already-addressed review threads, but does not start fixes, post GitHub replies, or push anything.
 2. Offer to address the valid comments in order only if the user explicitly asks in a follow-up message.
 3. If any valid comment would require code changes in that later follow-up, mention the relevant skills loaded from the section above.
 4. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
-5. If all valid comments have already been addressed, say the branch may be ready to push, but do not push anything as part of this command, until told, and if so, also resolve all outdated comments.
+5. If all valid comments have already been addressed and all duplicate, outdated, or already-addressed threads were resolved, say the branch may be ready to push, but do not push anything as part of this command until told.
 
 Example closing line:
 
 ```text
-This command only triages the unresolved review comments. It does not start fixes, post GitHub replies, or push the branch.
+This command triages the unresolved review comments and may resolve duplicate, outdated, or already-addressed review threads. It does not start fixes, post GitHub replies, or push the branch.
 
 If you want, I can address the valid items in order in a follow-up message, starting with #<first-valid-comment-number>.
 
@@ -208,7 +259,7 @@ Reply `write` if you want me to store this triage as `./tmp/pr-<number>.md`
 
 The prompter will use the comment numbers to address the various comments.
 
-### 9. Optional Handoff File
+### 10. Optional Handoff File
 
 If the user replies `write`, store the triage result in `./tmp/pr-<number>.md`.
 
@@ -217,6 +268,7 @@ Requirements for that file:
 - Make it self-contained so a fresh agent can understand the context with no prior chat history.
 - Start by stating that this document is the current PR comment triage and that the next step is to address the valid PR comments by their numbers.
 - Include the PR number, title, and URL.
+- Include the `Resolved automatically` section exactly as shown to the user, if present.
 - Include the same numbered deduped issue list that was shown to the user, preserving numbering exactly.
 - Preserve each issue's reviewer login, linked `path:line`, comment excerpt, and `VALID[quick|mid|long]` or `INVALID` reasoning.
 - Preserve duplicate-number groupings such as `2, 5, 8.`
@@ -235,8 +287,9 @@ When writing this file:
 
 - Validate comments against the actual code before deciding.
 - Do not invent certainty. If the code is ambiguous, say why, then choose the most defensible classification.
-- Use the response you already produced
+- Use the response you already produced.
 - Treat repeated comments as one issue only when they genuinely share the same fix and reasoning.
+- Resolve duplicate and outdated threads only after validation and dedupe are complete.
 - When in doubt between `VALID[...]` and `INVALID`, default to `VALID[...]`.
 - Do not start fixing files, posting GitHub comments, or pushing the branch as part of this command.
 

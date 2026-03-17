@@ -32,7 +32,6 @@ Invoke these skills when relevant:
 - `ux-laws` when implementing user-facing interaction flows
 - `web-design-guidelines` when implementing or adjusting web UI
 - `explore` for tightly scoped discovery in multiple code areas
-- `conflict-resolution` if merge conflicts are encountered
 
 ## Purpose
 
