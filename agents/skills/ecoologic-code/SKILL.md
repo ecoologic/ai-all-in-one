@@ -51,11 +51,6 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - List the files including the word architecture in `./planning/` to see if there's any that by the name might be relevant to our goal. If so, read the sections that seem relevant.
 
-## Testing
-
-- For test-writing and test-review guidance, load `ecoologic-test`
-- Keep this skill focused on application and domain code rules
-
 ## TypeScript
 
 - DO NOT CREATE any new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
@@ -69,6 +64,7 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 ## Code Style
 
+- When concepts are renamed, there's often no need to keep around any knowledge of the old name (it can live in git)
 - Prefer declarative style over imperative
 - Avoid declaring function inside other functions, prefer root functions when possible
 - We strictly control for quality and security entering the system; Once in, we assume information is correct, eg: Do not re-validate data in the DB
@@ -104,21 +100,72 @@ const doc = makeDoc(o);
 
 ## Shared code and module boundaries
 
-- Evaluate extracted or shared code across five axes: domain meaning, locality, ownership/location, dependency direction, and YAGNI/abstraction cost
+- Evaluate extracted or shared code in this order:
+  1. semantic ownership
+  2. conceptual correctness
+  3. dependency direction
+  4. existing architectural boundaries
+  5. locality / convenience
 - Distinguish two different problems:
   - the abstraction is bad
   - the abstraction is fine, but the module boundary or file location is bad
+- Also distinguish:
+  - where duplication is observed
+  - where the code belongs
+- If duplication is discovered in one feature, do not assume that feature owns the extracted code
+- First determine what kind of logic it is, then determine which module should own it
+- Put logic where it belongs by meaning and ownership, not where duplication first appears
+- Do not prefer the smallest shared module or nearest existing module if that module is only a consumer, not the true owner
+- If logic is generic, place it in a generic boundary even if it is currently used by only one feature
+- If logic is domain-specific, place it with that domain even if some parts look technically reusable
+- UI logic stays UI-local
+- Backend transport and error-shaping logic stays backend-local
 - Code should usually be grouped by feature, bounded context, or clear owner, not by technical shape such as `constants/`, `types/`, unless the project already has a stronger convention
-  - `helpers` might be a good exception to extract tech jargon in one location
-- Prefer colocating code with the hook, component, feature, or domain object that gives it meaning. Move it to a broader shared location only when multiple peers with the same owner truly need it
+  - a narrowly-scoped technical `helpers` module can be acceptable when the project already uses it intentionally, but do not turn it into a catch-all shared bucket
+- Prefer colocating code with the hook, component, feature, or domain object that truly owns its meaning. Locality is a tie-breaker, not the primary rule
 - Shared constants can be good when they remove arbitrary magic numbers, encode consistent UX defaults, or make behavior easier to tune. They still need a meaningful owner and should not be dumped into a global junk-drawer module
 - Dependency direction still matters after extraction: avoid creating "shared" modules that pull lower-level code upward or cause unrelated features to depend on a vague common bucket
+- Avoid creating misleading feature-local homes for generic logic just because one feature needed it first
+- Avoid creating vague global utility buckets for domain logic just because it looks reusable at a technical level
 - In reviews and refactors, call out the real smell precisely. If the value is useful but the placement is wrong, say that explicitly instead of rejecting the extraction wholesale
 - Mandatory checkpoint for every new shared file or module:
   - Who owns this?
   - Why does it live here?
+  - Is the current location the owner, or only the first consumer?
   - Is this grouped by feature or by tech type?
-  - Would colocating it with the hook or feature be clearer?
+  - Does this placement respect dependency direction and architectural boundaries?
+  - If there were no duplicate yet, where would this code naturally belong?
+
+<example>
+
+```typescript
+// Good: generic parsing belongs in a generic boundary,
+// even if a single feature discovered the need first.
+import { parsePostcode } from '@/shared/address/parsePostcode';
+
+// Bad: misleading feature-local home for generic logic.
+import { parsePostcode } from '@/features/data-partner/postcodeUtils';
+```
+
+```typescript
+// Good: data-partner mapping rules belong to the data-partner domain.
+import { mapDataPartnerForm } from '@/domains/data-partner/DataPartnerFormMapping';
+
+// Bad: vague utility bucket hides real ownership.
+import { mapDataPartnerForm } from '@/shared/utils/formMapping';
+```
+
+```typescript
+// Good: runtime/view concerns stay local to the runtime boundary.
+const viewState = getOrderFormViewState(formState);
+const publicError = toCreateOrderHttpError(error);
+
+// Bad: extracting app/runtime-local concerns into generic shared modules.
+const viewState = getSharedViewState(formState);
+const publicError = toSharedErrorShape(error);
+```
+
+</example>
 
 ## Positive Code
 

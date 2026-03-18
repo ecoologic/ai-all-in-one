@@ -1,6 +1,6 @@
 ---
 description: Break down an idea into personas and actionable user stories
-argument-hint: none
+argument-hint: "[instructions-or-suggestions]"
 allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
@@ -62,8 +62,10 @@ Treat each inconsistency independently:
 - NEVER abbreviate new names
 - NEVER slice stories by technology layer
 - NEVER write implementation details, API shapes, schema designs, or task-level work into `epic.md`
+- NEVER reuse a story number, place multiple stories under the same numbered heading, or represent one numbered story across multiple files; each story number must map 1:1 to exactly one `## Story N` section in `epic.md` and exactly one future `story-N.md` file
 - produce `personas.md` in this command so later stages inherit the same actors and usage context
 - keep stretch goals out of `epic.md`; write them to `stretch-goals.md` instead
+- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify scope, adjust story boundaries, or propose corrections, but it must not silently override `./planning/current.json`, required inputs, glossary canon, or stronger source-of-truth evidence
 
 ## Story canonical format
 
@@ -131,11 +133,19 @@ If either shared file is missing, stop and tell the user to run `/a-global-archi
 
 ## Step 1: Resolve inputs
 
-`$ARGUMENTS` = none
+`$ARGUMENTS` = `[instructions-or-suggestions]`
 
 This command does not accept an epic slug argument.
 
-If any explicit argument is provided, report that `/a-epic` always uses the active epic from `./planning/current.json` and stop.
+If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not as epic selection.
+
+Guidance may include:
+- scope clarifications
+- requested changes to the proposed plan
+- corrections to assumptions in existing planning artifacts
+- partial story, persona, or acceptance-criteria direction that should be validated against the inputs
+
+Use that guidance ahead of default story-splitting heuristics and stale assumptions, but do not let it silently override required inputs, `./planning/current.json`, or stronger source-of-truth evidence.
 
 Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
@@ -193,6 +203,7 @@ Only include personas that matter to the epic. Avoid speculative future roles.
 
 Split the work into minimal, user-facing stories. For each story:
 - use canonical format
+- assign a unique integer story number exactly once, in ascending order, with one story per numbered section
 - include a brief user context
 - include numbered acceptance criteria in _Given_ / _When_ / _Then_ form
 - include requirements only when they are truly part of the user-facing outcome
@@ -297,6 +308,7 @@ Include only `Actionable` and `Blocked` stories in `epic.md`. Exclude all `Nice 
 When UI references exist, include all of them in `epic.md`, even if only some stories use each reference.
 Place the `## UI Design References` section immediately after the epic summary so the main design link is visible near the top of the document.
 Place `## Resolved Source-of-Truth Decisions` immediately after `## UI Design References` so later stages can reuse the conflict decisions before reading the stories.
+Ensure the numbered story sections are unique and contiguous within `epic.md` so later stages can resolve `Story N` to one story only and one corresponding `story-N.md` file.
 
 ## Step 6: Write `stretch-goals.md`
 
@@ -363,6 +375,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 - [ ] all required inputs and followed references were validated before planning continued
 - [ ] every story uses canonical _As a / I want / so that_ format
 - [ ] every story has numbered acceptance criteria in _Given / When / Then_ form
+- [ ] every actionable or blocked story in `epic.md` has a unique story number, appears exactly once under its own `## Story N` heading, and maps to exactly one future `story-N.md` file
 - [ ] stories are sliced by user value, not by tech layer
 - [ ] acceptance criteria cover errors, failures and security
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
@@ -375,7 +388,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 
 ## Error Handling
 
-- **Unexpected arguments** — explain that `/a-epic` does not accept an epic slug argument and always uses `./planning/current.json`
+- **Epic selection attempted in guidance** — explain that `/a-epic` always uses `./planning/current.json` for epic selection; treat any remaining guidance text as high-priority instructions only
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `idea.md`** — report the exact path checked and ask the user to create it first
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it

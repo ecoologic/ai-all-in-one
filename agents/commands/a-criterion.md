@@ -1,6 +1,6 @@
 ---
 description: Implement one planned acceptance criterion in the codebase with focused validation
-argument-hint: <story-number> <criterion-number>
+argument-hint: "<story-number> <criterion-number> [\"instructions-or-suggestions\"]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Skill]
 ---
 
@@ -62,22 +62,33 @@ This command should:
 - Implementation tasks may be story-coherent rather than artificially isolated; if the criterion needs a full table, all story-relevant fields for that slice belong in scope
 - Add or update tests when the repo already has a relevant testing pattern and the criterion changes behavior
 - Run the smallest meaningful validation that can prove the criterion works
+- If trailing guidance is provided, treat it as the highest-priority execution input for this run. It may clarify expected behavior, request an implementation adjustment, or describe partial existing work, but it must not silently override the required selectors, approved planning artifacts, glossary canon, or other hard command constraints
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<story-number> <criterion-number>`
+`$ARGUMENTS` = `<story-number> <criterion-number> [instructions-or-suggestions]`
 
 Interpret argument shapes like this:
 - this command accepts exactly two explicit numeric arguments: `<story-number> <criterion-number>`
+- any remaining text after those selectors is optional high-priority guidance for this run
 - epic selection is not accepted as a command argument
 
 Examples:
 - `/a-criterion 2 1` -> use the current epic and criterion `2-1`
 - `/a-criterion 6 2` -> use the current epic and criterion `6-2`
+- `/a-criterion 2 1 "Prefer extending the existing sync job rather than adding a new worker"` -> use the current epic and criterion `2-1`, and treat the quoted text as highest-priority guidance
 
 If either `<story-number>` or `<criterion-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
 
-If extra arguments are provided, report that `/a-criterion` only accepts `<story-number> <criterion-number>` and always uses `./planning/current.json` for the epic context.
+If guidance text is present after `<story-number> <criterion-number>`, treat it as the highest-priority execution input for this run.
+
+Guidance may include:
+- implementation clarifications
+- desired changes to the plan
+- partial implementation notes or constraints
+- corrections to stale assumptions in the story plan
+
+Use that guidance ahead of default implementation heuristics and stale assumptions, but do not let it silently override the required selectors, `./planning/current.json`, approved planning artifacts, or stronger codebase evidence.
 
 Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
@@ -291,7 +302,7 @@ Ask the user to review the implementation before running another `/a-criterion`.
 ## Error Handling
 
 - **Missing criterion selector** — ask the user to provide both `<story-number>` and `<criterion-number>`
-- **Unexpected arguments** — explain that `/a-criterion` only accepts `<story-number> <criterion-number>` and always uses `./planning/current.json` for the epic context
+- **Epic selection attempted in guidance** — explain that `/a-criterion` always uses `./planning/current.json` for epic selection; keep the resolved `<story-number> <criterion-number>` and treat any remaining text as high-priority guidance only
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Invalid selector format** — explain the expected format `<story-number> <criterion-number>` and stop
 - **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <story-number>`

@@ -17,6 +17,7 @@ Answer the question provided in `$ARGUMENTS` with **maximum brevity**.
    - "Which" / "What" → answer with the name/value only
    - "Where" → answer with the path/location only
    - "This or that?" → response: this
+   - "question 1, question 2" -> "answer 1, answer 2"
 4. **Answer only what was asked.** Do not answer adjacent questions, do not add context, do not caveat.
 5. **acronyms or initials** If in the question or answer, provide a legend list
    1. eg: - NASA: National Aeronautics and Space Administration

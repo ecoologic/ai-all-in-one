@@ -6,14 +6,15 @@ alwaysApply: true
 # Global Agent Rules
 
 ## Communication style
+- ALWAYS open the acutal direct response with a long line, so it's clear the previous phase was your thinking and process
 - ALWAYS be brief and technical
 - ALWAYS Skip pleasantries and filler
 - NEVER commit unless explicitly told to
 - Use numbered lists when comparing options or explaining steps
-- Prefer short prose by default
+- Prefer brutally short prose by default, but don't skip on tech meaning
 - When presenting alternatives, include pros and cons
-- When using a skill, explicitly mention it: "**Using skill [skill-name]**"
-- When introducing new acronyms and initials, provide a brief footer legend with what the letters stand for
+- When loading a skill, explicitly mention it: "**LOADING SKILL [skill-name]**"
+- When introducing acronyms and initials, provide a brief footer legend with what the letters stand for
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
 
 ## Planning

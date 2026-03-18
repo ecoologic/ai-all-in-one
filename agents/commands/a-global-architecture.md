@@ -1,5 +1,6 @@
 ---
 description: Map the repo-wide architecture and write the shared glossary and global architecture artifacts
+argument-hint: "[instructions-or-suggestions]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 ---
 
@@ -49,6 +50,21 @@ Use these skills when relevant:
 - NEVER define synonyms for the same concept
 - prefer durable structure over local implementation noise
 - prefer code and stable project conventions over aspirational docs when they disagree
+- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify scope, suggest structure, or point out partial existing understanding, but it must not override verified code/doc truth or other hard command constraints silently
+
+## Step 0: Parse optional guidance
+
+`$ARGUMENTS` = `[instructions-or-suggestions]`
+
+If `$ARGUMENTS` is present, treat it as high-priority run guidance.
+
+Guidance may include:
+- clarifications about what to emphasize
+- corrections to earlier assumptions
+- suggested repo areas to inspect carefully
+- partial architecture or glossary notes that should be validated and incorporated when correct
+
+Use that guidance ahead of default heuristics, but do not let it silently override verified repo structure, durable naming already present in the codebase, or any other hard rule in this command.
 
 ## Step 1: Explore the repo-wide structure
 

@@ -1,12 +1,12 @@
 ---
-description: Revise one planning artifact from feedback using its original command contract
-argument-hint: <artifact-type> [selector...] <feedback>
+description: Revise one planning artifact from high-priority guidance using its original command contract
+argument-hint: "<artifact-type> [selector...] <instructions-or-suggestions>"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
 
 # Artifact Revision
 
-This command revises an existing planning artifact after user feedback:
+This command revises an existing planning artifact after user guidance:
 ```text
 a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                     \______________________________________________/
@@ -25,7 +25,7 @@ Use this command to correct or refine an artifact that already exists. Do not re
 | **Conditional In**     | codebase                            | Read only when the owner command for the target artifact is code-informed                                |
 | **Conditional In/Out** | `./planning/glossary.md`            | Update only when the owner command would have allowed a durable terminology promotion                    |
 | **Conditional In/Out** | `./planning/global-architecture.plan.md` | Update only when the owner command would have allowed a durable cross-epic promotion                     |
-| **Out**                | target planning artifact            | Revised artifact that addresses the user's feedback without discarding valid existing content            |
+| **Out**                | target planning artifact            | Revised artifact that addresses the user's highest-priority guidance without discarding valid existing content            |
 
 ## Supported Targets
 
@@ -51,20 +51,20 @@ Common examples:
 
 ## Purpose
 
-Revise one planning artifact from concrete feedback while preserving the original pipeline contract.
+Revise one planning artifact from concrete high-priority guidance while preserving the original pipeline contract.
 
 This command should:
 - reload the original owner command contract instead of guessing the artifact's shape
 - anchor on the already open planning artifact when it clearly matches the request
 - reread the inputs that justified the artifact originally
-- compare the current artifact against the feedback and the owner contract
+- compare the current artifact against the guidance and the owner contract
 - apply the smallest durable revision that addresses the issue
 - report any downstream artifacts that may now be stale or need reruns
 
 ## Rules
 
 - NEVER edit more than one primary target artifact per run
-- NEVER treat feedback as a request to regenerate the artifact from scratch unless the current artifact is unusable
+- NEVER treat guidance as a request to regenerate the artifact from scratch unless the current artifact is unusable
 - NEVER bypass the owner command contract; read the owner command file first
 - NEVER let editor context override explicit user arguments
 - NEVER silently rename glossary terms or durable architecture concepts
@@ -72,20 +72,21 @@ This command should:
 - NEVER write files outside `./planning/`
 - NEVER widen scope into unrelated cleanup or speculative improvements
 - For `story`, acceptance-criterion and implementation-task revisions still target the single `story-<story-number>.md` artifact
-- Preserve still-correct content; revise only the sections needed to address the feedback
+- Preserve still-correct content; revise only the sections needed to address the guidance
 - If the requested change implies broader planning drift, summarize the affected artifacts and suggest reruns instead of silently rewriting everything
 - Allow glossary or global-architecture promotion updates only when the owner command for the target artifact would have allowed them
 - Use the currently open or visible planning artifact as a resolution hint only when it maps cleanly to a supported target
 - Read the resolved target artifact before asking for section-level clarification unless the file is missing or the request is still genuinely ambiguous after reading it
+- Treat the final freeform argument as the highest-priority guidance for the revision. It may include clarifications, requested plan changes, or partial implementation notes, but it must not silently override the resolved target, owner contract, glossary canon, or other hard command constraints
 
 ## Step 1: Resolve arguments and local context
 
-`$ARGUMENTS` = `<artifact-type> [selector...] <feedback>`
+`$ARGUMENTS` = `<artifact-type> [selector...] <instructions-or-suggestions>`
 
 Parse explicit arguments from left to right:
 1. first argument is the `artifact-type`
 2. middle arguments are the selector required by that artifact type
-3. final argument is the feedback text and should usually be quoted
+3. final argument is the instructions-or-suggestions text and should usually be quoted
 
 Interpret selector shapes like this:
 - epic selection is not accepted as a command argument for any `a-*` command
@@ -122,7 +123,7 @@ If the selector is still incomplete for an epic-scoped target after using visibl
 
 If `artifact-type` is missing, unsupported, or still does not have the required selector after applying the precedence rules, stop and show the supported target table.
 
-If feedback is empty or missing, stop and ask the user to provide the issue to address.
+If the final instructions-or-suggestions text is empty or missing, stop and ask the user to provide the issue to address.
 
 If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
@@ -142,7 +143,7 @@ Treat the artifact that is already open or visible in the editor as the first fi
 
 If the target artifact does not exist, report the exact path checked and tell the user which owner command must produce it first.
 
-If the feedback references a section, story number, heading, or acceptance criterion inside the target artifact, inspect the current file to resolve it before asking the user to paste more context.
+If the guidance references a section, story number, heading, or acceptance criterion inside the target artifact, inspect the current file to resolve it before asking the user to paste more context.
 
 Ask for section-level clarification only if:
 - the file does not contain the referenced section or concept
@@ -162,7 +163,7 @@ Target type: <artifact-type>
 Owner command: </a-...>
 Target artifact: <path>
 Resolution source: <explicit | visible artifact | mixed>
-Feedback: <quoted feedback summary>
+Instructions: <quoted guidance summary>
 ```
 
 ## Step 3: Reload the original inputs
@@ -186,25 +187,25 @@ Minimum required inputs by target:
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
   - `./planning/global-architecture.plan.md`
-  - targeted codebase areas needed to validate the feedback
+  - targeted codebase areas needed to validate the guidance
 - `story`
   - `./planning/<epic-slug>/epic.md`
   - `./planning/<epic-slug>/architecture.plan.md`
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
   - `./planning/global-architecture.plan.md`
-  - targeted codebase areas needed to validate the feedback
+  - targeted codebase areas needed to validate the guidance
 
 Also follow any references that the owner command says are required for that target. If any required input or followed reference is missing or unreadable, stop and report the exact path or reference.
 
-If the owner command is code-informed, use only targeted exploration around the feedback. Do not do broad repo exploration.
+If the owner command is code-informed, use only targeted exploration around the guidance. Do not do broad repo exploration.
 
 If all required inputs can be resolved from the owner contract and the artifact path, keep going without asking the user to relink them manually.
 
 ## Step 4: Diagnose the requested revision
 
 Compare:
-1. the user's feedback
+1. the user's instructions-or-suggestions
 2. the current target artifact
 3. the owner command contract
 4. the reloaded inputs
@@ -216,11 +217,11 @@ Classify the revision request before editing:
 - **naming correction**: terminology conflicts with the glossary or durable code names
 - **stale artifact**: later discoveries invalidated part of the artifact
 
-If the feedback conflicts with prior approvals, glossary canon, or durable repo-wide architecture:
+If the instructions-or-suggestions conflict with prior approvals, glossary canon, or durable repo-wide architecture:
 - surface the conflict explicitly
 - ask the user before changing the target
 
-If the feedback is really a request to rerun the entire owner stage, say so explicitly and stop instead of faking a narrow edit.
+If the guidance is really a request to rerun the entire owner stage, say so explicitly and stop instead of faking a narrow edit.
 
 ## Step 5: Apply the constrained revision
 
@@ -228,7 +229,7 @@ Edit the target artifact in place.
 
 When revising:
 - preserve the file's existing structure unless the owner command contract requires a structural fix
-- update only the sections needed to address the feedback
+- update only the sections needed to address the guidance
 - keep all unaffected valid content
 - prefer additive or surgical edits over full rewrites
 - keep terminology aligned with `glossary.md`
@@ -280,7 +281,7 @@ Ask the user to review the revision before advancing the pipeline again.
 - [ ] the owner command file was read before revising the artifact
 - [ ] the target artifact was read before asking for section-level clarification
 - [ ] all required inputs and followed references were reloaded or the run stopped with an exact missing path
-- [ ] the requested feedback was addressed without broad regeneration
+- [ ] the requested guidance was addressed without broad regeneration
 - [ ] glossary and global architecture constraints were preserved
 - [ ] any downstream impact was summarized explicitly
 - [ ] the user was asked to review the revised artifact before the pipeline advanced
@@ -291,10 +292,10 @@ Ask the user to review the revision before advancing the pipeline again.
 - **Missing selector for the chosen target** — explain the required selector shape and stop
 - **Unexpected epic selector** — explain that epic-scoped `/a-edit` targets always use `./planning/current.json` and do not accept an epic slug argument
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Missing feedback text** — ask the user to provide the issue to address
+- **Missing instructions-or-suggestions text** — ask the user to provide the issue to address
 - **Explicit target conflicts with visible planning artifact** — show both resolutions and ask the user which target to revise
 - **Missing target artifact** — report the exact path checked and tell the user which owner command must create it first
 - **Missing required input or followed reference** — report the exact path or reference and stop instead of skipping it
-- **Feedback conflicts with glossary or durable architecture** — surface the conflict and ask the user before editing
+- **Guidance conflicts with glossary or durable architecture** — surface the conflict and ask the user before editing
 - **Requested change is too broad for a constrained revision** — recommend rerunning the owner command and explain why
 - **Requested change would require writing application code** — stop and tell the user this command only revises planning artifacts

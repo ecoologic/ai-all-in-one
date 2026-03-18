@@ -1,6 +1,6 @@
 ---
 description: Design the technical architecture for an epic from stories, personas, and the codebase
-argument-hint: none
+argument-hint: "[instructions-or-suggestions]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 ---
 
@@ -72,14 +72,23 @@ Use these skills when relevant:
 - Prefer existing code and established conventions over prototype structure when they conflict
 - Update `glossary.md` only for durable confirmed terms or mappings; ask before renaming an existing term
 - Update `global-architecture.plan.md` only for durable cross-epic structure, not epic-local design detail
+- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify desired architecture direction, note partial implementation reality, or request plan changes, but it must not silently override `./planning/current.json`, validated codebase evidence, glossary canon, or other hard command constraints
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = none
+`$ARGUMENTS` = `[instructions-or-suggestions]`
 
 This command does not accept an epic slug argument.
 
-If any explicit argument is provided, report that `/a-architecture` always uses the active epic from `./planning/current.json` and stop.
+If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not as epic selection.
+
+Guidance may include:
+- clarifications about the intended architecture direction
+- requested changes to the proposed plan
+- partial implementation details that should be validated against the codebase
+- corrections to assumptions in the existing planning packet
+
+Use that guidance ahead of default heuristics and stale assumptions, but do not let it silently override `./planning/current.json`, stronger source-of-truth evidence, or validated codebase reality.
 
 Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
@@ -403,7 +412,7 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 
 ## Error Handling
 
-- **Unexpected arguments** — explain that `/a-architecture` does not accept an epic slug argument and always uses `./planning/current.json`
+- **Epic selection attempted in guidance** — explain that `/a-architecture` always uses `./planning/current.json` for epic selection; treat any remaining guidance text as high-priority instructions only
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
 - **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`

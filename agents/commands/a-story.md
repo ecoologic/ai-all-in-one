@@ -1,6 +1,6 @@
 ---
 description: Break down a single story into a detailed implementation plan organized by acceptance criterion
-argument-hint: <story-number>
+argument-hint: "<story-number> [\"instructions-or-suggestions\"]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
 
@@ -52,21 +52,32 @@ Break one story into a concrete, code-informed implementation plan without writi
 - NEVER let implementation tasks float without a clear acceptance-criterion parent
 - NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
+- If trailing guidance is provided, treat it as the highest-priority refinement input for this run. It may clarify scope, request plan changes, or include partial implementation direction, but it must not silently override the required story selector, glossary canon, validated references, or other hard command constraints
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<story-number>`
+`$ARGUMENTS` = `<story-number> [instructions-or-suggestions]`
 
 Interpret argument shapes like this:
 - this command accepts exactly one explicit argument: `<story-number>`
+- any remaining text after `<story-number>` is optional high-priority guidance for this run
 - epic selection is not accepted as a command argument
 
 Examples:
 - `/a-story 2` -> use the current epic and story `2`
+- `/a-story 2 "Keep the existing webhook ingestion path and update the story plan around it"` -> use the current epic and story `2`, and treat the quoted text as highest-priority guidance
 
 If `<story-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
 
-If extra arguments are provided, report that `/a-story` only accepts `<story-number>` and always uses `./planning/current.json` for the epic context.
+If guidance text is present after `<story-number>`, treat it as the highest-priority refinement input for this run.
+
+Guidance may include:
+- clarifications
+- changes to the story plan
+- corrections to stale planning assumptions
+- partial implementation notes that should shape the plan when validated
+
+Use that guidance ahead of default planning heuristics and stale assumptions, but do not let it silently override the required story selector, `./planning/current.json`, followed references, or stronger source-of-truth evidence.
 
 Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
@@ -353,7 +364,7 @@ Ask the user to review before moving to `/a-criterion`.
 ## Error Handling
 
 - **Missing story number** — ask the user to provide a story number
-- **Unexpected arguments** — explain that `/a-story` only accepts `<story-number>` and always uses `./planning/current.json` for the epic context
+- **Epic selection attempted in guidance** — explain that `/a-story` always uses `./planning/current.json` for epic selection; keep the resolved `<story-number>` and treat any remaining text as high-priority guidance only
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Story not found in `epic.md`** — list available story numbers and ask the user to pick one
 - **Missing shared repo files** — tell the user to run `/a-global-architecture` first
