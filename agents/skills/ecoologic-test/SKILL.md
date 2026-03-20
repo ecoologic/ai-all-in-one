@@ -23,6 +23,10 @@ This skill covers only these four rules:
 3. Use black-box testing
 4. In unit tests, describe actual code elements
 
+## Rule 0: Only test for CI
+
+There's no point in testing code that is not executed in CI. If a test would not run in CI, don't write it.
+
 ## Rule 1: Preserve the subject under test
 
 Do not modify production code to satisfy a test unless you are deliberately verifying that the test fails first. If you temporarily break the implementation to confirm the test is red, restore it before continuing.
@@ -246,7 +250,8 @@ describe('the user form', () => {
 - Name the condition in the `when ...` block, not in the top-level subject
 - Assert outcomes that a caller can observe
 - If a test feels hard to write without poking internals, the test is probably violating black-box style
-- If a test title cannot be mapped back to a symbol or endpoint quickly, rename it to the real code element
+- If a test title cannot be mapped back to a symbol or endpoint, rename the title to the real code element
+- NEVER test endpoints return 500 error, if you found a bug, raise the issue, and we'll fix it separately
 
 ## Review checklist
 

@@ -31,11 +31,13 @@ Invoke these skills when relevant:
 - `react-best-practices` when the project uses React
 - `typescript-best-practices` when the project uses TypeScript
 - `web-design-guidelines` when the story includes web UI
+- All relevant project specific rules and skills
 
 ## Purpose
 
 Break one story into a concrete, code-informed implementation plan without writing code. This command should:
 - investigate the current codebase
+- draft and refine acceptance criteria with the user before locking them into the story artifact
 - define reuse opportunities and constraints
 - refine story-level details when needed
 - capture schema-impact context when the story changes persisted data
@@ -49,6 +51,7 @@ Break one story into a concrete, code-informed implementation plan without writi
 - NEVER abbreviate new names
 - NEVER propose extractions for hypothetical future use
 - NEVER write unnumbered acceptance criteria; `/a-criterion` depends on stable criterion numbers
+- NEVER finalize the acceptance-criteria list without explicit user approval for each criterion in order
 - NEVER let implementation tasks float without a clear acceptance-criterion parent
 - NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
@@ -125,7 +128,26 @@ Has UI: <yes | no>
 UI references: <list or none>
 ```
 
-## Step 2: Investigate the codebase
+## Step 2: Draft acceptance criteria with the user
+
+Use the source-story acceptance criteria from `epic.md`, the user context, dependencies, personas, and any trailing guidance to propose the story's working acceptance criteria list.
+
+Draft them interactively:
+1. propose exactly one numbered acceptance criterion at a time, starting with `1`
+2. ask the user to approve or revise that specific criterion before proposing the next one
+3. if the user revises a criterion, fold the revision into the wording and confirm it before continuing
+4. do not draft criterion `N + 1` until criterion `N` is explicitly approved
+5. keep the numbering stable once a criterion is approved; if a later change forces renumbering, stop and get explicit user confirmation for the renumbered list
+
+While drafting:
+- split overly broad source criteria into multiple numbered criteria when that improves implementation clarity
+- merge duplicate or overlapping source criteria when the user agrees
+- keep criteria implementation-relevant and testable, but do not turn them into tasks
+- preserve glossary-canonical naming
+
+After the last criterion is approved, restate the full numbered list and treat it as the locked acceptance-criteria source for the rest of the command.
+
+## Step 3: Investigate the codebase
 
 Use `global-architecture.plan.md` and `architecture.plan.md` to scope targeted code exploration to achieve the story acceptance criteria.
 
@@ -149,7 +171,7 @@ If the story affects persisted schema, also identify:
 
 Display the findings before proceeding.
 
-## Step 3: Check consistency
+## Step 4: Check consistency
 
 Based on the investigation, evaluate:
 1. naming conventions
@@ -161,7 +183,7 @@ Based on the investigation, evaluate:
 
 Flag inconsistencies that matter to this story. Do not fix unrelated issues.
 
-## Step 4: Define UX
+## Step 5: Define UX
 
 If the story has UI, use `ux-laws` and define:
 - user flow
@@ -173,7 +195,7 @@ Use the followed UI references to ground those decisions. Do not invent UI behav
 
 If there is no UI, explicitly note that UX/UI sections are skipped.
 
-## Step 5: Define UI and extraction opportunities
+## Step 6: Define UI
 
 If the story has UI, define:
 - component inventory
@@ -182,7 +204,11 @@ If the story has UI, define:
 - styling approach
 - responsive behavior
 
-Then identify justified extractions:
+If there is no UI, explicitly note that UI sections are skipped.
+
+## Step 7: Define opportunities for code extraction and reusability
+
+Identify justified extractions:
 - shared components
 - shared utilities
 - shared types
@@ -190,9 +216,9 @@ Then identify justified extractions:
 
 Only include extractions that are clearly warranted by this story.
 
-## Step 6: Refine upstream artifacts when needed
+## Step 8: Refine upstream artifacts when needed
 
-This command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
+_With user permission_, this command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
 - update `epic.md` when the story wording, boundaries, sequencing, or dependencies need correction
 - update `architecture.plan.md` when story work reveals epic-specific technical details other stories should inherit
 - update `glossary.md` when durable domain names, code names, sources, or statuses are confirmed
@@ -200,11 +226,11 @@ This command may update higher-level artifacts when deeper investigation uncover
 
 Summarize every such update in the output.
 
-## Step 7: Write `story-<story-number>.md`
+## Step 9: Write `story-<story-number>.md`
 
 Write `./planning/<epic-slug>/story-<story-number>.md` with this structure:
 
-This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, justified extractions, a story-level completion marker, numbered acceptance criteria, and the implementation plan that `/a-criterion` reads and updates.
+This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, the required story diagrams, justified extractions, a story-level completion marker, the user-approved numbered acceptance criteria, and the implementation plan that `/a-criterion` reads and updates.
 
 ```md
 # Story <story-number>: <title>
@@ -225,19 +251,6 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 1. [ ] ...
 2. [ ] ...
 
-## Codebase Context
-### Related Code
-- ...
-
-### Patterns To Follow
-- ...
-
-### Reuse Opportunities
-- ...
-
-## Consistency Notes
-- ...
-
 ## UX Definition
 ### User Flow
 1. ...
@@ -257,15 +270,56 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 ### Component Hierarchy
 - ...
 
+### ASCII UI Sketch
+- If the story has UI, include a compact ASCII drawing that shows the primary layout, key controls, important content regions, and main interaction affordances
+- Keep it implementation-oriented and readable in plain text; use labels that match the story terminology and followed UI references
+- If the story does not have UI, write `- None`
+
+```text
++--------------------------------------------------+
+| Story Screen Title                               |
++--------------------------------------------------+
+| Filter / Search: [______________]   [Action Btn] |
++--------------------------+-----------------------+
+| Navigation / List        | Primary Content Area  |
+| - Item A                 | - Key field           |
+| - Item B                 | - Status              |
+| - Item C                 | - Secondary actions   |
++--------------------------+-----------------------+
+| Feedback / validation / empty-state messaging    |
++--------------------------------------------------+
+```
+
 ## UI References
 - Story-relevant subset of the epic-level UI references, plus any story-local UI references followed during this run
 - If none exist, write `- None`
 
-## Database Changes
-- If the story changes persisted schema, include a Mermaid `classDiagram` that shows only the story-relevant entities/tables, their relationships, and the fields needed for implementation review
-- In the diagram, explicitly mark changed fields inline using `[new]`, `[changed]`, or `[deleted]`
+## Diagrams
+Present these diagrams in this exact order:
+1. Flow Diagram
+2. Class Diagram
+3. Activity Diagram
+
+### Flow Diagram
+- Include a Mermaid `flowchart` that shows the story's end-to-end user and system flow
+- Show the main happy path plus key decision branches, failures, and handoffs that matter to implementation review
+- Keep it scoped to this story only
+
+```mermaid
+flowchart TD
+    Start([User starts story flow]) --> StepA[Primary user action]
+    StepA --> Decision{Valid?}
+    Decision -->|Yes| StepB[System completes key operation]
+    Decision -->|No| Error[System shows recoverable error]
+    StepB --> End([Story outcome achieved])
+    Error --> End
+```
+
+### Class Diagram
+- Include a Mermaid `classDiagram` that shows only the story-relevant entities, tables, value objects, or components and their relationships
+- If the story changes persisted schema, explicitly mark changed fields inline using `[new]`, `[changed]`, or `[deleted]`
 - Include unchanged fields only when they are relevant for understanding the story
-- If the story does not change persisted schema, write `- None`
+- If the story does not change persisted schema, still include the story-relevant domain or structural relationships rather than writing `None`
 
 ```mermaid
 classDiagram
@@ -278,7 +332,35 @@ classDiagram
     }
 ```
 
-## Extractions
+### Activity Diagram
+- Include a UML-style activity diagram for the story, rendered with Mermaid `flowchart` syntax
+- Show the ordered actions, decisions, loops, and completion conditions that explain how the work progresses through the story
+- Focus on behavior and control flow, not on static structure
+
+```mermaid
+flowchart TD
+    Start([Start]) --> ActionA[Perform first activity]
+    ActionA --> Decision{Condition met?}
+    Decision -->|Yes| ActionB[Continue to next activity]
+    Decision -->|No| Retry[Retry or alternate activity]
+    Retry --> Decision
+    ActionB --> End([End])
+```
+
+## Codebase Context
+### Related Code
+- ...
+
+### Patterns To Follow
+- ...
+
+### Reuse Opportunities
+- ...
+
+## Consistency Notes
+- ...
+
+### Extractions
 | What | From/Why | Target Location | Blocks Story? |
 | ---- | -------- | --------------- | ------------- |
 
@@ -332,9 +414,9 @@ Rules for the implementation plan:
 - implementation tasks must be nested under their acceptance criterion and must never be mistaken for command selectors
 - implementation tasks may be story-coherent rather than artificially isolated
 - if a criterion needs a new type, validation, or helper to satisfy the slice, include it there instead of splitting it into a separate pseudo-task by default
-- keep schema details in `## Database Changes`, not scattered across implementation-task prose, unless a task needs to call out a migration-specific nuance
+- keep schema details in `## Diagrams` under `### Class Diagram`, not scattered across implementation-task prose, unless a task needs to call out a migration-specific nuance
 
-## Step 8: Present to user
+## Step 10: Present to user
 
 Summarize:
 1. number of acceptance criteria
@@ -344,19 +426,24 @@ Summarize:
 5. risks and open questions
 6. recommended starting criterion
 
-Ask the user to review before moving to `/a-criterion`.
+Ask the user to review the completed story artifact before moving to `/a-criterion`. Do not ask for fresh acceptance-criteria drafting at this stage unless the user wants to reopen one of the already approved criteria.
 
 ## Success Criteria
 
 - [ ] `story-<story-number>.md` exists
 - [ ] all required inputs and followed references were validated before story planning continued
 - [ ] `story-<story-number>.md` contains numbered acceptance criteria
+- [ ] each acceptance criterion was explicitly approved by the user before the next criterion was drafted
 - [ ] `story-<story-number>.md` contains a `## Status` section with `- [ ] Story complete`
 - [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Implementation Plan`
 - [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
+- [ ] UI stories include a `### ASCII UI Sketch` section with a readable plain-text layout sketch; non-UI stories explicitly write `- None`
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
-- [ ] when the story changes persisted schema, `story-<story-number>.md` contains a `## Database Changes` section with a Mermaid `classDiagram` covering the story-relevant entities and field-level `[new]`, `[changed]`, and `[deleted]` markers
+- [ ] `story-<story-number>.md` contains a `## Diagrams` section with `### Flow Diagram`, `### Class Diagram`, and `### Activity Diagram` in that exact order
+- [ ] the flow diagram uses Mermaid `flowchart` syntax and covers the story's user and system path
+- [ ] the class diagram uses Mermaid `classDiagram` syntax and covers the story-relevant structure; schema-changing stories include field-level `[new]`, `[changed]`, and `[deleted]` markers
+- [ ] the activity diagram explains the story's behavioral control flow as a UML-style activity diagram rendered with Mermaid `flowchart` syntax
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
 - [ ] the user reviewed the output before the pipeline advanced

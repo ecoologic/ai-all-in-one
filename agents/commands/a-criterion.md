@@ -32,6 +32,7 @@ Invoke these skills when relevant:
 - `ux-laws` when implementing user-facing interaction flows
 - `web-design-guidelines` when implementing or adjusting web UI
 - `explore` for tightly scoped discovery in multiple code areas
+- All relevant project specific rules and skills
 
 ## Purpose
 
@@ -54,6 +55,8 @@ This command should:
 - NEVER broaden scope into unrelated cleanup, opportunistic refactors, or the next acceptance criterion
 - NEVER define synonyms; if a glossary term exists, use its canonical name
 - NEVER propose speculative abstractions or extractions for future use
+- NEVER mention epic, story, acceptance criteria, AC, or similar planning jargon in code comments, user-facing copy, or committed implementation text; use plain language that still makes sense later without planning context
+- NEVER introduce in comments or UI outdated and history context that refers to implementation detail changes eg: The rename of a model
 - NEVER rewrite planning artifacts without a durable reason
 - NEVER update any story file except `./planning/<epic-slug>/story-<story-number>.md`
 - NEVER create commits or auto-chain into the next criterion
@@ -195,6 +198,7 @@ Implement the selected criterion by:
 3. following the codebase's current naming and placement conventions
 4. keeping abstractions criterion-justified, not future-proofed
 5. using the implementation tasks as work organization, not as separate stopping points
+6. writing or preserving only durable comments; when a comment is needed, describe the behavior or business rule directly instead of referring to planning artifacts
 
 If the story file lists a path that does not exist:
 - create it only if the architecture and local conventions make that the correct target

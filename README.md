@@ -10,8 +10,11 @@ ln -s ~/dev/ai/agents ~/.agents
 ln -s ~/dev/ai/claude ~/.claude
 ln -s ~/dev/ai/cursor ~/.cursor
 
+
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.claude/CLAUDE.md
-# NOTE: Cursor .mdc symlinks don't work reliably — use Cursor Settings > User Rules if you have a problem
+# Cursor .mdc symlinks don't work reliably — use Cursor Settings > User Rules if you have a problem
+# Cursor is a repo itself, so we need to link the subfolders too
+ln -s ~/dev/ai/agents/rules ~/.cursor/rules
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
 ```
 

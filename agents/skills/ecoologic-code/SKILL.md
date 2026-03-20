@@ -11,7 +11,7 @@ Lean coding rules grounded in agile delivery.
 
 ## Precedence
 
-IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. React Router conventions, Koa middleware chains, Zustand store patterns), use it. These rules apply when no stronger convention exists.
+IMPORTANT: **Project conventions and framework idioms always take priority over these rules.** If the codebase uses a layered architecture, follow it. If the framework prescribes a pattern (e.g. React Router conventions, Koa middleware chains, Zustand store patterns), use it. These rules apply when no unchallenged convention exists.
 
 This skill takes precedence over other coding-style skills. Domain-specific skills (e.g. ux-laws, react-best-practices) are complementary — apply them alongside these rules, not instead of them.
 
@@ -55,17 +55,18 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - DO NOT CREATE any new enums, EVER, it's fine to use existing ones, use simple strings and use consts for the values (grouped in an object eg: `{ green: 'green' } as const`) and type it strictly
 - Use `as const` where possible
-- Prefer maps over `switch` statements (always prefer declarative code!)
-- Use TypeScript type guards when possible `function isNumber(value: unknown): value is number {`
+- Use TypeScript type guards when possible `const isNumber = (value: unknown): value is number => {`
   Note that these have high chances of reusability and should be stored closed to the type they assert
 - Try to avoid optional types (eg: `active?: boolean`), there's probably a better way to type or code to write more confident code
 - NEVER create new magic numbers, extract to const for clarity
-- NEVER call a time `Xdate`, even if JS class is `Date`, a `date` is the day only, and `time` is a date _with time_
+- Use `typeof` and `keyof typeof` to reduce duplication
+
 
 ## Code Style
 
 - When concepts are renamed, there's often no need to keep around any knowledge of the old name (it can live in git)
 - Prefer declarative style over imperative
+- Prefer object-oriented or functional, but avoid procedural
 - Avoid declaring function inside other functions, prefer root functions when possible
 - We strictly control for quality and security entering the system; Once in, we assume information is correct, eg: Do not re-validate data in the DB
 
@@ -78,7 +79,8 @@ If those skills contain relevant structure guidance (for example: colocating by 
 - Use the domain's exact terms. If the business says "Shipment", code `Shipment`, not `Delivery`
 - Avoid synonyms, don't cheat when: you already have a name and you need a new one, the solution might be to make the older name more specific, and use the same level of specificity for the new name
 - Avoid hungarian notation like `userArray`, prefer common language, domain oriented, like `users`
-- Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`, `statusSet -> possibleStatuses`, `seatingSet -> seatingOptions`
+- Be specific with variable name suffixes, the type can often be inferred from a good name, without using hungarian notation, but like people speak eg: `time -> durationInMs`, `user -> userId`, `createdAt (time) createdOn (date)`, `statusSet -> possibleStatuses`, `seatingSet -> seatingOptions`,  `UserObject -> User<Model, DTO etc>`
+- When you use a design pattern, suffix it to the entity you're creating, eg: `OrganizationDTO StoreStrategy UserPresenter`
 - Maps can be precisely expressed by how they are accessed, eg: `userById = { '<id>': { name: "Erik" }}` and `usersByName = { 'Erik': [{ name: "Erik" }]}` clearly indicates the return type is a list
 - Avoid generics like `data, map, time` when possible, be precise
 - Be consistent with naming, eg: `{ bad: { relatedCompanyName: 'x', companyId: 1 }, good: { relatedCompanyName: 'x', relatedCompanyId: 1 }, better: { company: { id: 1, name: 'x' } } }`
@@ -221,10 +223,14 @@ if (!users.length) // ...
 - One repository per aggregate root — never for child entities
 - Anti-corruption layer at bounded context boundaries to translate between models
 
+## Domain Layer and DB
+
+- ALWAYS respect DB NF1, NF2, NF3 for every model, not only for DB tables
+
 ## YAGNI
 
 1. **Build only what is needed now.** No speculative features, no "might need later" abstractions
-2. **YAGNI does NOT restrict refactoring or extractions.** Making code clearer and easier to modify is always allowed
+2. **YAGNI does NOT restrict refactoring or extractions.** Making code clearer and defining the correct specific abstractions makes for easier maintenance and it's always allowed
 3. **Only ~1/3 of planned features improve their intended metric.** Defer decisions until the last responsible moment
 4. Three similar lines > a premature abstraction
 

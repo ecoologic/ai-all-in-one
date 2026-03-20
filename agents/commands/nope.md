@@ -10,7 +10,7 @@ Audit the most recent response (immediately before `/nope`, including if you wer
 
 ## Goal
 
-Determine not just **which** instructions were violated, but **why** they were not followed and **how the instructions should be amended** so the same failure is less likely to happen again.
+Determine not just **which** instructions were violated, but **why** they were not followed and **how the instructions should be _briefly_ amended** so the same failure is less likely to happen again.
 
 ## Step 1: Capture the response under review
 
