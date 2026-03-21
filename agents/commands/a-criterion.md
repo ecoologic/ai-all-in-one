@@ -6,46 +6,32 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Ski
 
 # Criterion Implementation
 
-This command is a single step of a longer pipeline:
+Pipeline position:
 ```text
 a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                                         ^current
 ```
-Next: user review, then another `/a-criterion` if requested
 
 ### Pipeline I/O
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, story-level completion status, numbered acceptance criteria, and implementation-plan tasks produced by `/a-story`; `/a-criterion` updates only the selected criterion's completion state in this file |
+| **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, completion status, acceptance criteria, and implementation-plan tasks; update only the selected criterion's state |
 | **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture and constraints |
-| **In/Out** | `./planning/glossary.md` | Shared naming baseline from `/a-global-architecture`; update only with durable confirmed names, code names, sources, or statuses |
-| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Read and update only when implementation reveals durable cross-epic structure |
-| **Out** | codebase | Code changes, tests, and other implementation artifacts required by the selected acceptance criterion |
+| **In/Out** | `./planning/glossary.md` | Shared naming baseline; update only with durable confirmed names |
+| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Read/update only when implementation reveals durable cross-epic structure |
+| **Out** | codebase | Code changes, tests, and implementation artifacts |
 
 ## Skills
 
-Invoke these skills when relevant:
+Invoke when relevant:
 - `ecoologic-code` before writing or modifying application code
-- `react-best-practices` when touching React components
-- `typescript-best-practices` when touching TypeScript or JavaScript
-- `ux-laws` when implementing user-facing interaction flows
-- `web-design-guidelines` when implementing or adjusting web UI
+- `react-best-practices` for React components
+- `typescript-best-practices` for TypeScript or JavaScript
+- `ux-laws` for user-facing interaction flows
+- `web-design-guidelines` for web UI
 - `explore` for tightly scoped discovery in multiple code areas
-- All relevant project specific rules and skills
-
-## Purpose
-
-Implement exactly one planned acceptance criterion, grounded in the approved planning artifacts and the real codebase.
-
-This command should:
-- load the selected acceptance criterion and its implementation-plan tasks
-- investigate only the code areas needed to implement that criterion safely
-- make the smallest coherent code change that satisfies the criterion
-- validate the result with focused checks
-- write completion state back to the matching `story-<story-number>.md` file once the selected criterion is done
-- stop after the selected criterion unless the user explicitly asks to continue
-- promote durable findings back into planning artifacts only when they will help future work
+- All relevant project-specific rules and skills
 
 ## Rules
 
@@ -56,267 +42,105 @@ This command should:
 - NEVER define synonyms; if a glossary term exists, use its canonical name
 - NEVER propose speculative abstractions or extractions for future use
 - NEVER mention epic, story, acceptance criteria, AC, or similar planning jargon in code comments, user-facing copy, or committed implementation text; use plain language that still makes sense later without planning context
-- NEVER introduce in comments or UI outdated and history context that refers to implementation detail changes eg: The rename of a model
+- NEVER introduce in comments or UI outdated history context that refers to implementation detail changes eg: The rename of a model
 - NEVER rewrite planning artifacts without a durable reason
 - NEVER update any story file except `./planning/<epic-slug>/story-<story-number>.md`
 - NEVER create commits or auto-chain into the next criterion
 - Prefer existing code patterns, file placement conventions, and interfaces over inventing new ones
-- Internal implementation tasks are execution guidance inside the selected criterion, not separate command entrypoints
-- Implementation tasks may be story-coherent rather than artificially isolated; if the criterion needs a full table, all story-relevant fields for that slice belong in scope
+- Internal implementation tasks are execution guidance, not separate command entrypoints
+- Implementation tasks may be story-coherent rather than artificially isolated; if the criterion needs a full table, all story-relevant fields belong in scope
 - Add or update tests when the repo already has a relevant testing pattern and the criterion changes behavior
 - Run the smallest meaningful validation that can prove the criterion works
-- If trailing guidance is provided, treat it as the highest-priority execution input for this run. It may clarify expected behavior, request an implementation adjustment, or describe partial existing work, but it must not silently override the required selectors, approved planning artifacts, glossary canon, or other hard command constraints
+- If trailing guidance is provided, treat it as the highest-priority execution input for this run, but it must not silently override required selectors, approved planning artifacts, glossary canon, or other hard constraints
 
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<story-number> <criterion-number> [instructions-or-suggestions]`
+`$ARGUMENTS` = `<story-number> <criterion-number> [guidance]`
 
-Interpret argument shapes like this:
-- this command accepts exactly two explicit numeric arguments: `<story-number> <criterion-number>`
-- any remaining text after those selectors is optional high-priority guidance for this run
-- epic selection is not accepted as a command argument
+Two required numeric arguments. Any remaining text is optional high-priority guidance. Epic comes from `./planning/current.json` field `epic-slug`, never from arguments.
 
-Examples:
-- `/a-criterion 2 1` -> use the current epic and criterion `2-1`
-- `/a-criterion 6 2` -> use the current epic and criterion `6-2`
-- `/a-criterion 2 1 "Prefer extending the existing sync job rather than adding a new worker"` -> use the current epic and criterion `2-1`, and treat the quoted text as highest-priority guidance
+If either selector is missing, stop and ask. If `current.json` is missing or malformed, report and stop.
 
-If either `<story-number>` or `<criterion-number>` is empty or missing, stop and ask the user to provide both values. Do not guess or continue with partial context.
-
-If guidance text is present after `<story-number> <criterion-number>`, treat it as the highest-priority execution input for this run.
-
-Guidance may include:
-- implementation clarifications
-- desired changes to the plan
-- partial implementation notes or constraints
-- corrections to stale assumptions in the story plan
-
-Use that guidance ahead of default implementation heuristics and stale assumptions, but do not let it silently override the required selectors, `./planning/current.json`, approved planning artifacts, or stronger codebase evidence.
-
-Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
-
-If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
-
-Derive:
-- `<story-number>` from the part before the hyphen
-- `<criterion-number>` from the part after the hyphen
-
-Read:
+Read these files (stop and report if any are missing):
 - `./planning/<epic-slug>/story-<story-number>.md`
 - `./planning/<epic-slug>/architecture.plan.md`
 - `./planning/glossary.md`
 
-Treat `story-<story-number>.md` as the single planning contract for this command.
+Follow all references from planning artifacts. If any reference is unreadable, stop and report the exact reference and originating file.
 
-If `story-<story-number>.md` or `architecture.plan.md` is missing, report the exact path checked and stop.
+When `story-<story-number>.md` contains a `UI References` section, read and follow those references before implementing UI behavior.
 
-If `glossary.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+Extract from the story file:
+- `## Status` and completion marker
+- The numbered acceptance criterion `<criterion-number>. [ ] ...`
+- The matching `### Acceptance Criterion <criterion-number>` section from `## Implementation Plan` (if missing, report malformed file and stop)
+- Criterion outcome, files likely to change, dependencies, implementation tasks, notes
 
-If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
+If the criterion is not found, list available criterion numbers and stop.
 
-Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
+If `Dependencies` is not `none`, verify the prerequisite exists in the codebase or ask before proceeding.
 
-When `story-<story-number>.md` contains a `UI References` section, treat those references as required input for this criterion. Read and follow them before implementing UI behavior.
+Before editing code, confirm planning artifacts were reviewed and approved by the user in this conversation.
 
-Extract from `story-<story-number>.md`:
-- the `## Status` section and current story completion marker
-- the numbered acceptance criterion ` <criterion-number>. [ ] ...`
-- the matching `### Acceptance Criterion <criterion-number>` section from `## Implementation Plan`
-- the criterion outcome
-- files likely to change
-- dependencies
-- implementation tasks nested under that criterion
-- notes
+## Step 2: Investigate and reconcile
 
-Output:
-```text
-Criterion: <story-number>-<criterion-number> <title>
-Files: <list>
-Depends on: <none | criterion ids | story ids>
-Architecture: loaded
-Story context: loaded
-UI references: <loaded | not needed>
-```
+Inspect the criterion's listed files, nearest collaborating code, and current patterns. Use targeted search only around the criterion's area — no broad exploration.
 
-If the acceptance criterion is not found, list the available acceptance-criterion numbers from the story file and stop.
+Before editing, resolve:
+1. Which files will actually change
+2. Whether supporting tests are required
+3. Whether planned paths need adjustment to match real repo conventions
+4. Whether the criterion can be completed without pulling in another criterion
 
-If the matching implementation-plan section is missing, report that `story-<story-number>.md` is malformed for `/a-criterion` and stop instead of reconstructing the plan from prose.
+If the criterion conflicts with the codebase or architecture in a way that changes scope, stop and ask. If it's underspecified but safely completable, document your interpretation and keep the change minimal. If it requires another criterion first, stop and report the dependency.
 
-Before editing code, confirm that the relevant planning artifacts were already reviewed and approved by the user. If approval is not evident in the current conversation, ask the user to confirm before proceeding.
+## Step 3: Implement the criterion
 
-If `Dependencies` is not `none`, verify that the prerequisite outcome already exists in the codebase or ask the user before proceeding. Do not assume the dependency is satisfied just because it appears earlier in the story file.
+Invoke `ecoologic-code` before making application code changes. Invoke language/UI-specific skills when relevant.
 
-## Step 2: Investigate the target code paths
+Implement by:
+1. Modifying only the files required, plus minimal supporting files (tests, wiring)
+2. Preserving existing working behavior outside scope
+3. Following codebase naming and placement conventions
+4. Keeping abstractions criterion-justified, not future-proofed
+5. Using implementation tasks as work organization, not separate stopping points
+6. Writing only durable comments that describe behavior or business rules directly — never reference planning artifacts
 
-Use the selected criterion's files, implementation tasks, architecture guidance, and glossary to drive targeted code exploration.
+If a listed path doesn't exist, create it only if architecture and conventions confirm it's correct; otherwise follow the nearest valid convention.
 
-Inspect:
-1. the listed files if they exist
-2. the nearest collaborating files, types, services, components, or tests
-3. current naming, placement, and validation patterns
+If part of the criterion is already implemented, reuse it and finish only the missing coverage.
 
-Use targeted search and explore agents only around the selected criterion's area. Do not do broad repo exploration.
-
-Each investigation result should report:
-- relevant files
-- why they matter
-- existing patterns to follow
-- reusable code or tests
-- naming matches or conflicts with the glossary
-- risks or gaps that could change the implementation approach
-
-Display the investigation summary before making edits.
-
-## Step 3: Reconcile the plan with the real codebase
-
-Map the selected acceptance criterion and its implementation tasks to concrete implementation changes.
-
-Decide:
-1. which listed files will actually change
-2. whether supporting tests are required
-3. whether any planned file paths should be adjusted to match real repo conventions
-4. whether the criterion can be completed without pulling in another acceptance criterion
-
-If the criterion conflicts with the current codebase or the architecture in a way that materially changes scope, stop and ask the user before editing.
-
-If implementation reveals that the selected criterion is underspecified but still safely completable, document the interpretation you are using and keep the change minimal.
-
-If implementation would require completing another acceptance criterion first, stop and report the dependency rather than folding extra work into this run.
-
-## Step 4: Implement the criterion
-
-Invoke `ecoologic-code` before making application code changes.
-
-Invoke language- or UI-specific skills when relevant:
-- `typescript-best-practices` for TypeScript or JavaScript
-- `react-best-practices` for React UI
-- `ux-laws` and `web-design-guidelines` for user-facing UI
-
-Implement the selected criterion by:
-1. modifying only the files required for this criterion, plus minimal supporting files such as tests or necessary wiring
-2. preserving existing working behavior outside the selected criterion's scope
-3. following the codebase's current naming and placement conventions
-4. keeping abstractions criterion-justified, not future-proofed
-5. using the implementation tasks as work organization, not as separate stopping points
-6. writing or preserving only durable comments; when a comment is needed, describe the behavior or business rule directly instead of referring to planning artifacts
-
-If the story file lists a path that does not exist:
-- create it only if the architecture and local conventions make that the correct target
-- otherwise, follow the nearest valid project convention and note the adjustment in the final summary
-
-If part of the selected criterion is already implemented:
-- reuse the existing implementation
-- finish only the missing acceptance-criterion coverage
-- avoid rewriting working code just to match an imagined ideal
-
-## Step 5: Validate with focused checks
-
-Use `Bash` for validation commands.
+## Step 4: Validate
 
 Run the smallest meaningful verification first:
-1. targeted tests for the changed module, component, endpoint, or workflow
-2. targeted lint, format, or type checks when available
-3. broader package- or app-level checks only when focused checks are unavailable or clearly insufficient
+1. Targeted tests for the changed module/component/endpoint
+2. Targeted lint, format, or type checks when available
+3. Broader checks only when focused checks are insufficient
 
-If the criterion changes behavior and the repo has a relevant test pattern, add or update tests before considering the criterion done.
+If failure is in scope: fix, rerun, repeat. If failure is pre-existing/unrelated: report the command and failure, explain why it's out of scope. If no automated validation exists, state this and review the code against the acceptance criteria manually.
 
-If a validation failure is inside the selected criterion's scope:
-- fix it
-- rerun the relevant validation
-- repeat until the criterion passes or a real blocker appears
+On merge conflicts, invoke `conflict-resolution` and continue only if criterion scope remains intact.
 
-If a validation failure is clearly unrelated or pre-existing:
-- stop after confirming it is outside this criterion's scope
-- report the exact command and failure
-- explain why it was not fixed as part of this criterion
+## Step 5: Update story progress
 
-If no automated validation exists, say so explicitly and perform a manual acceptance-criteria review against the changed code.
+After validation passes, update only `./planning/<epic-slug>/story-<story-number>.md`:
 
-## Step 6: Update story progress
+1. In `## Acceptance Criteria`, check only the selected criterion
+2. In `## Implementation Plan`, check only completed tasks under `### Acceptance Criterion <criterion-number>`
+3. If every acceptance criterion is now checked, set `## Status` to `- [x] Story complete`; otherwise ensure it remains `- [ ] Story complete`
+4. If `## Status` is missing, add it near the top before applying state
 
-After focused validation passes, update only `./planning/<epic-slug>/story-<story-number>.md`.
+Do not mark complete if validation is failing or implementation is partial.
 
-Apply these completion updates:
-1. in `## Acceptance Criteria`, change only the selected ` <criterion-number>. [ ] ...` entry to checked
-2. in `## Implementation Plan`, check only the completed task items under `### Acceptance Criterion <criterion-number>`
-3. do not check tasks under any other acceptance criterion
+## Step 6: Apply durable planning updates
 
-Story-level completion rule:
-1. use the `## Acceptance Criteria` checklist as the source of truth for overall story completion
-2. if every acceptance criterion in `story-<story-number>.md` is checked after this run, set `## Status` to `- [x] Story complete`
-3. otherwise, ensure `## Status` remains `- [ ] Story complete`
+Update planning artifacts only when implementation reveals durable knowledge for later work:
+- `architecture.plan.md` — epic-specific technical truth later criteria should inherit
+- `glossary.md` — confirmed domain terms, code names, sources, or statuses
+- `global-architecture.plan.md` — cross-epic structure, boundaries, contracts
 
-If `## Status` is missing, add this canonical section near the top of `story-<story-number>.md` before applying the final story-level state:
+Do not push debugging notes, silently rename glossary terms, rewrite tasks because implementation was hard, or backfill speculative future work.
 
-```md
-## Status
-- [ ] Story complete
-```
+## Step 7: Present the result
 
-Do not mark the selected criterion or its tasks complete if validation is still failing or the implementation is only partial.
-
-Summarize the exact progress updates before finishing.
-
-## Step 7: Apply durable planning updates
-
-Update planning artifacts only when implementation reveals durable knowledge worth preserving for later work.
-
-Allowed updates:
-- update `./planning/<epic-slug>/architecture.plan.md` when implementation reveals epic-specific technical truth that later criteria should inherit
-- update `./planning/glossary.md` when a durable domain term, code name, source, or status is confirmed
-- update `./planning/global-architecture.plan.md` only when implementation reveals durable cross-epic structure, boundaries, contracts, or communication paths
-
-Do not:
-- push temporary debugging notes into planning artifacts
-- silently rename an existing glossary term
-- rewrite the story's implementation-plan tasks just because the implementation was harder than expected
-- backfill speculative future work into architecture documents
-
-Summarize every planning-artifact update before finishing.
-
-## Step 8: Present the result to the user
-
-Summarize:
-1. files changed
-2. acceptance criterion covered
-3. validation run and result
-4. story progress updates applied in `story-<story-number>.md`
-5. planning updates applied
-6. remaining blockers, follow-ups, or risks
-7. whether another criterion is now unblocked
-
-Ask the user to review the implementation before running another `/a-criterion`.
-
-## Success Criteria
-
-- [ ] the selected acceptance criterion was located from `story-<story-number>.md`
-- [ ] the selected acceptance criterion number matched a dedicated implementation-plan section in `story-<story-number>.md`
-- [ ] all required inputs and followed references were validated before implementation continued
-- [ ] only the selected acceptance criterion's scope was implemented
-- [ ] changed files follow existing local patterns and canonical glossary naming
-- [ ] focused validation ran, or the lack of automation was explained explicitly
-- [ ] relevant tests were added or updated when a matching test pattern exists
-- [ ] relevant UI references were loaded before implementing UI behavior
-- [ ] internal implementation tasks were treated as guidance for the selected criterion, not as separate command targets
-- [ ] the selected criterion's checklist state was updated only in `story-<story-number>.md`
-- [ ] the story-level completion marker was checked only if every acceptance criterion in `story-<story-number>.md` is complete
-- [ ] any durable glossary or architecture updates were applied deliberately
-- [ ] the user reviewed the result before the pipeline advanced
-
-## Error Handling
-
-- **Missing criterion selector** — ask the user to provide both `<story-number>` and `<criterion-number>`
-- **Epic selection attempted in guidance** — explain that `/a-criterion` always uses `./planning/current.json` for epic selection; keep the resolved `<story-number> <criterion-number>` and treat any remaining text as high-priority guidance only
-- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Invalid selector format** — explain the expected format `<story-number> <criterion-number>` and stop
-- **Missing `story-<story-number>.md`** — report the exact path checked and tell the user to run `/a-story <story-number>`
-- **Missing `architecture.plan.md`** — report the exact path checked and tell the user to run `/a-architecture`
-- **Missing `glossary.md`** — tell the user to run `/a-global-architecture` first
-- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
-- **Acceptance criterion not found** — list available acceptance-criterion numbers from the story file and ask the user to pick one
-- **Malformed criterion plan** — report that the selected acceptance criterion in `story-<story-number>.md` is missing its required implementation-plan structure instead of reconstructing it from surrounding prose
-- **Missing story status marker** — add the canonical `## Status` section to `story-<story-number>.md` before writing the final completion state
-- **Unsatisfied dependency** — report the dependency and stop before editing code
-- **Criterion/architecture/codebase conflict** — surface the conflict clearly and ask the user before widening scope
-- **Validation blocked by unrelated existing failure** — report the exact command, the failure, and why it is out of scope
-- **Merge conflicts encountered** — invoke `conflict-resolution`, resolve carefully, verify the result, and then continue only if criterion scope is still intact
+Summarize: files changed, criterion covered, validation result, story progress updates, planning updates, blockers or risks, whether another criterion is unblocked.
