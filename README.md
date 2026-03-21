@@ -24,16 +24,17 @@ The remaining internal symlinks are already checked into the repos:
 Symlinked to `~` so all AI agents pick them up:
 
 - `agents/` → `~/.agents` — global scope skill code lives here
+  - `commands/` — shared slash commands (each `.md` file becomes `/filename`)
   - `skills/` — installed skill directories (each contains a `SKILL.md`)
   - `.skill-lock.json` — tracks installed skills with sources, hashes, timestamps (v3)
 
 - `claude/` → `~/.claude` — Claude Code user-level config
+  - `commands/` → `~/.agents/commands/` — folder symlink, shared commands auto-available
   - `skills/` → `~/.agents/skills/` — folder symlink, all shared skills auto-available
-  - `commands/` — slash commands, each `.md` file becomes `/filename`
   - `settings.json` — Claude Code user settings
 
 - `cursor/` → `~/.cursor` — Cursor user-level config (whole directory symlinked)
-  - `commands/` — slash commands, each `.md` file becomes `/filename`
+  - `commands/` → `~/.agents/commands/` — folder symlink, shared commands auto-available
   - `rules/` → `agents/rules/` — folder symlink, shared rules auto-available
   - `skills/` → `~/.agents/skills/` — folder symlink, all shared skills auto-available
   - `skills-cursor/` — Cursor-only skills (in addition to shared skills)

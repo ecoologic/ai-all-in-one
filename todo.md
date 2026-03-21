@@ -9,6 +9,7 @@
 - My tone `/pr-comments` (with examples)
 - Review for token optimisation. Consider parsing tokens, but particularly output (generation) tokens from the instructions
 - stretch: I might mention something during the commands interactions, eg: stretch story, feature, refactor, we should store that in a stretch artifact (one section for each command). maybe hardcode commands, eg: find-current-epic.
+- `a-refactor` before `a-criterion`
 
 ## Agile plan
 

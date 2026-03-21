@@ -19,6 +19,7 @@ claude/shell-snapshots/
 claude/tasks/
 claude/ide/
 claude/.mcp.json
+claude/paste-cache/**
 
 # Agent nested installs (prevent accidents in subdirs)
 **/.agent/
