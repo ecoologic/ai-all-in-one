@@ -20,14 +20,14 @@ The repo is symlinked to global paths so all AI agents pick up the same skills:
 ~/dev/ai/cursor  →  ~/.cursor   (Cursor user-level config)
 ```
 
-Skills flow: GitHub repos → `npx skills add` → `agents/skills/` (actual files) + `claude/skills/` (symlinks back to `~/.agents/skills/`).
+Skills flow: GitHub repos → `npx skills add` → `agents/skills/` (actual files). `claude/skills/` is a folder symlink to `~/.agents/skills/`, so all skills are auto-available.
 
 ### Directory layout
 
 #### Global scope (symlinked to `~`)
 
 - **`agents/`** → `~/.agents` — Installed skills (actual code) + `.skill-lock.json` (v3, tracks sources/hashes/timestamps)
-- **`claude/`** → `~/.claude` — Claude Code config (`settings.json`) + `skills/` symlinks pointing to agents skills
+- **`claude/`** → `~/.claude` — Claude Code config (`settings.json`) + `skills/` folder symlink → `~/.agents/skills/`
 - **`cursor/`** → `~/.cursor` — Cursor user-level config (separate git repo)
 
 #### Local scope (this repo only)

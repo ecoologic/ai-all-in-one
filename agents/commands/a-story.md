@@ -17,7 +17,7 @@ Next: `/a-criterion` consumes the numbered acceptance criteria and implementatio
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In** | `./planning/<epic-slug>/epic.md` | User stories and epic-level UI references from `/a-epic` |
+| **In** | `./planning/<epic-slug>/epic.md` | User stories, story-level context and dependencies, and epic-level UI references from `/a-epic` |
 | **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture from `/a-architecture` |
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
@@ -130,7 +130,7 @@ UI references: <list or none>
 
 ## Step 2: Draft acceptance criteria with the user
 
-Use the source-story acceptance criteria from `epic.md`, the user context, dependencies, personas, and any trailing guidance to propose the story's working acceptance criteria list.
+Use the selected story's canonical statement from `epic.md`, its user context, dependencies, personas, and any trailing guidance to propose the story's working acceptance criteria list.
 
 Draft them interactively:
 1. propose exactly one numbered acceptance criterion at a time, starting with `1`
@@ -434,6 +434,7 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 - [ ] all required inputs and followed references were validated before story planning continued
 - [ ] `story-<story-number>.md` contains numbered acceptance criteria
 - [ ] each acceptance criterion was explicitly approved by the user before the next criterion was drafted
+- [ ] acceptance criteria cover the story's happy path plus important errors, failures, and security constraints
 - [ ] `story-<story-number>.md` contains a `## Status` section with `- [ ] Story complete`
 - [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Implementation Plan`
 - [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector

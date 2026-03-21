@@ -205,7 +205,6 @@ Split the work into minimal, user-facing stories. For each story:
 - use canonical format
 - assign a unique integer story number exactly once, in ascending order, with one story per numbered section
 - include a brief user context
-- include numbered acceptance criteria in _Given_ / _When_ / _Then_ form
 - include requirements only when they are truly part of the user-facing outcome
 - assess prerequisites or dependencies between stories
 
@@ -268,14 +267,6 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 - User Role: ...
 - User Goals: ...
 - Use Case: ...
-
-### Acceptance Criteria
-1. [ ] _Given_ ...
-       _When_ ...
-       _Then_ ...
-2. [ ] _Given_ ...
-       _When_ ...
-       _Then_ ...
 
 ### Dependencies
 - ...
@@ -374,10 +365,10 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 - [ ] `stretch-goals.md` exists at `./planning/<epic-slug>/stretch-goals.md`
 - [ ] all required inputs and followed references were validated before planning continued
 - [ ] every story uses canonical _As a / I want / so that_ format
-- [ ] every story has numbered acceptance criteria in _Given / When / Then_ form
+- [ ] every story includes `### User Context` and `### Dependencies` sections
 - [ ] every actionable or blocked story in `epic.md` has a unique story number, appears exactly once under its own `## Story N` heading, and maps to exactly one future `story-N.md` file
 - [ ] stories are sliced by user value, not by tech layer
-- [ ] acceptance criteria cover errors, failures and security
+- [ ] `epic.md` does not include numbered acceptance criteria; `/a-story` owns acceptance-criteria drafting
 - [ ] `epic.md` contains only `Actionable` and `Blocked` stories
 - [ ] `Nice to have` stories, if any, were written only to `stretch-goals.md`
 - [ ] UI-facing references from the inputs were preserved near the top of `epic.md` in `## UI Design References`, or `- None` was written explicitly

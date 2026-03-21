@@ -10,13 +10,14 @@ ln -s ~/dev/ai/agents ~/.agents
 ln -s ~/dev/ai/claude ~/.claude
 ln -s ~/dev/ai/cursor ~/.cursor
 
-
 ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.claude/CLAUDE.md
-# Cursor .mdc symlinks don't work reliably — use Cursor Settings > User Rules if you have a problem
-# Cursor is a repo itself, so we need to link the subfolders too
-ln -s ~/dev/ai/agents/rules ~/.cursor/rules
-ln -s ~/dev/ai/agents/rules/GLOBAL.md ~/.cursor/rules/GLOBAL.mdc
 ```
+
+The remaining internal symlinks are already checked into the repos:
+- `claude/skills/` → `~/.agents/skills/` (folder symlink, all skills auto-available)
+- `cursor/skills/` → `~/.agents/skills/` (folder symlink, all skills auto-available)
+- `cursor/rules/` → `agents/rules/` (folder symlink)
+- `agents/rules/GLOBAL.mdc` → `GLOBAL.md` (Cursor needs `.mdc` extension)
 
 ## Global scope files
 
@@ -27,13 +28,15 @@ Symlinked to `~` so all AI agents pick them up:
   - `.skill-lock.json` — tracks installed skills with sources, hashes, timestamps (v3)
 
 - `claude/` → `~/.claude` — Claude Code user-level config
-  - `skills/` — symlinks to `~/.agents/skills/`, makes skills available to Claude Code
+  - `skills/` → `~/.agents/skills/` — folder symlink, all shared skills auto-available
+  - `commands/` — slash commands, each `.md` file becomes `/filename`
   - `settings.json` — Claude Code user settings
 
 - `cursor/` → `~/.cursor` — Cursor user-level config (whole directory symlinked)
-  - `commands/` — global scope slash commands, each `.md` file becomes `/filename` in chat
-  - `rules/` — Cursor rule files; documented cross-project global scope rules are User Rules configured in Settings
-  - `skills-cursor/` — Cursor-specific skills (separate from `~/.agents/skills/`)
+  - `commands/` — slash commands, each `.md` file becomes `/filename`
+  - `rules/` → `agents/rules/` — folder symlink, shared rules auto-available
+  - `skills/` → `~/.agents/skills/` — folder symlink, all shared skills auto-available
+  - `skills-cursor/` — Cursor-only skills (in addition to shared skills)
   - NOTE: Cursor is its own git repo
 
 ## Local scope files
