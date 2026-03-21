@@ -298,7 +298,7 @@ _As a_ [role], _I want_ [action], _so that_ [benefit].
 Present these diagrams in this exact order:
 1. Flow Diagram
 2. Class Diagram
-3. Activity Diagram
+3. Sequence Diagram
 
 ### Flow Diagram
 - Include a Mermaid `flowchart` that shows the story's end-to-end user and system flow
@@ -317,7 +317,8 @@ flowchart TD
 
 ### Class Diagram
 - Include a Mermaid `classDiagram` that shows only the story-relevant entities, tables, value objects, or components and their relationships
-- If the story changes persisted schema, explicitly mark changed fields inline using `[new]`, `[changed]`, or `[deleted]`
+- Show each entity once using its DB representation only; do not duplicate the same entity across tech stacks (e.g., do not show both a DB table and a TS interface for the same concept)
+- If the story changes persisted schema, explicitly mark changed fields inline using `((NEW))`, `((CHANGED))`, or `((DELETED))`
 - Include unchanged fields only when they are relevant for understanding the story
 - If the story does not change persisted schema, still include the story-relevant domain or structural relationships rather than writing `None`
 
@@ -326,25 +327,41 @@ classDiagram
     class ExampleEntity {
         id: uuid
         existing_field: text
-        new_field [new]: text
-        renamed_field [changed]: text
-        legacy_field [deleted]: text
+        new_field ((NEW)): text
+        renamed_field ((CHANGED)): text
+        legacy_field ((DELETED)): text
     }
 ```
 
-### Activity Diagram
-- Include a UML-style activity diagram for the story, rendered with Mermaid `flowchart` syntax
-- Show the ordered actions, decisions, loops, and completion conditions that explain how the work progresses through the story
-- Focus on behavior and control flow, not on static structure
+### Sequence Diagram
+- Include a Mermaid `sequenceDiagram` that shows the story's runtime interactions across tech layers
+- Participants (top row) must be real code entities: components, hooks, services, API controllers, repositories, external systems — not abstract roles
+- Group participants by tech layer so the boundaries are visually obvious (e.g., UI | API | Domain | DB)
+- Arrow labels must use the actual method signature or API call definition (e.g., `getUserById(id)`, `GET /admin/users?filter[active]=true`, `SELECT * FROM users WHERE active`)
+- Show the happy path first, then key alt/opt blocks for errors or edge cases
+- Keep it scoped to this story only
 
 ```mermaid
-flowchart TD
-    Start([Start]) --> ActionA[Perform first activity]
-    ActionA --> Decision{Condition met?}
-    Decision -->|Yes| ActionB[Continue to next activity]
-    Decision -->|No| Retry[Retry or alternate activity]
-    Retry --> Decision
-    ActionB --> End([End])
+sequenceDiagram
+    participant UI as UserList (React)
+    participant Hook as useUsers (hook)
+    participant API as UsersController
+    participant Svc as UserService
+    participant DB as users (table)
+
+    UI->>Hook: mount / filter change
+    Hook->>API: GET /admin/users?filter[active]=true
+    API->>Svc: findUsers(filter)
+    Svc->>DB: SELECT id, name, email FROM users WHERE active = true
+    DB-->>Svc: rows
+    Svc-->>API: User[]
+    API-->>Hook: 200 { data: User[] }
+    Hook-->>UI: re-render list
+
+    alt User not found
+        API-->>Hook: 404 { error: "No users match filter" }
+        Hook-->>UI: show empty state
+    end
 ```
 
 ## Codebase Context
@@ -366,7 +383,10 @@ flowchart TD
 
 ## Implementation Plan
 ### Acceptance Criterion 1
-> Selector: `/a-criterion <story-number> 1`
+
+> _Given_ [precondition]
+> _When_ [action]
+> _Then_ [expected result]
 
 #### Outcome
 - Describe what must be true when this criterion is complete
@@ -385,7 +405,10 @@ flowchart TD
   **Notes**: ...
 
 ### Acceptance Criterion 2
-> Selector: `/a-criterion <story-number> 2`
+
+> **Given** ...
+> **When** ...
+> **Then** ...
 
 #### Outcome
 - ...
@@ -441,10 +464,10 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
 - [ ] UI stories include a `### ASCII UI Sketch` section with a readable plain-text layout sketch; non-UI stories explicitly write `- None`
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
-- [ ] `story-<story-number>.md` contains a `## Diagrams` section with `### Flow Diagram`, `### Class Diagram`, and `### Activity Diagram` in that exact order
+- [ ] `story-<story-number>.md` contains a `## Diagrams` section with `### Flow Diagram`, `### Class Diagram`, and `### Sequence Diagram` in that exact order
 - [ ] the flow diagram uses Mermaid `flowchart` syntax and covers the story's user and system path
-- [ ] the class diagram uses Mermaid `classDiagram` syntax and covers the story-relevant structure; schema-changing stories include field-level `[new]`, `[changed]`, and `[deleted]` markers
-- [ ] the activity diagram explains the story's behavioral control flow as a UML-style activity diagram rendered with Mermaid `flowchart` syntax
+- [ ] the class diagram uses Mermaid `classDiagram` syntax and covers the story-relevant structure using DB representation only (no TS duplicates); schema-changing stories include field-level `((NEW))`, `((CHANGED))`, and `((DELETED))` markers
+- [ ] the sequence diagram uses Mermaid `sequenceDiagram` syntax with real code entities as participants, grouped by tech layer, and uses actual method signatures and API call definitions on arrows
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
 - [ ] the user reviewed the output before the pipeline advanced
