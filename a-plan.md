@@ -306,6 +306,15 @@ It must not accumulate:
 - speculative future terminology
 - story-local wording that is not durable
 
+### Diagram Framing
+
+- Sequence diagrams in planning artifacts should show the main technical boundaries first, not just the internal function or method names involved in one implementation path
+- Make runtime and deployment boundaries explicit where relevant, such as monorepo apps, API surfaces, Lambdas, jobs, queues, AWS services, databases, and third-party systems
+- Prefer arrow labels that describe the cross-boundary contract or call, such as HTTP routes, webhooks, events, queue operations, SDK calls, or SQL operations
+- Concrete code entrypoints may be annotated inside a boundary label when useful, but the diagram should remain boundary-led rather than an internal call trace
+- Story-level sequence diagrams stay scoped to the story; epic-level sequence diagrams stay scoped to the epic, but both should make the main handoffs easy to review
+- Class diagrams may use `((NEW))`, `((CHANGED))`, and `((DELETED))` markers only for actual persisted schema changes, not for ordinary data flow, content edits, or business-state changes
+
 ### Naming
 
 - Never define synonyms. If a term exists in the glossary, use its exact Code Name everywhere.

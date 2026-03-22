@@ -133,6 +133,7 @@ Each comment must end up in exactly one category:
 - `VALID[e:mid][s:<severity>]`: the reviewer is correct and the fix needs a moderate code change, touches a couple of call sites, or needs careful adjustment
 - `VALID[e:long][s:<severity>]`: the reviewer is correct but the fix is broader, cross-cutting, or requires meaningful refactoring / follow-up work
 - `INVALID`: when:
+  - Useless defensive coding practice
   - The reviewer is mistaken
   - The reviewer is asking to complicate the logic for little benefit
     - This is common with Copilot
@@ -349,6 +350,8 @@ The prompter will use the comment numbers to address the various comments.
 
 If the user replies `write`, store the triage result in `./tmp/pr-<number>.md`.
 
+If `./tmp/pr-<number>.md` already exists, treat it as stale and replace it without asking the prompter for confirmation.
+
 Requirements for that file:
 
 - Make it self-contained so a fresh agent can understand the context with no prior chat history.
@@ -370,6 +373,7 @@ When writing this file:
 
 - Reuse the already-produced triage output rather than regenerating it from scratch.
 - Ensure `./tmp` exists first.
+- Overwrite any existing `./tmp/pr-<number>.md` file with the latest triage output.
 - After writing, tell the user the exact file path that was created.
 
 ## Reply Guidelines

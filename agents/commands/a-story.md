@@ -18,7 +18,7 @@ Next: `/a-criterion` consumes the numbered acceptance criteria and implementatio
 | Direction | File | Description |
 | --------- | ---- | ----------- |
 | **In** | `./planning/<epic-slug>/epic.md` | User stories, story-level context and dependencies, and epic-level UI references from `/a-epic` |
-| **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture from `/a-architecture` |
+| **In/Out** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture from `/a-architecture`; update when the approved story acceptance criteria or deeper investigation reveal durable epic-level technical detail later stories should inherit |
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
 | **In/Out** | `./planning/global-architecture.plan.md` | Shared repo-wide architecture from `/a-global-architecture` |
@@ -40,7 +40,8 @@ Break one story into a concrete, code-informed implementation plan without writi
 - draft and refine acceptance criteria with the user before locking them into the story artifact
 - define reuse opportunities and constraints
 - refine story-level details when needed
-- capture schema-impact context when the story changes persisted data
+- reconcile `architecture.plan.md` when the approved acceptance criteria or story-level findings reveal durable epic-specific architecture detail
+- capture schema-impact context when the story changes persisted schema
 - produce a single story artifact with numbered acceptance criteria and implementation-plan tasks for `/a-criterion`
 
 ## Rules
@@ -55,6 +56,7 @@ Break one story into a concrete, code-informed implementation plan without writi
 - NEVER let implementation tasks float without a clear acceptance-criterion parent
 - NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
+- reconcile `architecture.plan.md` after the acceptance criteria are locked and story investigation is complete when the story reveals epic-specific technical truth other stories should inherit
 - If trailing guidance is provided, treat it as the highest-priority refinement input for this run. It may clarify scope, request plan changes, or include partial implementation direction, but it must not silently override the required story selector, glossary canon, validated references, or other hard command constraints
 
 ## Step 1: Resolve required inputs
@@ -147,6 +149,8 @@ While drafting:
 
 After the last criterion is approved, restate the full numbered list and treat it as the locked acceptance-criteria source for the rest of the command.
 
+Immediately compare the locked list against `architecture.plan.md` and note any epic-level technical detail that now needs confirmation, correction, or expansion during investigation.
+
 ## Step 3: Investigate the codebase
 
 Use `global-architecture.plan.md` and `architecture.plan.md` to scope targeted code exploration to achieve the story acceptance criteria.
@@ -155,6 +159,7 @@ Use targeted search and explore agents to gather:
 1. related existing code
 2. patterns and conventions
 3. reuse opportunities
+4. epic-specific architecture details that should be added back to `architecture.plan.md` once this story is better understood
 
 Each investigation result should report:
 - relevant files
@@ -220,9 +225,14 @@ Only include extractions that are clearly warranted by this story.
 
 _With user permission_, this command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
 - update `epic.md` when the story wording, boundaries, sequencing, or dependencies need correction
-- update `architecture.plan.md` when story work reveals epic-specific technical details other stories should inherit
+- update `architecture.plan.md` when the locked acceptance criteria or story work reveal epic-specific technical details other stories should inherit, especially newly clarified entities, interfaces, flows, sequencing, or constraints
 - update `glossary.md` when durable domain names, code names, sources, or statuses are confirmed
 - update `global-architecture.plan.md` only when the work reveals durable cross-epic structure
+
+When `architecture.plan.md` needs refinement:
+- update it before or alongside writing `story-<story-number>.md`, not as an afterthought
+- keep the architecture artifact focused on epic-level technical truth other stories should inherit
+- leave story-local execution detail in `story-<story-number>.md`
 
 Summarize every such update in the output.
 
@@ -239,7 +249,9 @@ This file is the single source of truth for the story. It captures story context
 > Generated: <date>
 > Source Story: `./planning/<epic-slug>/epic.md`
 
-_As a_ [role], _I want_ [action], _so that_ [benefit].
+> _As a_ [role]
+> _I want_ [action]
+> _So that_ [benefit]
 
 ## Status
 - [ ] Story complete
@@ -318,7 +330,7 @@ flowchart TD
 ### Class Diagram
 - Include a Mermaid `classDiagram` that shows only the story-relevant entities, tables, value objects, or components and their relationships
 - Show each entity once using its DB representation only; do not duplicate the same entity across tech stacks (e.g., do not show both a DB table and a TS interface for the same concept)
-- If the story changes persisted schema, explicitly mark changed fields inline using `((NEW))`, `((CHANGED))`, or `((DELETED))`
+- Use `((NEW))`, `((CHANGED))`, and `((DELETED))` only for actual persisted schema changes
 - Include unchanged fields only when they are relevant for understanding the story
 - If the story does not change persisted schema, still include the story-relevant domain or structural relationships rather than writing `None`
 
@@ -335,32 +347,29 @@ classDiagram
 
 ### Sequence Diagram
 - Include a Mermaid `sequenceDiagram` that shows the story's runtime interactions across tech layers
-- Participants (top row) must be real code entities: components, hooks, services, API controllers, repositories, external systems — not abstract roles
-- Group participants by tech layer so the boundaries are visually obvious (e.g., UI | API | Domain | DB)
-- Arrow labels must use the actual method signature or API call definition (e.g., `getUserById(id)`, `GET /admin/users?filter[active]=true`, `SELECT * FROM users WHERE active`)
+- Participants must make the main runtime and deployment boundaries obvious first: monorepo apps, API surfaces, workers, Lambdas, queues, databases, AWS services, and third-party systems
+- When helpful, annotate a participant with the concrete code entrypoint behind that boundary, but do not let the diagram collapse into an internal function-call trace
+- Group participants by tech boundary so the handoffs are visually obvious (e.g., Web App | API | Lambda | Queue | AWS | Third Party | DB)
+- Arrow labels must describe the boundary-crossing contract or call, such as an HTTP route, webhook, queue publish/consume, event, SDK call, or SQL operation
 - Show the happy path first, then key alt/opt blocks for errors or edge cases
 - Keep it scoped to this story only
 
 ```mermaid
 sequenceDiagram
-    participant UI as UserList (React)
-    participant Hook as useUsers (hook)
-    participant API as UsersController
-    participant Svc as UserService
-    participant DB as users (table)
+    participant UI as Admin Web App\nUserList
+    participant API as Admin API\nGET /admin/users
+    participant Svc as User Service
+    participant DB as users table
 
-    UI->>Hook: mount / filter change
-    Hook->>API: GET /admin/users?filter[active]=true
+    UI->>API: GET /admin/users?filter[active]=true
     API->>Svc: findUsers(filter)
     Svc->>DB: SELECT id, name, email FROM users WHERE active = true
     DB-->>Svc: rows
     Svc-->>API: User[]
-    API-->>Hook: 200 { data: User[] }
-    Hook-->>UI: re-render list
+    API-->>UI: 200 { data: User[] }
 
     alt User not found
-        API-->>Hook: 404 { error: "No users match filter" }
-        Hook-->>UI: show empty state
+        API-->>UI: 404 { error: "No users match filter" }
     end
 ```
 
@@ -406,9 +415,9 @@ sequenceDiagram
 
 ### Acceptance Criterion 2
 
-> **Given** ...
-> **When** ...
-> **Then** ...
+> _Given_ ...
+> _When_ ...
+> _Then_ ...
 
 #### Outcome
 - ...
@@ -466,8 +475,11 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 - [ ] story-relevant UI references were carried into `story-<story-number>.md`, or `- None` was written explicitly
 - [ ] `story-<story-number>.md` contains a `## Diagrams` section with `### Flow Diagram`, `### Class Diagram`, and `### Sequence Diagram` in that exact order
 - [ ] the flow diagram uses Mermaid `flowchart` syntax and covers the story's user and system path
-- [ ] the class diagram uses Mermaid `classDiagram` syntax and covers the story-relevant structure using DB representation only (no TS duplicates); schema-changing stories include field-level `((NEW))`, `((CHANGED))`, and `((DELETED))` markers
-- [ ] the sequence diagram uses Mermaid `sequenceDiagram` syntax with real code entities as participants, grouped by tech layer, and uses actual method signatures and API call definitions on arrows
+- [ ] the class diagram uses Mermaid `classDiagram` syntax and covers the story-relevant structure using DB representation only (no TS duplicates)
+- [ ] `((NEW))`, `((CHANGED))`, and `((DELETED))` markers are used only for actual persisted schema changes
+- [ ] the sequence diagram uses Mermaid `sequenceDiagram` syntax and makes the main runtime and deployment boundaries obvious, such as apps, APIs, Lambdas, queues, AWS services, databases, and third-party systems
+- [ ] the sequence diagram focuses on boundary-crossing contracts and handoffs, not an internal function-call trace
+- [ ] `architecture.plan.md` was updated when the approved acceptance criteria or story investigation revealed durable epic-specific technical detail
 - [ ] any durable naming updates were propagated to `glossary.md`
 - [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
 - [ ] the user reviewed the output before the pipeline advanced

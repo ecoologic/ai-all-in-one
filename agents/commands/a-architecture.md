@@ -286,7 +286,10 @@ Rules:
 - cover the whole epic through its major user and system interactions
 - include more than one sequence diagram when a single flow cannot represent the epic clearly
 - map each sequence diagram back to the relevant stories
-- show the main actors, system boundaries, and handoffs introduced or affected by the epic
+- show the main technical boundaries and handoffs introduced or affected by the epic
+- make runtime and deployment boundaries explicit, such as monorepo apps, API surfaces, jobs, Lambdas, queues, AWS services, databases, and third-party systems
+- label arrows with the boundary-crossing contract or call, such as HTTP routes, webhooks, queue publishes or consumes, events, SDK calls, or SQL operations
+- do not turn these diagrams into internal function-call traces; concrete code entrypoints may be annotated, but the boundary should remain the primary unit shown
 
 ### 7f. Change inventory
 

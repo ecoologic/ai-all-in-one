@@ -69,13 +69,19 @@ Treat each inconsistency independently:
 
 ## Story canonical format
 
-> _As a_ [role],
-> _I want_ [action],
-> _so that_ [benefit]
+> _As a_ [role]
+> _I want_ [action]
+> _So that_ [benefit]
 
 ## What Is A User Story
 
-> A user story is a short, plain-language description of a capability told from the perspective of someone who uses the system, not someone who builds it. It follows the template "As a [persona], I want [goal] so that [benefit]" and describes what the user can do and why it matters, never how it is implemented. Each story should be small enough to complete in a single iteration, deliver standalone value, and be independently testable. The written story is a placeholder for a conversation, not a full specification. Good stories follow the INVEST criteria: Independent, Negotiable, Valuable, Estimable, Small, and Testable.
+> A user story is a short, plain-language description of a capability told from the perspective of someone who uses the system, not someone who builds it. It follows this structure:
+>
+> _As a_ [persona]
+> _I want_ [goal]
+> _So that_ [benefit]
+>
+> It describes what the user can do and why it matters, never how it is implemented. Each story should be small enough to complete in a single iteration, deliver standalone value, and be independently testable. The written story is a placeholder for a conversation, not a full specification. Good stories follow the INVEST criteria: Independent, Negotiable, Valuable, Estimable, Small, and Testable.
 
 ## What A User Story Is Not
 
@@ -261,7 +267,9 @@ Write `./planning/<epic-slug>/epic.md` with this structure:
 
 ## Story 1: <title>
 
-_As a_ [role], _I want_ [action], _so that_ [benefit].
+> _As a_ [role]
+> _I want_ [action]
+> _So that_ [benefit]
 
 ### User Context
 - User Role: ...
@@ -317,7 +325,9 @@ Write `./planning/<epic-slug>/stretch-goals.md` with this structure:
 
 ## Stretch Goal 1: <title>
 
-_As a_ [role], _I want_ [action], _so that_ [benefit].
+> _As a_ [role]
+> _I want_ [action]
+> _So that_ [benefit]
 
 ### Why Later
 - ...
@@ -364,7 +374,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 - [ ] `personas.md` exists at `./planning/<epic-slug>/personas.md`
 - [ ] `stretch-goals.md` exists at `./planning/<epic-slug>/stretch-goals.md`
 - [ ] all required inputs and followed references were validated before planning continued
-- [ ] every story uses canonical _As a / I want / so that_ format
+- [ ] every story uses canonical _As a / I want / So that_ format
 - [ ] every story includes `### User Context` and `### Dependencies` sections
 - [ ] every actionable or blocked story in `epic.md` has a unique story number, appears exactly once under its own `## Story N` heading, and maps to exactly one future `story-N.md` file
 - [ ] stories are sliced by user value, not by tech layer

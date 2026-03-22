@@ -119,6 +119,8 @@ Run the smallest meaningful verification first:
 
 If failure is in scope: fix, rerun, repeat. If failure is pre-existing/unrelated: report the command and failure, explain why it's out of scope. If no automated validation exists, state this and review the code against the acceptance criteria manually.
 
+After targeted validation passes, run the full test suite. If a failure is caused by this criterion's changes: fix it. If pre-existing or unrelated: report it but do not block completion.
+
 On merge conflicts, invoke `conflict-resolution` and continue only if criterion scope remains intact.
 
 ## Step 5: Update story progress
