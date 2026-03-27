@@ -1,5 +1,5 @@
 ---
-description: Break down a single story into a detailed implementation plan organized by acceptance criterion
+description: Break down a single story into an execution process organized by acceptance criterion
 argument-hint: "<story-number> [\"instructions-or-suggestions\"]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
@@ -11,18 +11,18 @@ This command is a single step of a longer pipeline:
 a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                                 ^current
 ```
-Next: `/a-criterion` consumes the numbered acceptance criteria and implementation plan produced by this command
+Next: `/a-criterion` consumes the numbered acceptance criteria and execution process produced by this command
 
 ### Pipeline I/O
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
 | **In** | `./planning/<epic-slug>/epic.md` | User stories, story-level context and dependencies, and epic-level UI references from `/a-epic` |
-| **In/Out** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture from `/a-architecture`; update when the approved story acceptance criteria or deeper investigation reveal durable epic-level technical detail later stories should inherit |
+| **In/Out** | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture from `/a-architecture`; update when the approved story acceptance criteria or deeper investigation reveal durable epic-level technical detail later stories should inherit |
 | **In** | `./planning/<epic-slug>/personas.md` | Personas from `/a-epic` |
 | **In/Out** | `./planning/glossary.md` | Shared domain glossary from `/a-global-architecture` |
-| **In/Out** | `./planning/global-architecture.plan.md` | Shared repo-wide architecture from `/a-global-architecture` |
-| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-level completion status, numbered acceptance criteria, story-relevant UI references, and the implementation plan that `/a-criterion` reads and updates |
+| **In/Out** | `./planning/global-architecture.md` | Shared repo-wide architecture from `/a-global-architecture` |
+| **Out** | `./planning/<epic-slug>/story-<story-number>.md` | Detailed story breakdown for this story, including story-level completion status, numbered acceptance criteria, story-relevant UI references, and the execution process that `/a-criterion` reads and updates |
 
 ## Skills
 
@@ -35,19 +35,19 @@ Invoke these skills when relevant:
 
 ## Purpose
 
-Break one story into a concrete, code-informed implementation plan without writing code. This command should:
+Break one story into a concrete, code-informed execution process without writing code. This command should:
 - investigate the current codebase
 - draft and refine acceptance criteria with the user before locking them into the story artifact
 - define reuse opportunities and constraints
 - refine story-level details when needed
-- reconcile `architecture.plan.md` when the approved acceptance criteria or story-level findings reveal durable epic-specific architecture detail
+- reconcile `architecture.md` when the approved acceptance criteria or story-level findings reveal durable epic-specific architecture detail
 - capture schema-impact context when the story changes persisted schema
-- produce a single story artifact with numbered acceptance criteria and implementation-plan tasks for `/a-criterion`
+- produce a single story artifact with numbered acceptance criteria and execution tasks for `/a-criterion`
 
 ## Rules
 
 - NEVER write or modify application code, create commits, or write files outside `./planning/`
-- NEVER skip codebase investigation; task planning must be grounded in the real codebase
+- NEVER skip codebase investigation; story work must be grounded in the real codebase
 - NEVER define synonyms; if a term exists in the glossary, use its canonical name
 - NEVER abbreviate new names
 - NEVER propose extractions for hypothetical future use
@@ -56,8 +56,8 @@ Break one story into a concrete, code-informed implementation plan without writi
 - NEVER let implementation tasks float without a clear acceptance-criterion parent
 - NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
-- reconcile `architecture.plan.md` after the acceptance criteria are locked and story investigation is complete when the story reveals epic-specific technical truth other stories should inherit
-- If trailing guidance is provided, treat it as the highest-priority refinement input for this run. It may clarify scope, request plan changes, or include partial implementation direction, but it must not silently override the required story selector, glossary canon, validated references, or other hard command constraints
+- reconcile `architecture.md` after the acceptance criteria are locked and story investigation is complete when the story reveals epic-specific technical truth other stories should inherit
+- If trailing guidance is provided, treat it as the highest-priority refinement input for this run. It may clarify scope, request story changes, or include partial implementation direction, but it must not silently override the required story selector, glossary canon, validated references, or other hard command constraints
 
 ## Step 1: Resolve required inputs
 
@@ -70,7 +70,7 @@ Interpret argument shapes like this:
 
 Examples:
 - `/a-story 2` -> use the current epic and story `2`
-- `/a-story 2 "Keep the existing webhook ingestion path and update the story plan around it"` -> use the current epic and story `2`, and treat the quoted text as highest-priority guidance
+- `/a-story 2 "Keep the existing webhook ingestion path and update the story around it"` -> use the current epic and story `2`, and treat the quoted text as highest-priority guidance
 
 If `<story-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
 
@@ -78,11 +78,11 @@ If guidance text is present after `<story-number>`, treat it as the highest-prio
 
 Guidance may include:
 - clarifications
-- changes to the story plan
-- corrections to stale planning assumptions
-- partial implementation notes that should shape the plan when validated
+- changes to the story
+- corrections to stale workflow assumptions
+- partial implementation notes that should shape the execution process when validated
 
-Use that guidance ahead of default planning heuristics and stale assumptions, but do not let it silently override the required story selector, `./planning/current.json`, followed references, or stronger source-of-truth evidence.
+Use that guidance ahead of default story-shaping heuristics and stale assumptions, but do not let it silently override the required story selector, `./planning/current.json`, followed references, or stronger source-of-truth evidence.
 
 Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
 
@@ -90,20 +90,20 @@ If `./planning/current.json` does not provide `<epic-slug>`, stop and report the
 
 Read:
 - `./planning/<epic-slug>/epic.md`
-- `./planning/<epic-slug>/architecture.plan.md`
+- `./planning/<epic-slug>/architecture.md`
 - `./planning/<epic-slug>/personas.md`
 - `./planning/glossary.md`
-- `./planning/global-architecture.plan.md`
+- `./planning/global-architecture.md`
 
-If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
-If `epic.md`, `architecture.plan.md`, or `personas.md` is missing, stop and report the exact path checked.
+If `epic.md`, `architecture.md`, or `personas.md` is missing, stop and report the exact path checked.
 
 If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
 Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
 
-When `epic.md` contains a `UI References` section, treat those references as required input for this run. Read and follow them before planning any story that has UI or depends on UI behavior.
+When `epic.md` contains a `UI References` section, treat those references as required input for this run. Read and follow them before working on any story that has UI or depends on UI behavior.
 
 Extract the requested story section from `epic.md`. The story context includes:
 - title
@@ -149,17 +149,17 @@ While drafting:
 
 After the last criterion is approved, restate the full numbered list and treat it as the locked acceptance-criteria source for the rest of the command.
 
-Immediately compare the locked list against `architecture.plan.md` and note any epic-level technical detail that now needs confirmation, correction, or expansion during investigation.
+Immediately compare the locked list against `architecture.md` and note any epic-level technical detail that now needs confirmation, correction, or expansion during investigation.
 
 ## Step 3: Investigate the codebase
 
-Use `global-architecture.plan.md` and `architecture.plan.md` to scope targeted code exploration to achieve the story acceptance criteria.
+Use `global-architecture.md` and `architecture.md` to scope targeted code exploration to achieve the story acceptance criteria.
 
 Use targeted search and explore agents to gather:
 1. related existing code
 2. patterns and conventions
 3. reuse opportunities
-4. epic-specific architecture details that should be added back to `architecture.plan.md` once this story is better understood
+4. epic-specific architecture details that should be added back to `architecture.md` once this story is better understood
 
 Each investigation result should report:
 - relevant files
@@ -225,11 +225,11 @@ Only include extractions that are clearly warranted by this story.
 
 _With user permission_, this command may update higher-level artifacts when deeper investigation uncovers durable knowledge:
 - update `epic.md` when the story wording, boundaries, sequencing, or dependencies need correction
-- update `architecture.plan.md` when the locked acceptance criteria or story work reveal epic-specific technical details other stories should inherit, especially newly clarified entities, interfaces, flows, sequencing, or constraints
+- update `architecture.md` when the locked acceptance criteria or story work reveal epic-specific technical details other stories should inherit, especially newly clarified entities, interfaces, flows, sequencing, or constraints
 - update `glossary.md` when durable domain names, code names, sources, or statuses are confirmed
-- update `global-architecture.plan.md` only when the work reveals durable cross-epic structure
+- update `global-architecture.md` only when the work reveals durable cross-epic structure
 
-When `architecture.plan.md` needs refinement:
+When `architecture.md` needs refinement:
 - update it before or alongside writing `story-<story-number>.md`, not as an afterthought
 - keep the architecture artifact focused on epic-level technical truth other stories should inherit
 - leave story-local execution detail in `story-<story-number>.md`
@@ -240,7 +240,7 @@ Summarize every such update in the output.
 
 Write `./planning/<epic-slug>/story-<story-number>.md` with this structure:
 
-This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, the required story diagrams, justified extractions, a story-level completion marker, the user-approved numbered acceptance criteria, and the implementation plan that `/a-criterion` reads and updates.
+This file is the single source of truth for the story. It captures story context, codebase findings, UX, UI, references, the required story diagrams, justified extractions, a story-level completion marker, the user-approved numbered acceptance criteria, and the execution process that `/a-criterion` reads and updates.
 
 ```md
 # Story <story-number>: <title>
@@ -390,7 +390,7 @@ sequenceDiagram
 | What | From/Why | Target Location | Blocks Story? |
 | ---- | -------- | --------------- | ------------- |
 
-## Implementation Plan
+## Execution Process
 ### Acceptance Criterion 1
 
 > _Given_ [precondition]
@@ -435,11 +435,11 @@ sequenceDiagram
 - ...
 
 ## References
-- `./planning/<epic-slug>/architecture.plan.md`
-- `./planning/global-architecture.plan.md`
+- `./planning/<epic-slug>/architecture.md`
+- `./planning/global-architecture.md`
 ```
 
-Rules for the implementation plan:
+Rules for the execution process:
 - acceptance criteria must stay explicitly numbered, because `/a-criterion` selects by criterion number
 - include a `## Status` section with `- [ ] Story complete`; `/a-criterion` owns updating it after implementation runs
 - every `### Acceptance Criterion N` section must match an item in `## Acceptance Criteria`
@@ -463,12 +463,12 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 ## Success Criteria
 
 - [ ] `story-<story-number>.md` exists
-- [ ] all required inputs and followed references were validated before story planning continued
+- [ ] all required inputs and followed references were validated before story work continued
 - [ ] `story-<story-number>.md` contains numbered acceptance criteria
 - [ ] each acceptance criterion was explicitly approved by the user before the next criterion was drafted
 - [ ] acceptance criteria cover the story's happy path plus important errors, failures, and security constraints
 - [ ] `story-<story-number>.md` contains a `## Status` section with `- [ ] Story complete`
-- [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Implementation Plan`
+- [ ] every acceptance criterion has a matching `### Acceptance Criterion N` section in `## Execution Process`
 - [ ] implementation tasks are clearly nested under their acceptance criterion and cannot be confused with the `/a-criterion` selector
 - [ ] implementation tasks are organized around coherent story-slice delivery, not just technology-layer isolation
 - [ ] UI stories include a `### ASCII UI Sketch` section with a readable plain-text layout sketch; non-UI stories explicitly write `- None`
@@ -479,9 +479,9 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 - [ ] `((NEW))`, `((CHANGED))`, and `((DELETED))` markers are used only for actual persisted schema changes
 - [ ] the sequence diagram uses Mermaid `sequenceDiagram` syntax and makes the main runtime and deployment boundaries obvious, such as apps, APIs, Lambdas, queues, AWS services, databases, and third-party systems
 - [ ] the sequence diagram focuses on boundary-crossing contracts and handoffs, not an internal function-call trace
-- [ ] `architecture.plan.md` was updated when the approved acceptance criteria or story investigation revealed durable epic-specific technical detail
+- [ ] `architecture.md` was updated when the approved acceptance criteria or story investigation revealed durable epic-specific technical detail
 - [ ] any durable naming updates were propagated to `glossary.md`
-- [ ] any durable cross-epic structure updates were propagated to `global-architecture.plan.md`
+- [ ] any durable cross-epic structure updates were propagated to `global-architecture.md`
 - [ ] the user reviewed the output before the pipeline advanced
 
 ## Error Handling

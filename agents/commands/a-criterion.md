@@ -1,5 +1,5 @@
 ---
-description: Implement one planned acceptance criterion in the codebase with focused validation
+description: Implement one acceptance criterion in the codebase with focused validation
 argument-hint: "<story-number> <criterion-number> [\"instructions-or-suggestions\"]"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Skill]
 ---
@@ -16,10 +16,10 @@ a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 
 | Direction | File | Description |
 | --------- | ---- | ----------- |
-| **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, completion status, acceptance criteria, and implementation-plan tasks; update only the selected criterion's state |
-| **In** | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture and constraints |
+| **In/Out** | `./planning/<epic-slug>/story-<story-number>.md` | Story context, completion status, acceptance criteria, and execution tasks; update only the selected criterion's state |
+| **In** | `./planning/architecture/<epic-slug>.md` | Epic-specific architecture and constraints |
 | **In/Out** | `./planning/glossary.md` | Shared naming baseline; update only with durable confirmed names |
-| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Read/update only when implementation reveals durable cross-epic structure |
+| **Conditional In/Out** | `./planning/global-architecture.md` | Read/update only when implementation reveals durable cross-epic structure |
 | **Out** | codebase | Code changes, tests, and implementation artifacts |
 
 ## Skills
@@ -41,9 +41,9 @@ Invoke when relevant:
 - NEVER broaden scope into unrelated cleanup, opportunistic refactors, or the next acceptance criterion
 - NEVER define synonyms; if a glossary term exists, use its canonical name
 - NEVER propose speculative abstractions or extractions for future use
-- NEVER mention epic, story, acceptance criteria, AC, or similar planning jargon in code comments, user-facing copy, or committed implementation text; use plain language that still makes sense later without planning context
+- NEVER mention epic, story, acceptance criteria, AC, or similar workflow jargon in code comments, user-facing copy, or committed implementation text; use plain language that still makes sense later without process context
 - NEVER introduce in comments or UI outdated history context that refers to implementation detail changes eg: The rename of a model
-- NEVER rewrite planning artifacts without a durable reason
+- NEVER rewrite workflow artifacts without a durable reason
 - NEVER update any story file except `./planning/<epic-slug>/story-<story-number>.md`
 - NEVER create commits or auto-chain into the next criterion
 - Prefer existing code patterns, file placement conventions, and interfaces over inventing new ones
@@ -51,7 +51,7 @@ Invoke when relevant:
 - Implementation tasks may be story-coherent rather than artificially isolated; if the criterion needs a full table, all story-relevant fields belong in scope
 - Add or update tests when the repo already has a relevant testing pattern and the criterion changes behavior
 - Run the smallest meaningful validation that can prove the criterion works
-- If trailing guidance is provided, treat it as the highest-priority execution input for this run, but it must not silently override required selectors, approved planning artifacts, glossary canon, or other hard constraints
+- If trailing guidance is provided, treat it as the highest-priority execution input for this run, but it must not silently override required selectors, approved workflow artifacts, glossary canon, or other hard constraints
 
 ## Step 1: Resolve required inputs
 
@@ -63,24 +63,24 @@ If either selector is missing, stop and ask. If `current.json` is missing or mal
 
 Read these files (stop and report if any are missing):
 - `./planning/<epic-slug>/story-<story-number>.md`
-- `./planning/<epic-slug>/architecture.plan.md`
+- `./planning/<epic-slug>/architecture.md`
 - `./planning/glossary.md`
 
-Follow all references from planning artifacts. If any reference is unreadable, stop and report the exact reference and originating file.
+Follow all references from workflow artifacts. If any reference is unreadable, stop and report the exact reference and originating file.
 
 When `story-<story-number>.md` contains a `UI References` section, read and follow those references before implementing UI behavior.
 
 Extract from the story file:
 - `## Status` and completion marker
 - The numbered acceptance criterion `<criterion-number>. [ ] ...`
-- The matching `### Acceptance Criterion <criterion-number>` section from `## Implementation Plan` (if missing, report malformed file and stop)
+- The matching `### Acceptance Criterion <criterion-number>` section from `## Execution Process` (if missing, report malformed file and stop)
 - Criterion outcome, files likely to change, dependencies, implementation tasks, notes
 
 If the criterion is not found, list available criterion numbers and stop.
 
 If `Dependencies` is not `none`, verify the prerequisite exists in the codebase or ask before proceeding.
 
-Before editing code, confirm planning artifacts were reviewed and approved by the user in this conversation.
+Before editing code, confirm the required workflow artifacts were reviewed and approved by the user in this conversation.
 
 ## Step 2: Investigate and reconcile
 
@@ -104,7 +104,7 @@ Implement by:
 3. Following codebase naming and placement conventions
 4. Keeping abstractions criterion-justified, not future-proofed
 5. Using implementation tasks as work organization, not separate stopping points
-6. Writing only durable comments that describe behavior or business rules directly — never reference planning artifacts
+6. Writing only durable comments that describe behavior or business rules directly — never reference workflow artifacts
 
 If a listed path doesn't exist, create it only if architecture and conventions confirm it's correct; otherwise follow the nearest valid convention.
 
@@ -128,21 +128,21 @@ On merge conflicts, invoke `conflict-resolution` and continue only if criterion 
 After validation passes, update only `./planning/<epic-slug>/story-<story-number>.md`:
 
 1. In `## Acceptance Criteria`, check only the selected criterion
-2. In `## Implementation Plan`, check only completed tasks under `### Acceptance Criterion <criterion-number>`
+2. In `## Execution Process`, check only completed tasks under `### Acceptance Criterion <criterion-number>`
 3. If every acceptance criterion is now checked, set `## Status` to `- [x] Story complete`; otherwise ensure it remains `- [ ] Story complete`
 4. If `## Status` is missing, add it near the top before applying state
 
 Do not mark complete if validation is failing or implementation is partial.
 
-## Step 6: Apply durable planning updates
+## Step 6: Apply durable workflow updates
 
-Update planning artifacts only when implementation reveals durable knowledge for later work:
-- `architecture.plan.md` — epic-specific technical truth later criteria should inherit
+Update workflow artifacts only when implementation reveals durable knowledge for later work:
+- `architecture.md` — epic-specific technical truth later criteria should inherit
 - `glossary.md` — confirmed domain terms, code names, sources, or statuses
-- `global-architecture.plan.md` — cross-epic structure, boundaries, contracts
+- `global-architecture.md` — cross-epic structure, boundaries, contracts
 
 Do not push debugging notes, silently rename glossary terms, rewrite tasks because implementation was hard, or backfill speculative future work.
 
 ## Step 7: Present the result
 
-Summarize: files changed, criterion covered, validation result, story progress updates, planning updates, blockers or risks, whether another criterion is unblocked.
+Summarize: files changed, criterion covered, validation result, story progress updates, workflow updates, blockers or risks, whether another criterion is unblocked.

@@ -7,13 +7,7 @@ description: 'Use when writing a git commit message for already staged changes, 
 
 Only enforce the commit title format.
 
-Operate only within the current git repository root.
-
-If there are nested git repositories inside that root, ignore them.
-
-Do not enter nested repositories, and do not let staging or commit commands cross into them.
-
-If that root sits inside another git repository, ignore the outer repository too.
+Commit all already staged changes without asking the user to confirm scope.
 
 Use only the changes that are already staged.
 
@@ -33,19 +27,17 @@ If the user explicitly asks to update the full message while amending, replace t
 
 ### Workflow
 
-1. Use the current git repository root and commit only there.
-    Never commit from an outer repository and never descend into nested repositories to commit there.
-2. Inspect only the staged changes for that root repository, for example with `git diff --cached`.
+1. Inspect only the staged changes, for example with `git diff --cached`.
     If no changes, STOP and tell the prompter
-3. Do not run `git add` or other commands to change the cached state.
-4. Unless the user explicitly asks to split, narrow, or confirm commit scope, proceed with the staged set exactly as inspected.
-5. If the user explicitly asks to amend, inspect the current `HEAD` commit message so the replacement message matches the final amended commit.
-6. Decide the best conventional-commit `type` and the optional `scope`.
-7. If the session includes a user story or acceptance criteria that match the staged changes, write a short first line in conventional-commit format that focuses on the feature improvement rather than the implementation detail.
-8. In the rest of the commit message, include the full relevant story or acceptance criteria first, then add the technical details from the staged changes.
-9. If the user explicitly asked to amend, run `git commit --amend`.
-10. If the user explicitly asked to update the full message, replace the whole message during the amend instead of preserving any existing title, body, or footer.
-11. Otherwise create a normal new commit.
+2. Do not run `git add` or other commands to change the cached state.
+3. Unless the user explicitly asks to split, narrow, or confirm commit scope, proceed with the staged set exactly as inspected.
+4. If the user explicitly asks to amend, inspect the current `HEAD` commit message so the replacement message matches the final amended commit.
+5. Decide the best conventional-commit `type` and the optional `scope`.
+6. If the session includes a user story or acceptance criteria that match the staged changes, write a short first line in conventional-commit format that focuses on the feature improvement rather than the implementation detail.
+7. In the rest of the commit message, include the full relevant story or acceptance criteria first, then add the technical details from the staged changes.
+8. If the user explicitly asked to amend, run `git commit --amend`.
+9. If the user explicitly asked to update the full message, replace the whole message during the amend instead of preserving any existing title, body, or footer.
+10. Otherwise create a normal new commit.
 
 ### Commit Message Structure
 
@@ -85,7 +77,6 @@ feat: CreateUser
 - Only the title must follow this format.
 - Base the message only on already staged changes.
 - Agile context from the session may shape the wording, but only when it matches the already staged changes.
-- Never cross repository boundaries: commit only the current repository root, not any outer repo and not any nested repo.
 - Do not treat differences from earlier snapshots or prior expectations as a reason to block the commit.
 - When amending with a full-message update, make the replacement message fit the final amended commit, not just the newly staged delta.
 - NEVER write titles like "addressing feedback", instead, stick to what work was done and summarise that as usual

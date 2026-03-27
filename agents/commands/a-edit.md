@@ -1,16 +1,16 @@
 ---
-description: Revise one planning artifact from high-priority guidance using its original command contract
+description: Revise one workflow artifact from high-priority guidance using its original command contract
 argument-hint: "<artifact-type> [selector...] <instructions-or-suggestions>"
 allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 ---
 
 # Artifact Revision
 
-This command revises an existing planning artifact after user guidance:
+This command revises an existing workflow artifact after user guidance:
 ```text
 a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
                     \______________________________________________/
-                                  a-edit can revisit any planning artifact
+                                  a-edit can revisit any workflow artifact
 ```
 
 Use this command to correct or refine an artifact that already exists. Do not rerun the whole pipeline.
@@ -20,23 +20,23 @@ Use this command to correct or refine an artifact that already exists. Do not re
 | Direction              | File                                | Description                                                                                              |
 | ---------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | **In**                 | owner command file                  | The original `a-*` command spec that defines the artifact contract, required inputs, and allowed updates |
-| **In**                 | target planning artifact            | The current artifact being revised                                                                       |
-| **In**                 | original command inputs             | The same planning inputs the owner command requires for that artifact type                               |
+| **In**                 | target workflow artifact            | The current artifact being revised                                                                       |
+| **In**                 | original command inputs             | The same workflow inputs the owner command requires for that artifact type                               |
 | **Conditional In**     | codebase                            | Read only when the owner command for the target artifact is code-informed                                |
 | **Conditional In/Out** | `./planning/glossary.md`            | Update only when the owner command would have allowed a durable terminology promotion                    |
-| **Conditional In/Out** | `./planning/global-architecture.plan.md` | Update only when the owner command would have allowed a durable cross-epic promotion                     |
-| **Out**                | target planning artifact            | Revised artifact that addresses the user's highest-priority guidance without discarding valid existing content            |
+| **Conditional In/Out** | `./planning/global-architecture.md` | Update only when the owner command would have allowed a durable cross-epic promotion                     |
+| **Out**                | target workflow artifact            | Revised artifact that addresses the user's highest-priority guidance without discarding valid existing content            |
 
 ## Supported Targets
 
 | Artifact Type         | Selector                     | Owner Command            | Target Artifact                                        |
 | --------------------- | ---------------------------- | ------------------------ | ------------------------------------------------------ |
-| `global-architecture` | none                         | `/a-global-architecture` | `./planning/global-architecture.plan.md`               |
+| `global-architecture` | none                         | `/a-global-architecture` | `./planning/global-architecture.md`                    |
 | `glossary`            | none                         | `/a-global-architecture` | `./planning/glossary.md`                               |
 | `epic`                | none                         | `/a-epic`                | `./planning/<epic-slug>/epic.md`                       |
 | `personas`            | none                         | `/a-epic`                | `./planning/<epic-slug>/personas.md`                   |
 | `stretch-goals`       | none                         | `/a-epic`                | `./planning/<epic-slug>/stretch-goals.md`              |
-| `architecture`        | none                         | `/a-architecture`        | `./planning/<epic-slug>/architecture.plan.md`          |
+| `architecture`        | none                         | `/a-architecture`        | `./planning/<epic-slug>/architecture.md`               |
 | `story`               | `<story-number>`             | `/a-story`               | `./planning/<epic-slug>/story-<story-number>.md`       |
 
 ## Skills
@@ -51,11 +51,11 @@ Common examples:
 
 ## Purpose
 
-Revise one planning artifact from concrete high-priority guidance while preserving the original pipeline contract.
+Revise one workflow artifact from concrete high-priority guidance while preserving the original pipeline contract.
 
 This command should:
 - reload the original owner command contract instead of guessing the artifact's shape
-- anchor on the already open planning artifact when it clearly matches the request
+- anchor on the already open workflow artifact when it clearly matches the request
 - reread the inputs that justified the artifact originally
 - compare the current artifact against the guidance and the owner contract
 - apply the smallest durable revision that addresses the issue
@@ -75,9 +75,9 @@ This command should:
 - Preserve still-correct content; revise only the sections needed to address the guidance
 - If the requested change implies broader planning drift, summarize the affected artifacts and suggest reruns instead of silently rewriting everything
 - Allow glossary or global-architecture promotion updates only when the owner command for the target artifact would have allowed them
-- Use the currently open or visible planning artifact as a resolution hint only when it maps cleanly to a supported target
+- Use the currently open or visible workflow artifact as a resolution hint only when it maps cleanly to a supported target
 - Read the resolved target artifact before asking for section-level clarification unless the file is missing or the request is still genuinely ambiguous after reading it
-- Treat the final freeform argument as the highest-priority guidance for the revision. It may include clarifications, requested plan changes, or partial implementation notes, but it must not silently override the resolved target, owner contract, glossary canon, or other hard command constraints
+- Treat the final freeform argument as the highest-priority guidance for the revision. It may include clarifications, requested artifact changes, or partial implementation notes, but it must not silently override the resolved target, owner contract, glossary canon, or other hard command constraints
 
 ## Step 1: Resolve arguments and local context
 
@@ -93,11 +93,11 @@ Interpret selector shapes like this:
 - for `story`, the only selector token is `<story-number>`
 - for `epic`, `personas`, `stretch-goals`, and `architecture`, no selector token is accepted
 
-Also inspect the currently open or visible planning artifact when that context is available. Treat it as a candidate target only if its path maps cleanly to one of the supported targets in this command.
+Also inspect the currently open or visible workflow artifact when that context is available. Treat it as a candidate target only if its path maps cleanly to one of the supported targets in this command.
 
 Resolve target context in this precedence order:
 1. explicit command arguments
-2. currently open or visible planning artifact
+2. currently open or visible workflow artifact
 3. `./planning/current.json` field `epic-slug` for epic-scoped targets
 4. supported target table inference from the remaining context
 
@@ -113,11 +113,11 @@ Examples:
 - `/a-edit glossary "Use Subscription, not Plan, for the billing object"`
 - `/a-edit epic "Split billing and activity into separate stories"` while `./planning/data-partners/epic.md` is open
 
-If explicit arguments and the visible planning artifact disagree about the target, stop and ask the user which target to use. Do not guess.
+If explicit arguments and the visible workflow artifact disagree about the target, stop and ask the user which target to use. Do not guess.
 
-If `artifact-type` is missing but the visible planning artifact cleanly identifies a supported target, use that target.
+If `artifact-type` is missing but the visible workflow artifact cleanly identifies a supported target, use that target.
 
-If `artifact-type` is present but the selector is missing, use the visible planning artifact to fill the selector only when the mapping is exact and conflict-free.
+If `artifact-type` is present but the selector is missing, use the visible workflow artifact to fill the selector only when the mapping is exact and conflict-free.
 
 If the selector is still incomplete for an epic-scoped target after using visible context, use `./planning/current.json` only when its `epic-slug` field resolves the epic context exactly and conflict-free.
 
@@ -180,20 +180,20 @@ Minimum required inputs by target:
 - `epic`, `personas`, or `stretch-goals`
   - `./planning/<epic-slug>/idea.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.plan.md`
+  - `./planning/global-architecture.md`
 - `architecture`
   - `./planning/<epic-slug>/idea.md`
   - `./planning/<epic-slug>/epic.md`
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.plan.md`
+  - `./planning/global-architecture.md`
   - targeted codebase areas needed to validate the guidance
 - `story`
   - `./planning/<epic-slug>/epic.md`
-  - `./planning/<epic-slug>/architecture.plan.md`
+  - `./planning/<epic-slug>/architecture.md`
   - `./planning/<epic-slug>/personas.md`
   - `./planning/glossary.md`
-  - `./planning/global-architecture.plan.md`
+  - `./planning/global-architecture.md`
   - targeted codebase areas needed to validate the guidance
 
 Also follow any references that the owner command says are required for that target. If any required input or followed reference is missing or unreadable, stop and report the exact path or reference.
@@ -236,7 +236,7 @@ When revising:
 
 Allowed promotion updates:
 - update `./planning/glossary.md` only when the owner command for the target artifact would have allowed a durable terminology update
-- update `./planning/global-architecture.plan.md` only when the owner command for the target artifact would have allowed a durable cross-epic update
+- update `./planning/global-architecture.md` only when the owner command for the target artifact would have allowed a durable cross-epic update
 
 If a promotion update is needed, keep it minimal and summarize it separately from the primary artifact revision.
 
@@ -245,12 +245,12 @@ If a promotion update is needed, keep it minimal and summarize it separately fro
 After editing, determine which downstream artifacts may now be stale.
 
 Use these defaults unless the specific change proves otherwise:
-- editing `global-architecture.plan.md` may affect every epic-specific artifact
+- editing `global-architecture.md` may affect every epic-specific artifact
 - editing `glossary.md` may affect every artifact that uses the renamed or corrected term
-- editing `epic.md` may affect `personas.md`, `architecture.plan.md`, and `story-*.md` for that epic
-- editing `personas.md` may affect `architecture.plan.md` and `story-*.md` for that epic
+- editing `epic.md` may affect `personas.md`, `architecture.md`, and `story-*.md` for that epic
+- editing `personas.md` may affect `architecture.md` and `story-*.md` for that epic
 - editing `stretch-goals.md` usually has no downstream effect on the active pipeline unless a now-work vs later-work boundary changed
-- editing `architecture.plan.md` may affect `story-*.md` and future `/a-criterion` runs for that epic
+- editing `architecture.md` may affect `story-*.md` and future `/a-criterion` runs for that epic
 - editing `story-<story-number>.md` may affect future `/a-criterion` runs for that story
 
 Do not silently rewrite those downstream artifacts in the same run unless the owner rules explicitly require a minimal promotion update.
@@ -293,9 +293,9 @@ Ask the user to review the revision before advancing the pipeline again.
 - **Unexpected epic selector** — explain that epic-scoped `/a-edit` targets always use `./planning/current.json` and do not accept an epic slug argument
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing instructions-or-suggestions text** — ask the user to provide the issue to address
-- **Explicit target conflicts with visible planning artifact** — show both resolutions and ask the user which target to revise
+- **Explicit target conflicts with visible workflow artifact** — show both resolutions and ask the user which target to revise
 - **Missing target artifact** — report the exact path checked and tell the user which owner command must create it first
 - **Missing required input or followed reference** — report the exact path or reference and stop instead of skipping it
 - **Guidance conflicts with glossary or durable architecture** — surface the conflict and ask the user before editing
 - **Requested change is too broad for a constrained revision** — recommend rerunning the owner command and explain why
-- **Requested change would require writing application code** — stop and tell the user this command only revises planning artifacts
+- **Requested change would require writing application code** — stop and tell the user this command only revises workflow artifacts

@@ -6,7 +6,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 # Global Architecture
 
-This command creates and maintains the shared planning context used by all epic-specific commands:
+This command creates and maintains the shared workflow context used by all epic-specific commands:
 ```text
 a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 ^current
@@ -18,15 +18,15 @@ a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s
 | --------- | ---- | ----------- |
 | **In** | codebase | Read-only repo structure, conventions, modules, contracts, and domain language |
 | **In** | durable repo docs | Product docs, architecture docs, ADRs, README files, and stable references |
-| **Out** | `./planning/global-architecture.plan.md` | Lean cross-epic map of major system areas, boundaries, and communication paths |
+| **Out** | `./planning/global-architecture.md` | Lean cross-epic map of major system areas, boundaries, and communication paths |
 | **Out** | `./planning/glossary.md` | Shared domain glossary with canonical names, code names, sources, and statuses |
 
 ## Purpose
 
-Build the shared planning baseline before epic-specific work begins.
+Build the shared workflow baseline before epic-specific work begins.
 
 This command owns two cross-epic artifacts:
-- `global-architecture.plan.md` for structure and communication paths
+- `global-architecture.md` for structure and communication paths
 - `glossary.md` for domain language and canonical naming
 
 Later commands may refine them, but this command is the baseline producer.
@@ -45,7 +45,7 @@ Use these skills when relevant:
 ## Rules
 
 - NEVER write or modify application code
-- NEVER put epic-specific rationale into `global-architecture.plan.md`
+- NEVER put epic-specific rationale into `global-architecture.md`
 - NEVER put temporary aliases or speculative names into `glossary.md`
 - NEVER define synonyms for the same concept
 - prefer durable structure over local implementation noise
@@ -113,7 +113,7 @@ Only include durable terms that later planning and implementation work should in
 
 ## Step 3: Build the global architecture map
 
-Write `./planning/global-architecture.plan.md` as a lean cross-epic map.
+Write `./planning/global-architecture.md` as a lean cross-epic map.
 
 Use this structure:
 
@@ -189,7 +189,7 @@ Ask the user to review before epic-specific planning begins.
 
 ## Success Criteria
 
-- [ ] `./planning/global-architecture.plan.md` exists
+- [ ] `./planning/global-architecture.md` exists
 - [ ] `./planning/glossary.md` exists
 - [ ] all required inputs and followed references were validated before synthesis continued
 - [ ] the architecture file is lean and cross-epic

@@ -19,7 +19,7 @@ Next: `/a-architecture`
 | ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **In**     | `./planning/<epic-slug>/idea.md`          | Raw epic idea and links to supporting artifacts                                                                  |
 | **In/Out** | `./planning/glossary.md`                  | Shared domain glossary created by `/a-global-architecture`                                                       |
-| **In**     | `./planning/global-architecture.plan.md`  | Shared repo-wide context created by `/a-global-architecture`                                                     |
+| **In**     | `./planning/global-architecture.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
 | **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and a top-of-file UI design reference section for later stages |
 | **Out**    | `./planning/<epic-slug>/personas.md`      | Personas, actors, and usage context for later stages                                                             |
 | **Out**    | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path                                   |
@@ -38,7 +38,7 @@ Turn a rough idea into a high-quality epic packet for the rest of the pipeline:
 - `personas.md` captures the actors, goals, and contexts that later commands must inherit
 - `stretch-goals.md` captures worthwhile later-scope ideas that no one needs to read for now
 
-This command produces planning artifacts only. It must not investigate the codebase or write implementation code.
+This command produces workflow artifacts only. It must not investigate the codebase or write implementation code.
 
 For downstream commands, the source of truth shifts to the packet produced here:
 1. `epic.md`
@@ -131,7 +131,7 @@ When several reasonable splits exist, prefer the smallest user-visible slice and
 
 Read:
 - `./planning/glossary.md`
-- `./planning/global-architecture.plan.md`
+- `./planning/global-architecture.md`
 
 Use the glossary terms consistently. Never introduce an alternative name for an existing concept.
 
@@ -147,8 +147,8 @@ If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not
 
 Guidance may include:
 - scope clarifications
-- requested changes to the proposed plan
-- corrections to assumptions in existing planning artifacts
+- requested changes to the proposed story set
+- corrections to assumptions in existing workflow artifacts
 - partial story, persona, or acceptance-criteria direction that should be validated against the inputs
 
 Use that guidance ahead of default story-splitting heuristics and stale assumptions, but do not let it silently override required inputs, `./planning/current.json`, or stronger source-of-truth evidence.
@@ -373,7 +373,7 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 - [ ] `epic.md` exists at `./planning/<epic-slug>/epic.md`
 - [ ] `personas.md` exists at `./planning/<epic-slug>/personas.md`
 - [ ] `stretch-goals.md` exists at `./planning/<epic-slug>/stretch-goals.md`
-- [ ] all required inputs and followed references were validated before planning continued
+- [ ] all required inputs and followed references were validated before execution continued
 - [ ] every story uses canonical _As a / I want / So that_ format
 - [ ] every story includes `### User Context` and `### Dependencies` sections
 - [ ] every actionable or blocked story in `epic.md` has a unique story number, appears exactly once under its own `## Story N` heading, and maps to exactly one future `story-N.md` file

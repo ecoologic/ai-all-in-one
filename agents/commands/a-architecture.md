@@ -20,8 +20,8 @@ a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
 | **In**     | `./planning/<epic-slug>/epic.md`         | Story list from `/a-epic`                                                                         |
 | **In**     | `./planning/<epic-slug>/personas.md`     | Personas from `/a-epic`                                                                           |
 | **In/Out** | `./planning/glossary.md`                 | Shared naming baseline from `/a-global-architecture`; update durable confirmed terms and mappings |
-| **In/Out** | `./planning/global-architecture.plan.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure      |
-| **Out**    | `./planning/<epic-slug>/architecture.plan.md` | Epic-specific architecture, critique, and change mapping                                     |
+| **In/Out** | `./planning/global-architecture.md` | Shared repo map from `/a-global-architecture`; update only with durable cross-epic structure      |
+| **Out**    | `./planning/<epic-slug>/architecture.md` | Epic-specific architecture, critique, and change mapping                                     |
 
 ## Purpose
 
@@ -57,7 +57,7 @@ For every inconsistency:
 
 Use these skills when relevant:
 - `explore` for targeted multi-area codebase exploration
-- `architecture-blueprint-generator` when `global-architecture.plan.md` is stale or too weak to guide targeted exploration
+- `architecture-blueprint-generator` when `global-architecture.md` is stale or too weak to guide targeted exploration
 - `ecoologic-code` to validate naming and pattern alignment
 - `mermaid-diagrams` for epic class diagrams, sequence diagrams, and optional ERD review artifacts
 - `lovable` when input artifacts reference a Lovable prototype
@@ -71,8 +71,8 @@ Use these skills when relevant:
 - Treat inferred models as hypotheses until challenged against the codebase and project conventions
 - Prefer existing code and established conventions over prototype structure when they conflict
 - Update `glossary.md` only for durable confirmed terms or mappings; ask before renaming an existing term
-- Update `global-architecture.plan.md` only for durable cross-epic structure, not epic-local design detail
-- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify desired architecture direction, note partial implementation reality, or request plan changes, but it must not silently override `./planning/current.json`, validated codebase evidence, glossary canon, or other hard command constraints
+- Update `global-architecture.md` only for durable cross-epic structure, not epic-local design detail
+- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify desired architecture direction, note partial implementation reality, or request architecture changes, but it must not silently override `./planning/current.json`, validated codebase evidence, glossary canon, or other hard command constraints
 
 ## Step 1: Resolve required inputs
 
@@ -84,9 +84,9 @@ If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not
 
 Guidance may include:
 - clarifications about the intended architecture direction
-- requested changes to the proposed plan
+- requested changes to the proposed architecture output
 - partial implementation details that should be validated against the codebase
-- corrections to assumptions in the existing planning packet
+- corrections to assumptions in the existing workflow artifacts
 
 Use that guidance ahead of default heuristics and stale assumptions, but do not let it silently override `./planning/current.json`, stronger source-of-truth evidence, or validated codebase reality.
 
@@ -99,11 +99,11 @@ Read:
 - `./planning/<epic-slug>/epic.md`
 - `./planning/<epic-slug>/personas.md`
 - `./planning/glossary.md`
-- `./planning/global-architecture.plan.md`
+- `./planning/global-architecture.md`
 
 If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact missing path. The expected producer is `/a-epic`.
 
-If `glossary.md` or `global-architecture.plan.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
 
 If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
 
@@ -130,7 +130,7 @@ Before exploring the codebase, derive from the inputs:
 Infer a provisional domain model from all useful input evidence, not only the UI.
 
 If evidence is strong enough:
-- include the inferred ERD in `architecture.plan.md`
+- include the inferred ERD in `architecture.md`
 - label it as a review artifact, not accepted truth
 
 If evidence is weak:
@@ -156,11 +156,11 @@ If a contradiction materially changes the architecture recommendation, stop, sur
 
 ## Step 3: Load shared repo context
 
-Read `./planning/global-architecture.plan.md` and use it to narrow exploration.
+Read `./planning/global-architecture.md` and use it to narrow exploration.
 
 If it is stale or too weak:
 - do targeted structural exploration or invoke `architecture-blueprint-generator`
-- refresh `global-architecture.plan.md` only with durable cross-epic structure
+- refresh `global-architecture.md` only with durable cross-epic structure
 
 Use the shared map to understand:
 - major system areas
@@ -186,13 +186,13 @@ Each exploration result must report:
 - reuse candidates
 - naming matches and conflicts
 - how the area communicates with the rest of the system
-- any durable structure that may belong in `global-architecture.plan.md`
+- any durable structure that may belong in `global-architecture.md`
 
 Display a summary of findings by system area before moving on.
 
 ## Step 5: Reconcile terminology
 
-Build a terminology table for `architecture.plan.md`:
+Build a terminology table for `architecture.md`:
 
 | Domain Term | Code Name | Definition | Source | Status |
 | ----------- | --------- | ---------- | ------ | ------ |
@@ -208,7 +208,7 @@ Rules:
 - existing glossary terms remain canonical unless the user approves a change
 - add safe new glossary rows and safe enrichments to `glossary.md` in this command
 - do not silently rename existing glossary terms
-- keep conflicts and rename requests explicit in `architecture.plan.md` and review them with the user before writing outputs
+- keep conflicts and rename requests explicit in `architecture.md` and review them with the user before writing outputs
 
 ## Step 6: Make architecture decisions
 
@@ -232,7 +232,7 @@ If a decision has meaningful tradeoffs, present options with pros and cons and r
 
 ### 6a. Review open questions before writing
 
-Before writing `architecture.plan.md` or updating shared artifacts, present the current architecture direction to the user.
+Before writing `architecture.md` or updating shared artifacts, present the current architecture direction to the user.
 
 Include:
 - input conflicts and gaps, listed one by one
@@ -242,7 +242,7 @@ Include:
 
 For each conflict or tradeoff, present explicit options, state which option the hierarchy or codebase evidence favors, and explain the downstream impact.
 
-Persist every resolved source-of-truth inconsistency in `architecture.plan.md` under the same section structure described below so later stages inherit the decision history instead of re-opening the same conflict.
+Persist every resolved source-of-truth inconsistency in `architecture.md` under the same section structure described below so later stages inherit the decision history instead of re-opening the same conflict.
 
 Pause for user feedback on these items before continuing to the write steps.
 
@@ -295,9 +295,9 @@ Rules:
 
 List every new or modified artifact that later story and criterion work will depend on.
 
-## Step 8: Write `architecture.plan.md`
+## Step 8: Write `architecture.md`
 
-Write `./planning/<epic-slug>/architecture.plan.md` with this structure:
+Write `./planning/<epic-slug>/architecture.md` with this structure:
 
 ```md
 # <Epic Name> — Architecture
@@ -373,7 +373,7 @@ Do not:
 
 ### 9b. Update global architecture
 
-Update `./planning/global-architecture.plan.md` only with durable cross-epic structure such as:
+Update `./planning/global-architecture.md` only with durable cross-epic structure such as:
 - stable modules and boundaries
 - major responsibilities
 - communication paths
@@ -400,7 +400,7 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 
 ## Success Criteria
 
-- [ ] `architecture.plan.md` exists with the required sections
+- [ ] `architecture.md` exists with the required sections
 - [ ] all required inputs and followed references were validated before architecture work continued
 - [ ] every story appears in Story Mapping and Change Inventory
 - [ ] the inferred ERD is included or explicitly unavailable
@@ -408,9 +408,9 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 - [ ] the recommended domain model is explicit
 - [ ] the epic-wide class diagram is included
 - [ ] the epic-wide sequence diagrams are included
-- [ ] resolved inconsistencies, if any, were persisted in `architecture.plan.md` under `## Resolved Source-of-Truth Decisions`, or `- None` was written explicitly
+- [ ] resolved inconsistencies, if any, were persisted in `architecture.md` under `## Resolved Source-of-Truth Decisions`, or `- None` was written explicitly
 - [ ] any safe durable glossary updates were applied
-- [ ] any `global-architecture.plan.md` updates are lean and cross-epic
+- [ ] any `global-architecture.md` updates are lean and cross-epic
 - [ ] blocking conflicts, tradeoffs, and weak assumptions were reviewed with the user before files were written
 
 ## Error Handling
@@ -419,9 +419,9 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 - **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
 - **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
 - **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`
-- **Missing `glossary.md` or `global-architecture.plan.md`** — stop and tell the user to run `/a-global-architecture`
+- **Missing `glossary.md` or `global-architecture.md`** — stop and tell the user to run `/a-global-architecture`
 - **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
-- **Weak `global-architecture.plan.md`** — continue, perform targeted structural mapping, and keep the shared file lean
+- **Weak `global-architecture.md`** — continue, perform targeted structural mapping, and keep the shared file lean
 - **Empty or new codebase** — say so explicitly and focus on greenfield decisions
 - **Inputs too weak for an ERD** — record the gap instead of fabricating certainty
 - **Conflicting input artifacts** — surface the conflict immediately and pause for user direction before continuing

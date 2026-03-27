@@ -22,13 +22,14 @@ If no PR is found, report the error and stop.
 
 ### 2. Fetch Review Data (GraphQL)
 
-Use GraphQL to fetch the PR author, file order, unresolved review threads, and top-level PR reviews. Run:
+Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, and top-level PR reviews. Run:
 
 ```bash
 gh api graphql -f query='
 query($owner: String!, $repo: String!, $pr: Int!) {
   repository(owner: $owner, name: $repo) {
     pullRequest(number: $pr) {
+      number
       title
       url
       author { login }
@@ -48,6 +49,11 @@ query($owner: String!, $repo: String!, $pr: Int!) {
           comments(first: 10) {
             nodes {
               id
+            databaseId
+            fullDatabaseId
+            replyTo {
+              id
+            }
               url
               body
               author { login }
@@ -77,6 +83,15 @@ query($owner: String!, $repo: String!, $pr: Int!) {
 ```
 
 Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --json owner,name` and the PR number from step 1.
+
+Do not change the query shape by probing GitHub's GraphQL schema or running introspection queries. Use only the fields and mutations documented in this command.
+
+The fetched data must include every identifier needed for later cleanup writes:
+
+- `pullRequest.number` for the REST reply endpoint
+- each review thread `id` for `resolveReviewThread`
+- each top-level review comment's `fullDatabaseId`, falling back to `databaseId` only if `fullDatabaseId` is absent
+- each review comment's `replyTo { id }` so top-level comments can be identified without parsing URLs
 
 Only process threads where `isResolved: false`.
 
@@ -171,7 +186,82 @@ For each deduped issue:
 - Mention all matching numbers together, like `2, 5, 8.`
 - Mark every non-canonical duplicate thread for resolution after classification is complete
 
-### 6. Cleanup conversations
+### 6. Order Issues by Code Position
+
+Present issues in the order they appear in the PR diff:
+
+1. Use `pullRequest.files.nodes[].path` to determine file order.
+2. Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
+3. For deduped issues, use the canonical comment's position.
+
+### 7. Print the Final Triage Document Before Cleanup
+
+Before any cleanup write, assemble the exact final user-facing triage document using the ordered issue list and the cleanup set you plan to execute. Print that complete document to the user first, then start the GitHub cleanup pass. Treat the printed document as the authoritative triage output for the rest of the run.
+
+Start with:
+
+```text
+## PR #<number>: <title>
+<url>
+```
+
+Then, if any threads are queued for auto-resolution or any stale bot overview reviews are queued for minimization, include this section before the actionable issue list:
+
+```text
+Resolved automatically:
+- <n>. duplicate of #<canonical-number>
+- <n>. outdated
+- <n>. already addressed
+- <author> overview review hidden
+```
+
+Then, if there are any substantive human general review comments, include this unnumbered section before the actionable issue list:
+
+```text
+General comments summary:
+- @<reviewer login>: <brief summary of the substantive general comment body>
+```
+
+Then list each remaining deduped issue in order using exactly this shape:
+
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
+> <comment text truncated to one paragraph>
+
+VALID[e:quick|mid|long][s:low|mid|high]
+<brief paragraph with a tailored example of how this could go wrong in practice>
+
+<brief paragraph with the suggested fix>
+```
+
+Or:
+
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
+> <comment text truncated to one paragraph>
+
+INVALID
+<telegraphic sentence explaining why>
+```
+
+Presentation rules:
+
+- Number every raw reviewer comment first, in code order, before deduping. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
+- Do not include auto-resolved duplicate, outdated, or already-addressed threads in the actionable issue list. Mention them only in `Resolved automatically`.
+- Do not include minimized top-level bot overview reviews in the numbered issue list. Mention them only in `Resolved automatically`.
+- Do include substantive human general review comments in `General comments summary`, but never number them as issues.
+- Render `path:line` as a markdown link to the canonical PR review comment's Changes tab URL, for example `https://github.com/owner/repo/pull/326/changes#r2929596414`.
+- Truncate the quoted reviewer text to a single paragraph. Remove extra blank lines and shorten if needed, but preserve the substance.
+- For `VALID[...]` items, write exactly two short paragraphs: first the tailored failure mode example, then the suggested fix.
+- Do not include planned GitHub reply text.
+- Do not include storage paths or persistence details in the main triage list itself.
+- Do not include general PR comments outside review threads as actionable issues; summarize substantive human ones separately instead.
+- Keep explanations concise but specific to the code.
+- The `Resolved automatically` section is the cleanup plan that will be executed immediately after this document is printed. Do not wait until after cleanup to print the document.
+
+### 8. Cleanup conversations
 
 After classification and dedupe are complete, resolve review threads in GitHub when any of these is true:
 
@@ -180,6 +270,41 @@ After classification and dedupe are complete, resolve review threads in GitHub w
 - The thread is classified `INVALID` because it is outdated or already addressed
 
 In those cases, leave a short explanation reply before closing.
+
+Before any cleanup write:
+
+- Pick a top-level reviewer comment from the thread, meaning `replyTo` is null
+- Use that top-level comment's REST comment identifier for replies: prefer `fullDatabaseId`, fall back to `databaseId` only if `fullDatabaseId` is absent
+- Do not derive the reply comment id from the comment URL
+- Do not use GraphQL introspection or schema-discovery queries
+- If `pullRequest.number`, `threadId`, or the top-level reply comment id is missing, report the missing identifier and stop before making any cleanup write
+
+Use the REST reply endpoint below once per thread that should be auto-resolved:
+
+```bash
+short_reason="$(cat <<'EOF'
+{short-reason}
+EOF
+)"
+gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies --raw-field body="$short_reason"
+```
+
+Quoting requirements for this REST reply step:
+
+- Do not inline arbitrary reply text inside single quotes
+- Always build the reply body first, then pass it as `--raw-field body="$short_reason"`
+- Use the heredoc form above even for short one-line replies so apostrophes, quotes, backticks, and punctuation do not break the shell command
+- If the constructed command still contains an inline literal body like `-f body='...'`, treat it as malformed command construction and fix it before running any GitHub write
+
+Run the reply creation and the thread resolution as separate commands so the failing write is unambiguous. Do not combine cleanup writes into one shell line with `&&`.
+
+To stay below GitHub secondary rate limits during cleanup:
+
+- Run cleanup writes serially, never concurrently
+- Wait at least 1 second between every mutating GitHub request in this section, including reply creation, `resolveReviewThread`, and `minimizeComment`
+- If GitHub returns a rate limit response with `retry-after`, report it and stop without retrying automatically
+- If GitHub returns `x-ratelimit-remaining: 0`, report that the primary limit is exhausted and stop
+- If GitHub returns a secondary rate limit error without `retry-after`, report that it is likely a burst-content or per-minute secondary limit and stop
 
 Do not resolve the canonical thread for a still-valid issue. Do not resolve a thread just because it is low severity.
 
@@ -242,81 +367,13 @@ Track minimized top-level reviews separately as:
 
 - `<author> overview review hidden`
 
-If a thread resolution or review minimization should happen but the API call fails, report the failing command and stop instead of continuing with partial state.
+If a cleanup write is needed but a required identifier is missing, report which identifier is missing and stop before writing anything.
+
+If a thread resolution or review minimization API call fails, report the failing command and stop instead of continuing with partial state.
 
 NOTE: If the prompter asks to "cleanup the conversation", these above are the rules.
 
-### 7. Order Issues by Code Position
-
-Present issues in the order they appear in the PR diff:
-
-1. Use `pullRequest.files.nodes[].path` to determine file order.
-2. Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
-3. For deduped issues, use the canonical comment's position.
-
-### 8. Present Results to the User
-
-Start with:
-
-```text
-## PR #<number>: <title>
-<url>
-```
-
-Then, if any threads were auto-resolved or stale bot overview reviews were minimized, include this section before the actionable issue list:
-
-```text
-Resolved automatically:
-- <n>. duplicate of #<canonical-number>
-- <n>. outdated
-- <n>. already addressed
-- <author> overview review hidden
-```
-
-Then, if there are any substantive human general review comments, include this unnumbered section before the actionable issue list:
-
-```text
-General comments summary:
-- @<reviewer login>: <brief summary of the substantive general comment body>
-```
-
-Then list each remaining deduped issue in order using exactly this shape:
-
-```text
-<n>[, <n2>, <n3>]. @<reviewer login>
-[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
-> <comment text truncated to one paragraph>
-
-VALID[e:quick|mid|long][s:low|mid|high]
-<brief paragraph with a tailored example of how this could go wrong in practice>
-
-<brief paragraph with the suggested fix>
-```
-
-Or:
-
-```text
-<n>[, <n2>, <n3>]. @<reviewer login>
-[path/to/file.ts:<line>](<canonical-review-comment-changes-url>)
-> <comment text truncated to one paragraph>
-
-INVALID
-<telegraphic sentence explaining why>
-```
-
-Presentation rules:
-
-- Number every raw reviewer comment first, in code order, before deduping. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
-- Do not include auto-resolved duplicate, outdated, or already-addressed threads in the actionable issue list. Mention them only in `Resolved automatically`.
-- Do not include minimized top-level bot overview reviews in the numbered issue list. Mention them only in `Resolved automatically`.
-- Do include substantive human general review comments in `General comments summary`, but never number them as issues.
-- Render `path:line` as a markdown link to the canonical PR review comment's Changes tab URL, for example `https://github.com/owner/repo/pull/326/changes#r2929596414`.
-- Truncate the quoted reviewer text to a single paragraph. Remove extra blank lines and shorten if needed, but preserve the substance.
-- For `VALID[...]` items, write exactly two short paragraphs: first the tailored failure mode example, then the suggested fix.
-- Do not include planned GitHub reply text.
-- Do not include storage paths or persistence details in the main triage list itself.
-- Do not include general PR comments outside review threads as actionable issues; summarize substantive human ones separately instead.
-- Keep explanations concise but specific to the code.
+After the final triage document from section 7 has been printed, execute the queued cleanup writes. Use the same `Resolved automatically` set that was already shown to the user. Do not silently add new cleanup items after printing the document.
 
 ### 9. Close with a Clear Next Step
 
@@ -392,6 +449,10 @@ When writing this file:
 ## Error Handling
 
 If any step fails:
+- If the command as written here does not provide a required identifier, report the missing identifier and stop before any GitHub write
+- If a GitHub command was constructed incorrectly, report that exact command and why it does not match the templates in this file
 - Report the specific command that failed and its error output
+- If the failure happened after triage analysis started and after the section 7 document was printed, explicitly say that the final triage document was already printed before cleanup started and that the command stopped on the first cleanup write failure to avoid further partial GitHub mutations
+- In that explanation, summarize the debugging details in technical terms: which cleanup step was running, whether it was a REST reply, `resolveReviewThread`, or `minimizeComment`, which identifier or endpoint was involved, and whether the failure points to malformed command construction, missing identifiers, rate limiting, permissions, or a GitHub-side rejection
 - Stop and ask the user how to proceed
 - DO NOT retry automatically

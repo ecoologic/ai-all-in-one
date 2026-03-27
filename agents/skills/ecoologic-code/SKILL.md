@@ -66,9 +66,9 @@ If those skills contain relevant structure guidance (for example: colocating by 
 
 - When concepts are renamed, there's often no need to keep around any knowledge of the old name (it can live in git)
 - Prefer declarative style over imperative
-- Prefer object-oriented or functional, but avoid procedural
+- Prefer functional or object-oriented, but avoid procedural
 - Avoid declaring function inside other functions, prefer root functions when possible
-- We strictly control for quality and security entering the system; Once in, we assume information is correct, eg: Do not re-validate data in the DB
+- We strictly control for quality and security at the edges (eg: endpoints); Once in, we assume information is correct, eg: Do not re-validate internal data (eg: from the DB)
 
 ## Readability
 
@@ -212,15 +212,22 @@ if (!users.length) // ...
 
 - NEVER expose raw code errors and internals to the user, neither in UIs or APIs
 
+## Monitoring
+
+- NEVER hide errors, make sure logging has the original error
+
 ## API
 
-- ALWAYS apply RESTful architecture for new "regular" endpoints (no GraphQL, RPC)
+- ALWAYS apply RESTful architecture for new "regular" endpoints (not necessarily for GraphQL, RPC)
+
+## Error Handling
+
+- Internally store all the information for future debugging
+- NEVER expose internal details to clients, ALWAYS map internal errors to user friendly versions at API level
 
 ## Domain Layer Independence
 
 - Domain layer has **zero dependencies** on infrastructure (no imports from DB, HTTP, or framework)
-- Repository interface lives in domain; implementation lives in infrastructure
-- One repository per aggregate root — never for child entities
 - Anti-corruption layer at bounded context boundaries to translate between models
 
 ## Domain Layer and DB

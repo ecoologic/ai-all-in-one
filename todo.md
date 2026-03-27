@@ -20,4 +20,3 @@
 - No `.plan.md`, just `.md`
 - Criterion ultimate line of defence for reviewing architecture and ui
 - New `/a-board` to update the board using `./planning/current.json` (don't touch worked on stories)
-- `a-plan` add? https://skills.sh/oimiragieo/agent-studio/spec-critique (needs customisation)
