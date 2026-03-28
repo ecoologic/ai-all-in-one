@@ -6,13 +6,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 
 # Story Breakdown
 
-This command is a single step of a longer pipeline:
-```text
-a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-                                ^current
-```
-Next: `/a-criterion` consumes the numbered acceptance criteria and execution process produced by this command
-
 ### Pipeline I/O
 
 | Direction | File | Description |
@@ -57,53 +50,24 @@ Break one story into a concrete, code-informed execution process without writing
 - NEVER split implementation tasks by technology layer alone when one coherent story-slice task would be clearer
 - refine higher-level artifacts only when the finding is durable and useful beyond this one local note
 - reconcile `architecture.md` after the acceptance criteria are locked and story investigation is complete when the story reveals epic-specific technical truth other stories should inherit
-- If trailing guidance is provided, treat it as the highest-priority refinement input for this run. It may clarify scope, request story changes, or include partial implementation direction, but it must not silently override the required story selector, glossary canon, validated references, or other hard command constraints
-
 ## Step 1: Resolve required inputs
 
 `$ARGUMENTS` = `<story-number> [instructions-or-suggestions]`
 
-Interpret argument shapes like this:
-- this command accepts exactly one explicit argument: `<story-number>`
-- any remaining text after `<story-number>` is optional high-priority guidance for this run
-- epic selection is not accepted as a command argument
+One required numeric argument. Remaining text is optional high-priority guidance. Does not accept an epic slug.
 
-Examples:
-- `/a-story 2` -> use the current epic and story `2`
-- `/a-story 2 "Keep the existing webhook ingestion path and update the story around it"` -> use the current epic and story `2`, and treat the quoted text as highest-priority guidance
+Resolve `<epic-slug>` from `./planning/current.json`. Stop if missing or malformed.
 
-If `<story-number>` is empty or missing, stop and ask the user to provide it. Do not guess or continue with partial context.
-
-If guidance text is present after `<story-number>`, treat it as the highest-priority refinement input for this run.
-
-Guidance may include:
-- clarifications
-- changes to the story
-- corrections to stale workflow assumptions
-- partial implementation notes that should shape the execution process when validated
-
-Use that guidance ahead of default story-shaping heuristics and stale assumptions, but do not let it silently override the required story selector, `./planning/current.json`, followed references, or stronger source-of-truth evidence.
-
-Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
-
-If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
-
-Read:
+Read (stop if any are missing):
 - `./planning/<epic-slug>/epic.md`
 - `./planning/<epic-slug>/architecture.md`
 - `./planning/<epic-slug>/personas.md`
 - `./planning/glossary.md`
 - `./planning/global-architecture.md`
 
-If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
+Follow all references from planning artifacts. Stop and report any unreadable reference.
 
-If `epic.md`, `architecture.md`, or `personas.md` is missing, stop and report the exact path checked.
-
-If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
-
-Also follow references from every planning artifact read in this step. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it.
-
-When `epic.md` contains a `UI References` section, treat those references as required input for this run. Read and follow them before working on any story that has UI or depends on UI behavior.
+When `epic.md` contains a `UI References` section, treat those references as required input. Read and follow them before working on any story with UI.
 
 Extract the requested story section from `epic.md`. The story context includes:
 - title
@@ -486,11 +450,7 @@ Ask the user to review the completed story artifact before moving to `/a-criteri
 
 ## Error Handling
 
-- **Missing story number** — ask the user to provide a story number
-- **Epic selection attempted in guidance** — explain that `/a-story` always uses `./planning/current.json` for epic selection; keep the resolved `<story-number>` and treat any remaining text as high-priority guidance only
-- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
+@include includes/error-protocol.md
+
 - **Story not found in `epic.md`** — list available story numbers and ask the user to pick one
-- **Missing shared repo files** — tell the user to run `/a-global-architecture` first
-- **Missing epic-specific files** — report the exact missing path and tell the user which earlier command to run
-- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
 - **No relevant code found** — say so explicitly and treat the story as a greenfield area while still following project-wide patterns

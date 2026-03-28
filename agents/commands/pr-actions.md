@@ -22,67 +22,13 @@ If no PR is found, report the error and stop.
 
 ### 2. Fetch Review Data (GraphQL)
 
-Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, and top-level PR reviews. Run:
+Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, and top-level PR reviews.
 
 ```bash
-gh api graphql -f query='
-query($owner: String!, $repo: String!, $pr: Int!) {
-  repository(owner: $owner, name: $repo) {
-    pullRequest(number: $pr) {
-      number
-      title
-      url
-      author { login }
-      files(first: 100) {
-        nodes {
-          path
-        }
-      }
-      reviewThreads(first: 100) {
-        nodes {
-          id
-          isResolved
-          path
-          line
-          startLine
-          diffSide
-          comments(first: 10) {
-            nodes {
-              id
-            databaseId
-            fullDatabaseId
-            replyTo {
-              id
-            }
-              url
-              body
-              author { login }
-              createdAt
-            }
-          }
-        }
-      }
-      reviews(first: 100) {
-        nodes {
-          id
-          url
-          body
-          state
-          submittedAt
-          isMinimized
-          viewerCanMinimize
-          author { login }
-          comments(first: 1) {
-            totalCount
-          }
-        }
-      }
-    }
-  }
-}' -f owner='{owner}' -f repo='{repo}' -F pr={number}
+bash agents/commands/scripts/pr-fetch-reviews.sh {owner} {repo} {number}
 ```
 
-Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --json owner,name` and the PR number from step 1.
+Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --json owner,name` and the PR number from step 1. The script outputs the full GraphQL response as JSON.
 
 Do not change the query shape by probing GitHub's GraphQL schema or running introspection queries. Use only the fields and mutations documented in this command.
 

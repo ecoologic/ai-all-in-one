@@ -6,15 +6,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 
 # Artifact Revision
 
-This command revises an existing workflow artifact after user guidance:
-```text
-a-global-architecture -> a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-                    \______________________________________________/
-                                  a-edit can revisit any workflow artifact
-```
-
-Use this command to correct or refine an artifact that already exists. Do not rerun the whole pipeline.
-
 ### Pipeline I/O
 
 | Direction              | File                                | Description                                                                                              |
@@ -83,49 +74,16 @@ This command should:
 
 `$ARGUMENTS` = `<artifact-type> [selector...] <instructions-or-suggestions>`
 
-Parse explicit arguments from left to right:
-1. first argument is the `artifact-type`
-2. middle arguments are the selector required by that artifact type
-3. final argument is the instructions-or-suggestions text and should usually be quoted
+Parse left to right: artifact-type, optional selector, then guidance text (usually quoted).
 
-Interpret selector shapes like this:
-- epic selection is not accepted as a command argument for any `a-*` command
-- for `story`, the only selector token is `<story-number>`
-- for `epic`, `personas`, `stretch-goals`, and `architecture`, no selector token is accepted
+Resolve target using this precedence:
+1. Explicit command arguments
+2. Currently open/visible workflow artifact
+3. `./planning/current.json` for epic-scoped targets
 
-Also inspect the currently open or visible workflow artifact when that context is available. Treat it as a candidate target only if its path maps cleanly to one of the supported targets in this command.
+If explicit arguments and visible artifact disagree, stop and ask. If artifact-type is missing but visible artifact identifies a supported target, use it. If selector is still incomplete, use `./planning/current.json` when unambiguous.
 
-Resolve target context in this precedence order:
-1. explicit command arguments
-2. currently open or visible workflow artifact
-3. `./planning/current.json` field `epic-slug` for epic-scoped targets
-4. supported target table inference from the remaining context
-
-Use the visible artifact to fill in omitted target details only when that fill is unambiguous. Examples:
-- infer `epic` from an open file at `./planning/data-partners/epic.md`
-- infer `story 7` from an open file at `./planning/data-partners/story-7.md`
-
-For epic-scoped targets (`epic`, `personas`, `stretch-goals`, `architecture`, and `story`), read `./planning/current.json` and use its `epic-slug` value.
-
-Examples:
-- `/a-edit architecture "You missed the webhook retry flow"`
-- `/a-edit story 2 "Acceptance criterion 2 does not cover authorization failures"` -> use the current epic and story `2`
-- `/a-edit glossary "Use Subscription, not Plan, for the billing object"`
-- `/a-edit epic "Split billing and activity into separate stories"` while `./planning/data-partners/epic.md` is open
-
-If explicit arguments and the visible workflow artifact disagree about the target, stop and ask the user which target to use. Do not guess.
-
-If `artifact-type` is missing but the visible workflow artifact cleanly identifies a supported target, use that target.
-
-If `artifact-type` is present but the selector is missing, use the visible workflow artifact to fill the selector only when the mapping is exact and conflict-free.
-
-If the selector is still incomplete for an epic-scoped target after using visible context, use `./planning/current.json` only when its `epic-slug` field resolves the epic context exactly and conflict-free.
-
-If `artifact-type` is missing, unsupported, or still does not have the required selector after applying the precedence rules, stop and show the supported target table.
-
-If the final instructions-or-suggestions text is empty or missing, stop and ask the user to provide the issue to address.
-
-If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
+Stop if artifact-type is unsupported, selector is incomplete after all resolution, guidance text is empty, or `current.json` is missing/malformed.
 
 ## Step 2: Resolve the owner contract and target files
 
@@ -288,14 +246,9 @@ Ask the user to review the revision before advancing the pipeline again.
 
 ## Error Handling
 
+@include includes/error-protocol.md
+
 - **Unsupported `artifact-type`** — show the supported targets table and stop
-- **Missing selector for the chosen target** — explain the required selector shape and stop
-- **Unexpected epic selector** — explain that epic-scoped `/a-edit` targets always use `./planning/current.json` and do not accept an epic slug argument
-- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Missing instructions-or-suggestions text** — ask the user to provide the issue to address
-- **Explicit target conflicts with visible workflow artifact** — show both resolutions and ask the user which target to revise
-- **Missing target artifact** — report the exact path checked and tell the user which owner command must create it first
-- **Missing required input or followed reference** — report the exact path or reference and stop instead of skipping it
 - **Guidance conflicts with glossary or durable architecture** — surface the conflict and ask the user before editing
 - **Requested change is too broad for a constrained revision** — recommend rerunning the owner command and explain why
 - **Requested change would require writing application code** — stop and tell the user this command only revises workflow artifacts

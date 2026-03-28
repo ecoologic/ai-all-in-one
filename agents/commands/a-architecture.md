@@ -6,12 +6,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, Skill, AskUserQuestion]
 
 # Architecture
 
-Pipeline position:
-```text
-a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-           ^current
-```
-
 ### Pipeline I/O
 
 | Direction  | File                                     | Description                                                                                       |
@@ -72,42 +66,20 @@ Use these skills when relevant:
 - Prefer existing code and established conventions over prototype structure when they conflict
 - Update `glossary.md` only for durable confirmed terms or mappings; ask before renaming an existing term
 - Update `global-architecture.md` only for durable cross-epic structure, not epic-local design detail
-- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify desired architecture direction, note partial implementation reality, or request architecture changes, but it must not silently override `./planning/current.json`, validated codebase evidence, glossary canon, or other hard command constraints
-
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `[instructions-or-suggestions]`
+`$ARGUMENTS` = `[instructions-or-suggestions]` — high-priority guidance for this run. Does not select the epic.
 
-This command does not accept an epic slug argument.
+Resolve `<epic-slug>` from `./planning/current.json`. Stop if missing or malformed.
 
-If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not as epic selection.
-
-Guidance may include:
-- clarifications about the intended architecture direction
-- requested changes to the proposed architecture output
-- partial implementation details that should be validated against the codebase
-- corrections to assumptions in the existing workflow artifacts
-
-Use that guidance ahead of default heuristics and stale assumptions, but do not let it silently override `./planning/current.json`, stronger source-of-truth evidence, or validated codebase reality.
-
-Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
-
-If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
-
-Read:
+Read (stop if any are missing):
 - `./planning/<epic-slug>/idea.md`
 - `./planning/<epic-slug>/epic.md`
 - `./planning/<epic-slug>/personas.md`
 - `./planning/glossary.md`
 - `./planning/global-architecture.md`
 
-If `idea.md`, `epic.md`, or `personas.md` is missing, stop and report the exact missing path. The expected producer is `/a-epic`.
-
-If `glossary.md` or `global-architecture.md` is missing, stop and tell the user to run `/a-global-architecture` first.
-
-If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
-
-Also follow references from those files to supporting artifacts such as designs, screenshots, specs, prototype repos, or research notes. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep an explicit list of what was read.
+Follow references from those files to supporting artifacts. Stop and report any unreadable reference.
 
 Extract:
 - epic name and slug
@@ -415,12 +387,8 @@ Invite final feedback or corrections before moving to `/a-story`. Do not use thi
 
 ## Error Handling
 
-- **Epic selection attempted in guidance** — explain that `/a-architecture` always uses `./planning/current.json` for epic selection; treat any remaining guidance text as high-priority instructions only
-- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Missing `epic.md` or `personas.md`** — report the path checked and tell the user to run `/a-epic`
-- **Missing `idea.md`** — report the path checked and tell the user to run `/a-epic`
-- **Missing `glossary.md` or `global-architecture.md`** — stop and tell the user to run `/a-global-architecture`
-- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
+@include includes/error-protocol.md
+
 - **Weak `global-architecture.md`** — continue, perform targeted structural mapping, and keep the shared file lean
 - **Empty or new codebase** — say so explicitly and focus on greenfield decisions
 - **Inputs too weak for an ERD** — record the gap instead of fabricating certainty

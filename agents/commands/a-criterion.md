@@ -6,12 +6,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Ski
 
 # Criterion Implementation
 
-Pipeline position:
-```text
-a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-                                        ^current
-```
-
 ### Pipeline I/O
 
 | Direction | File | Description |
@@ -51,22 +45,18 @@ Invoke when relevant:
 - Implementation tasks may be story-coherent rather than artificially isolated; if the criterion needs a full table, all story-relevant fields belong in scope
 - Add or update tests when the repo already has a relevant testing pattern and the criterion changes behavior
 - Run the smallest meaningful validation that can prove the criterion works
-- If trailing guidance is provided, treat it as the highest-priority execution input for this run, but it must not silently override required selectors, approved workflow artifacts, glossary canon, or other hard constraints
-
 ## Step 1: Resolve required inputs
 
-`$ARGUMENTS` = `<story-number> <criterion-number> [guidance]`
+`$ARGUMENTS` = `<story-number> <criterion-number> [instructions-or-suggestions]`
 
-Two required numeric arguments. Any remaining text is optional high-priority guidance. Epic comes from `./planning/current.json` field `epic-slug`, never from arguments.
+Two required numeric arguments. Remaining text is optional high-priority guidance. Epic comes from `./planning/current.json`. Stop if missing or malformed.
 
-If either selector is missing, stop and ask. If `current.json` is missing or malformed, report and stop.
-
-Read these files (stop and report if any are missing):
+Read (stop if any are missing):
 - `./planning/<epic-slug>/story-<story-number>.md`
 - `./planning/<epic-slug>/architecture.md`
 - `./planning/glossary.md`
 
-Follow all references from workflow artifacts. If any reference is unreadable, stop and report the exact reference and originating file.
+Follow all references from workflow artifacts. Stop and report any unreadable reference.
 
 When `story-<story-number>.md` contains a `UI References` section, read and follow those references before implementing UI behavior.
 
@@ -146,3 +136,7 @@ Do not push debugging notes, silently rename glossary terms, rewrite tasks becau
 ## Step 7: Present the result
 
 Summarize: files changed, criterion covered, validation result, story progress updates, workflow updates, blockers or risks, whether another criterion is unblocked.
+
+## Error Handling
+
+@include includes/error-protocol.md

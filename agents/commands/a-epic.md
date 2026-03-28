@@ -6,13 +6,6 @@ allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 
 # Epic
 
-This command is a single step of a longer pipeline:
-```text
-a-epic -> a-architecture -> a-story(s) -> a-criterion(s)
-^current
-```
-Next: `/a-architecture`
-
 ### Pipeline I/O
 
 | Direction  | File                                      | Description                                                                                                      |
@@ -65,7 +58,6 @@ Treat each inconsistency independently:
 - NEVER reuse a story number, place multiple stories under the same numbered heading, or represent one numbered story across multiple files; each story number must map 1:1 to exactly one `## Story N` section in `epic.md` and exactly one future `story-N.md` file
 - produce `personas.md` in this command so later stages inherit the same actors and usage context
 - keep stretch goals out of `epic.md`; write them to `stretch-goals.md` instead
-- If `$ARGUMENTS` is provided, treat it as high-priority guidance for this run. It may clarify scope, adjust story boundaries, or propose corrections, but it must not silently override `./planning/current.json`, required inputs, glossary canon, or stronger source-of-truth evidence
 
 ## Story canonical format
 
@@ -129,43 +121,19 @@ When several reasonable splits exist, prefer the smallest user-visible slice and
 
 ## Step 0: Load glossary
 
-Read:
-- `./planning/glossary.md`
-- `./planning/global-architecture.md`
-
-Use the glossary terms consistently. Never introduce an alternative name for an existing concept.
-
-If either shared file is missing, stop and tell the user to run `/a-global-architecture` first.
+Read `./planning/glossary.md` and `./planning/global-architecture.md`. Stop if either is missing.
 
 ## Step 1: Resolve inputs
 
-`$ARGUMENTS` = `[instructions-or-suggestions]`
+`$ARGUMENTS` = `[instructions-or-suggestions]` — high-priority guidance for this run. Does not select the epic.
 
-This command does not accept an epic slug argument.
+Resolve `<epic-slug>` from `./planning/current.json`. Stop if missing or malformed.
 
-If `$ARGUMENTS` is present, treat it as high-priority guidance for this run, not as epic selection.
+Read `./planning/<epic-slug>/idea.md`. Stop if missing.
 
-Guidance may include:
-- scope clarifications
-- requested changes to the proposed story set
-- corrections to assumptions in existing workflow artifacts
-- partial story, persona, or acceptance-criteria direction that should be validated against the inputs
+Follow references from `idea.md` to supporting materials. Stop and report any unreadable reference.
 
-Use that guidance ahead of default story-splitting heuristics and stale assumptions, but do not let it silently override required inputs, `./planning/current.json`, or stronger source-of-truth evidence.
-
-Resolve `<epic-slug>` from `./planning/current.json` field `epic-slug`.
-
-If `./planning/current.json` does not provide `<epic-slug>`, stop and report the exact problem. Do not guess or continue with partial context.
-
-Read `./planning/<epic-slug>/idea.md`.
-
-If `idea.md` does not exist, report the exact path checked and stop. Do not fall back to another file or prompt mode.
-
-If `./planning/current.json` is unreadable, malformed, or missing `epic-slug`, report that exact problem and stop.
-
-Also follow references from `idea.md` to supporting materials such as product notes, design files, screenshots, research, or prototype links. Treat each followed reference as required input for this run. If any followed reference cannot be found, accessed, or read, stop and report the exact reference and the file that referenced it. Keep a list of what was read.
-
-Identify which referenced artifacts are UI-facing inputs such as mockups, prototypes, screenshots, recordings, interaction notes, or design specs. Preserve every relevant UI reference in `epic.md` so later commands can read and follow them without reopening `idea.md`.
+Identify UI-facing referenced artifacts. Preserve every relevant UI reference in `epic.md` for later commands.
 
 Output:
 ```text
@@ -389,8 +357,6 @@ Invite final feedback on the generated artifacts before moving to `/a-architectu
 
 ## Error Handling
 
-- **Epic selection attempted in guidance** — explain that `/a-epic` always uses `./planning/current.json` for epic selection; treat any remaining guidance text as high-priority instructions only
-- **Invalid `./planning/current.json`** — report the exact issue with the missing or malformed `epic-slug` field and stop
-- **Missing `idea.md`** — report the exact path checked and ask the user to create it first
-- **Missing or unreadable followed reference** — report the exact reference and originating file and stop instead of skipping it
+@include includes/error-protocol.md
+
 - **Weak input** — say what is missing, keep assumptions explicit, and ask the user instead of inventing certainty
