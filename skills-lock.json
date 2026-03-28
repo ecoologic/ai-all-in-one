@@ -10,15 +10,6 @@
       "installedAt": "2026-03-03T09:27:00.000Z",
       "updatedAt": "2026-03-03T09:27:00.000Z"
     },
-    "skill-authoring": {
-      "source": "microsoft/github-copilot-for-azure",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/microsoft/github-copilot-for-azure.git",
-      "skillPath": "skills/skill-authoring/SKILL.md",
-      "skillFolderHash": null,
-      "installedAt": "2026-03-03T09:13:00.000Z",
-      "updatedAt": "2026-03-03T09:13:00.000Z"
-    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
