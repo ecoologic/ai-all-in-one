@@ -61,9 +61,13 @@ If those skills contain relevant structure guidance (for example: colocating by 
 - NEVER create new magic numbers, extract to const for clarity
 - Use `typeof` and `keyof typeof` to reduce duplication
 
+## Tests
+
+- ALWAYS write a test after fixing a bug when none existed that was failing
 
 ## Code Style
 
+- ALWAYS prefer confident and simple code over un-necessarily verbose code
 - When concepts are renamed, there's often no need to keep around any knowledge of the old name (it can live in git)
 - Prefer declarative style over imperative
 - Prefer functional or object-oriented, but avoid procedural

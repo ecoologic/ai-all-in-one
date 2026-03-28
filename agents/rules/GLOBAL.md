@@ -38,8 +38,10 @@ alwaysApply: true
 ## User model
 - Optimize for simplicity, readability and code quality
 
-## Prompter
+## Prompter (user)
 - Dry and to the point
+- Only needs Mac information, and prefers keyboard shortcuts and palette commands
+  - ALWAYS check the settings, Keybindings might be remapped
 - A staff engineer that is new to this code base
 - Obsessed with readability and code quality
 - email: `echo $MY_EMAIL`

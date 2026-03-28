@@ -17,7 +17,7 @@ Let the AI write the commit body and footer normally from the staged changes.
 
 Treat the current staged set as the source of truth for commit scope.
 
-If the session includes agile terminology such as a user story, story, or acceptance criteria, use that context to shape the commit message wording when it matches the staged changes.
+If the session includes agile terminology such as a user story, story, or acceptance criteria, use that context to shape the commit message wording when it matches the staged changes, but avoid mentioning story/ac number.
 
 Do not pause, warn, or ask for reconfirmation just because the staged set differs from an earlier snapshot, repo status output, or assumptions from prior turns.
 
@@ -79,7 +79,7 @@ feat: CreateUser
 - Agile context from the session may shape the wording, but only when it matches the already staged changes.
 - Do not treat differences from earlier snapshots or prior expectations as a reason to block the commit.
 - When amending with a full-message update, make the replacement message fit the final amended commit, not just the newly staged delta.
-- NEVER write titles like "addressing feedback", instead, stick to what work was done and summarise that as usual
+- NEVER write titles like "addressing review feedback", instead, stick to what work was done and summarise that as usual. If the changes are too broad to summarise, use something like "Misc small amends".
 
 ### Final Step
 

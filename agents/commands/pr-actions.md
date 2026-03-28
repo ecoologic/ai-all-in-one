@@ -140,6 +140,8 @@ For that later follow-up:
 
 #### Process
 
+Before proceeding, check all the recent commits for the affected LoCs and relative tests. Answer the question: "Are we going in circles? Are we applying a change that undoes a previous fix?". In that case, think deeper about the solution that fixes both issues raised. Sometimes it will mean undoing the latest change, sometimes we shouldn't do anything, and sometimes it will mean finding a solution that fixes both issues.
+
 Each comment must end up in exactly one category:
 
 - `VALID[done]`: the reviewer is correct but the fix has already been applied
