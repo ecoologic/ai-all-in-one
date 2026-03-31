@@ -22,10 +22,11 @@
       "Bash(claude mcp:*)",
       "Bash(npm install:*)",
       "Bash(which mcp-server-memory:*)",
-      "Bash(ls -d /Users/erik/.agents/skills/*/)",
-      "Bash(xargs -I{} basename {})",
-      "Bash(for d:*)",
-      "Bash(do head:*)"
+      "Bash(ls -d /Users/erik/.agents/skills/:*)",
+      "Bash(ls -d ~/.agents/skills/:*)",
+      "Bash(ls -d /Users/erik/dev/ai/.agents/skills/:*)",
+      "Bash(for d in /Users/erik/.agents/skills/:*)",
+      "Bash(for d in /Users/erik/dev/ai/.agents/skills/:*)"
     ]
   },
   "enabledPlugins": {

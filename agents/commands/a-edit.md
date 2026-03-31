@@ -90,10 +90,10 @@ Stop if artifact-type is unsupported, selector is incomplete after all resolutio
 Map the `artifact-type` to its owner command and target artifact path using the supported targets table.
 
 Read the owner command file first:
-- `./agents/commands/a-global-architecture.md`
-- `./agents/commands/a-epic.md`
-- `./agents/commands/a-architecture.md`
-- `./agents/commands/a-story.md`
+- `~/.agents/commands/a-global-architecture.md`
+- `~/.agents/commands/a-epic.md`
+- `~/.agents/commands/a-architecture.md`
+- `~/.agents/commands/a-story.md`
 
 Then read the current target artifact immediately.
 

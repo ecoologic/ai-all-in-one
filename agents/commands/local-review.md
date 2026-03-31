@@ -32,7 +32,7 @@ Run a **local-only** review of the current branch. **Do not run `git fetch`.** *
 
 ## 1. Read The Docs (`/rtd`)
 
-Execute the full **Read The Docs** workflow defined in `agents/commands/rtd.md` (read-only bootstrap: root docs, Claude/Cursor config, skills manifest, report format). **Do not modify any files** in this phase.
+Execute the full **Read The Docs** workflow defined in `~/.agents/commands/rtd.md` (read-only bootstrap: root docs, Claude/Cursor config, skills manifest, report format). **Do not modify any files** in this phase.
 
 ## 2. Local code review only
 

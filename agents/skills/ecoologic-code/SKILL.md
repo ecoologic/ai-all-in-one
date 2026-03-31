@@ -73,6 +73,7 @@ If those skills contain relevant structure guidance (for example: colocating by 
 - Prefer functional or object-oriented, but avoid procedural
 - Avoid declaring function inside other functions, prefer root functions when possible
 - We strictly control for quality and security at the edges (eg: endpoints); Once in, we assume information is correct, eg: Do not re-validate internal data (eg: from the DB)
+- Avoid intermediate variables when inline is sufficient
 
 ## Readability
 

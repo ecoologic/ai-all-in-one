@@ -25,7 +25,7 @@ If no PR is found, report the error and stop.
 Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, and top-level PR reviews.
 
 ```bash
-bash agents/commands/scripts/pr-fetch-reviews.sh {owner} {repo} {number}
+bash ~/.agents/commands/scripts/pr-fetch-reviews.sh {owner} {repo} {number}
 ```
 
 Replace `{owner}`, `{repo}`, and `{number}` with values from `gh repo view --json owner,name` and the PR number from step 1. The script outputs the full GraphQL response as JSON.
