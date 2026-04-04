@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Set this to exactly what you type in Cursor chat.
+# If you normally type /rtd, keep /rtd.
+# If you normally type rtd, change it to rtd.
+RDT_CMD="/rtd"
+
+remote="${1:-origin}"
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "cursor_review: not inside a git repo" >&2
+  exit 1
+fi
+
+branch="$(git branch --show-current)"
+if [ -z "$branch" ]; then
+  echo "cursor_review: could not determine current branch" >&2
+  exit 1
+fi
+
+base="$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" 2>/dev/null || true)"
+base="${base#"$remote"/}"
+
+if [ -z "$base" ]; then
+  if git show-ref --verify --quiet "refs/remotes/$remote/main"; then
+    base="main"
+  elif git show-ref --verify --quiet "refs/remotes/$remote/master"; then
+    base="master"
+  else
+    echo "cursor_review: could not determine base branch for remote '$remote'" >&2
+    exit 1
+  fi
+fi
+
+base_ref="$remote/$base"
+
+if ! git show-ref --verify --quiet "refs/remotes/$base_ref"; then
+  echo "cursor_review: base ref not found: $base_ref" >&2
+  exit 1
+fi
+
+merge_base="$(git merge-base "$base_ref" HEAD)"
+diff_file="$(mktemp "/tmp/cursor-review.${branch}.XXXXXX.diff")"
+trap 'rm -f "$diff_file"' EXIT
+
+git diff --find-renames "$merge_base"...HEAD > "$diff_file"
+
+if [ ! -s "$diff_file" ]; then
+  echo "cursor_review: no diff for '$branch' against '$base_ref'"
+  exit 0
+fi
+
+prompt=$(cat <<EOF
+$RDT_CMD
+
+Review the current git branch like a strict PR reviewer.
+
+Branch: $branch
+Base branch: $base_ref
+Diff file: $diff_file
+
+Focus on:
+- correctness and regressions
+- edge cases
+- security issues
+- broken assumptions or contract changes
+- missing tests
+- config, env, route, migration, or infra coupling when relevant
+
+Rules:
+- Only report issues that are likely real and actionable
+- Prefer high-signal findings over style comments
+- Cite concrete file paths from the diff
+- Explain the failure mode clearly
+- If no important issues are found, say so explicitly
+EOF
+)
+
+cur agent \
+  -p \
+  --mode ask \
+  --output-format text \
+  --workspace "$PWD" \
+  "$prompt"

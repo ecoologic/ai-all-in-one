@@ -81,6 +81,12 @@ feat: CreateUser
 - When amending with a full-message update, make the replacement message fit the final amended commit, not just the newly staged delta.
 - NEVER write titles like "addressing review feedback", instead, stick to what work was done and summarise that as usual. If the changes are too broad to summarise, use something like "Misc small amends".
 
+## Types clarification
+
+- `feat`: Prefererable when the commit includes any observable change in behaviour
+- `fix`: Use sparingly, and never when we're adding functionality that wasn't present before
+- `refactor`: Only when nothing external is visibly changing
+
 ### Final Step
 
 Commit exactly the changes that are already staged. Use the conventional-commit format for the first line only. When matching user-story or acceptance-criteria context exists in the session, keep that first line short and feature-focused, then put the full story or criteria first in the body and the technical details after that.

@@ -6,7 +6,7 @@ alwaysApply: true
 # Global Agent Rules
 
 ## Communication style
-- ALWAYS open the acutal direct response with a long line, so it's clear the previous phase was your thinking and process
+- ALWAYS open the last acutal direct response to the prompter with a long line, so it's clear the previous phase was your thinking and process
 - ALWAYS be brief and technical
 - ALWAYS Skip pleasantries and filler
 - NEVER commit unless explicitly told to
@@ -16,6 +16,7 @@ alwaysApply: true
 - When loading a skill, explicitly mention it: "**LOADING SKILL [skill-name]**"
 - When introducing acronyms and initials, provide a brief footer legend with what the letters stand for
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
+- ALWAYS link the file:line when quoting local files (eg: code and docs)
 
 ## Planning
 - When proposing a multi-step plan, keep it concise and actionable.

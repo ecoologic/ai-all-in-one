@@ -1,5 +1,7 @@
 # TODOs
 
+- script folder finish?
+
 ## Meta
 
 - Subagents??
