@@ -1,15 +1,6 @@
 {
   "version": 3,
   "skills": {
-    "web-design-guidelines": {
-      "source": "vercel-labs/agent-skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
-      "skillPath": "skills/web-design-guidelines/SKILL.md",
-      "skillFolderHash": "3116f3e62dbd02b44a598b1aa690d2a8938e8f89",
-      "installedAt": "2026-03-02T04:58:06.554Z",
-      "updatedAt": "2026-03-02T04:58:06.554Z"
-    },
     "react-best-practices": {
       "source": "0xbigboss/claude-code",
       "sourceType": "github",
@@ -18,15 +9,6 @@
       "skillFolderHash": "e321b6890cdb378275a2c9708302b9ae1d084def",
       "installedAt": "2026-03-02T06:52:08.926Z",
       "updatedAt": "2026-03-02T06:52:08.926Z"
-    },
-    "typescript-best-practices": {
-      "source": "0xbigboss/claude-code",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/0xbigboss/claude-code.git",
-      "skillPath": ".claude/skills/typescript-best-practices/SKILL.md",
-      "skillFolderHash": "70d6e4013509e92ab8bce7313a2d35673688ed33",
-      "installedAt": "2026-03-02T06:53:24.247Z",
-      "updatedAt": "2026-03-02T06:53:24.247Z"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -54,15 +36,6 @@
       "skillFolderHash": "a58dec189a598e96a17e1a0b6a88a198d427d337",
       "installedAt": "2026-03-04T02:08:01.383Z",
       "updatedAt": "2026-03-13T23:03:46.561Z"
-    },
-    "lovable": {
-      "source": "10k-digital/lovable-claude-code",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/10k-digital/lovable-claude-code.git",
-      "skillPath": "plugins/lovable/skills/lovable/SKILL.md",
-      "skillFolderHash": "1ca9a8b8a7bccf47d10373ceec014a0a53bbfd7c",
-      "installedAt": "2026-03-05T11:11:17.654Z",
-      "updatedAt": "2026-03-05T11:11:17.654Z"
     },
     "architecture-blueprint-generator": {
       "source": "github/awesome-copilot",
