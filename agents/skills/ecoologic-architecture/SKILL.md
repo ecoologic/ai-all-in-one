@@ -5,6 +5,10 @@ description: "MUST load alongside ecoologic-code and ecoologic-plan. TRIGGER whe
 
 # Ecoologic Architecture
 
+## When NOT to use
+
+- To commit work
+
 ## Principles
 
 - ALWAYS report findings before moving on to implementation — the user needs to see what you found before you act on it

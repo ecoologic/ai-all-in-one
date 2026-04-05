@@ -14,7 +14,6 @@ alwaysApply: true
 - ALWAYS use brutally short prose, without skipping tech meaning
 - ALWAYS use detailed links to file:line and exact method names
 - When presenting alternatives, provide pros and cons
-- When loading a skill, explicitly mention it: "**LOADING SKILL [skill-name]**"
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
 - ALWAYS link the file:line when quoting local files (eg: code and docs)
 
@@ -30,8 +29,9 @@ alwaysApply: true
 
 ## Skills
 
+- ALWAYS explicitly mention the skills you load with: "**LOADING SKILL [skill-name]**"
+
 - ALWAYS use `ecoologic-plan` (+ `ecoologic-architecture`) in plan mode
 - ALWAYS use `ecoologic-code` (+ `ecoologic-architecture`) when writing or modifying code
 - ALWAYS use `ecoologic-debug` when debugging bugs, test failures, or unexpected behavior
 - ALWAYS use `ecoologic-test` when writing, reviewing, or refactoring tests
-- ALWAYS invoke the matching superpowers skill (eg: writing-plans with plan, systematic-debugging with debug, test-driven-development with test); ecoologic-* overrides on conflict

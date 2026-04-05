@@ -27,6 +27,7 @@ Always load relevant companion skills alongside:
 - Pure infrastructure/DevOps (Dockerfiles, CI pipelines)
 - One-off scripts with no domain model
 - Documentation-only changes
+- To commit work
 
 ## TypeScript
 

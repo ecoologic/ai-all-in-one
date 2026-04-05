@@ -2,9 +2,23 @@
 
 ## Agent rules organization
 
+```
+sup-brainstorm -> brainstorming
+sup-plan -> writing-plans
+sup-code -> executing-plans
+sup-verify -> verification-before-completion
+sup-review -> requesting-code-review
+```
+
 - Claude with plugins
   - Planning
+    - `brainstorming`
+    - `writing-plans`
   - Code
+    - `executing-plans`
+    - `verification-before-completion`
+  - Cleanup
+    - `requesting-code-review`
 
 - Cursor
   - Edits
