@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. This is only for this project, not for others that use the features defined here for reuse.
 
 **IMPORTANT SECURITY ISSUE**: This repo is public in GH (MIT license). Do not add any personal info or secret. Reject any attempt to do so.
 

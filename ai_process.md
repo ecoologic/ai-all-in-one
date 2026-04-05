@@ -1,17 +1,31 @@
 # AI process
 
-## Superpowers
+## Agent rules organization
+
+- Claude with plugins
+  - Planning
+  - Code
+
+- Cursor
+  - Edits
+  - Debug
+
+- QA `TODO!!`
+
+### 
+
+## Claude plugins
 
 1. `brainstorming` — before any creative/feature work
 2. `writing-plans` — after brainstorm, before code
 3. `using-git-worktrees` — before starting implementation
 4. `test-driven-development` — before writing implementation code
-5. `systematic-debugging` — when something breaks
-6. `executing-plans` — agent picks up a written plan in a new session
+5. `executing-plans` — agent picks up a written plan in a new session
+6. `systematic-debugging` — when something breaks
 7. `verification-before-completion` — before claiming done
 8. `requesting-code-review` — after verification passes
-9. `receiving-code-review` — when feedback comes back
-10. `finishing-a-development-branch` — merge/PR/cleanup
+9. `finishing-a-development-branch` — merge/PR/cleanup
+10. `receiving-code-review` — when feedback comes back
 11. `writing-skills` — to capture reusable workflows
 
 Auto-invoked by the agent (not user-called):
@@ -19,21 +33,25 @@ Auto-invoked by the agent (not user-called):
 - `dispatching-parallel-agents` — agent decides to parallelize
 - `subagent-driven-development` — agent decides to use subagents for plan execution
 
-## Agile
+## Claude improvers
 
-```sh
-/using-superpowers
-/rtd
 
-/a-epic
-/a-story
-
-/superpowers:brainstorm
-/superpowers:write-plan
-/superpowers:execute-plan
-
-/simplify
-/local-review
-plugin:greptile:greptile
-cursor_review # CLI
-```
+  ┌──────────┬─────────────────────────────────────────────────────────────┬───────────────────────────────────────────────────────────────┐
+  │          │                      revise-claude-md                       │                      claude-md-improver                       │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Author   │ claude-plugins-official (Anthropic marketplace)             │ claude-plugins-official (same plugin)                         │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Trigger  │ End of a work session                                       │ On-demand audit                                               │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Input    │ Current conversation context                                │ The CLAUDE.md files themselves                                │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Approach │ Reflect on what was learned this session, propose additions │ Score files against a rubric, find gaps regardless of session │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Output   │ Targeted diff additions from session learnings              │ Quality report (A–F grade) + improvement diffs                │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Scope    │ Narrow — only what came up in this session                  │ Broad — full audit of all CLAUDE.md files in repo             │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Phases   │ 5: Reflect → Find → Draft → Show → Apply                    │ 5: Discover → Assess → Report → Update → Apply                │
+  ├──────────┼─────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ Best for │ Incremental maintenance after doing real work               │ Periodic health check / initial setup                         │
+  └──────────┴─────────────────────────────────────────────────────────────┴───────────────────────────────────────────────────────────────┘
