@@ -9,33 +9,14 @@ alwaysApply: true
 
 - ALWAYS be brief and technical
 - NEVER use pleasantries and filler
-- ALWAYS use numbered lists when comparing options or explaining steps
+- ALWAYS prefer numbered lists over bullets, so the user can reference them
+- ALWAYS prefer tables and lists over prose
 - ALWAYS use brutally short prose, without skipping tech meaning
 - ALWAYS use detailed links to file:line and exact method names
 - When presenting alternatives, provide pros and cons
 - When loading a skill, explicitly mention it: "**LOADING SKILL [skill-name]**"
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
 - ALWAYS link the file:line when quoting local files (eg: code and docs)
-
-## Planning
-
-- ALWAYS use superpowers planning skill
-- ALWAYS report findings before moving on to implementation
-- NEVER plan beyond the user's requested scope
-- ALWAYS close the response by providing a link to the file, so it can be opened in IDE
-- ALWAYS search for code to reuse buried inside other features
-- ALWAYS extract code to be reused (see Coding)
-
-## Coding
-
-- When the same logic appears in 2+ places, extract it immediately into the most natural location for its meaning. Don't wait for a third consumer — duplication drifts and gets harder to unify later.
-- NEVER narrate change history in code comments or UI copy — describe current behavior only, history is un-necessary
-
-## Debugging Execution
-
-- ALWAYS report findings before moving on to implementation
-- NEVER start implementing before confirming with the user
-- ALWAYS plan a rollback to avoide make changes that leave the DB or runtime broken
 
 ## Your user
 
@@ -46,3 +27,11 @@ alwaysApply: true
 - email: `echo $MY_EMAIL`
 - GitHub user: `gh api user --jq '.login'`
 - Worktree or `wt` refert to a Git worktree
+
+## Skills
+
+- ALWAYS use `ecoologic-plan` (+ `ecoologic-architecture`) in plan mode
+- ALWAYS use `ecoologic-code` (+ `ecoologic-architecture`) when writing or modifying code
+- ALWAYS use `ecoologic-debug` when debugging bugs, test failures, or unexpected behavior
+- ALWAYS use `ecoologic-test` when writing, reviewing, or refactoring tests
+- ALWAYS invoke the matching superpowers skill (eg: writing-plans with plan, systematic-debugging with debug, test-driven-development with test); ecoologic-* overrides on conflict

@@ -24,9 +24,9 @@ The remaining internal symlinks are already checked into the repos:
 Symlinked to `~` so all AI agents pick them up:
 
 - `agents/` → `~/.agents` — global scope skill code lives here
-  - `commands/` — shared slash commands (each `.md` file becomes `/filename`)
+  - `commands/` — shared slash commands (each `.md` file becomes `/filename`): nope, pr-actions, rtd, wt
   - `skills/` — installed skill directories (each contains a `SKILL.md`)
-  - `.skill-lock.json` — tracks installed skills with sources, hashes, timestamps (v3)
+  - `.skill-lock.json` — tracks **global** installed skills (sources, hashes, timestamps, v3)
 
 - `claude/` → `~/.claude` — Claude Code user-level config
   - `commands/` → `~/.agents/commands/` — folder symlink, shared commands auto-available
@@ -47,7 +47,7 @@ Note this repo has skills and settings both global, BUT ALSO, has its own local 
 Only active in this repo:
 
 - `.agents/skills/` — repo-local skills (not symlinked globally)
-- `skills-lock.json` — tracks repo-local skills in `.agents/skills/` (v3 format)
+- `skills-lock.json` — tracks **repo-local** skills in `.agents/skills/` (v3 format, separate from global `agents/.skill-lock.json`)
 - `.claude/` — project-level Claude Code config (gitignored)
   - `skills/` — symlinks to skills available only in this repo
 - `tts/` — Kokoro TTS integration: hotkey listener, Docker wrapper, binary
