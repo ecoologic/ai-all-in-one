@@ -7,7 +7,9 @@ description: "MUST load alongside ecoologic-code and ecoologic-plan. TRIGGER whe
 
 ## When NOT to use
 
-- To commit work
+- NEVER use for questions and investigations
+- NEVER use to commit work
+
 
 ## Principles
 

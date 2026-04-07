@@ -7,13 +7,6 @@ model: sonnet
 
 # Ecoologic Code
 
-## Pair with other skills
-
-Always load relevant companion skills alongside:
-
-- `ecoologic-architecture` — MUST load alongside (shared principles for planning and coding)
-- React → `react-best-practices` (covers hooks, effects, refs, component design)
-
 ## When to use
 
 - Writing or modifying application/domain code
@@ -24,10 +17,18 @@ Always load relevant companion skills alongside:
 
 ## When NOT to use
 
-- Pure infrastructure/DevOps (Dockerfiles, CI pipelines)
-- One-off scripts with no domain model
-- Documentation-only changes
-- To commit work
+- NEVER use for Pure infrastructure/DevOps (Dockerfiles, CI pipelines)
+- NEVER use for One-off scripts with no domain model
+- NEVER use for Documentation-only changes
+- NEVER use for questions and investigations
+- NEVER use to commit work
+
+## Pair with other skills
+
+Always load relevant companion skills alongside:
+
+- `ecoologic-architecture` — MUST load alongside (shared principles for planning and coding)
+- React → `react-best-practices` (covers hooks, effects, refs, component design)
 
 ## TypeScript
 

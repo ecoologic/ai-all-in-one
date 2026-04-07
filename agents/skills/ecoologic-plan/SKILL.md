@@ -1,11 +1,16 @@
 ---
 name: ecoologic-plan
-description: "MUST USE when planning, designing, or in plan mode. TRIGGER when: entering plan mode, designing implementation approach, creating specs, or discussing architecture decisions. Loads ecoologic-architecture alongside. Ensures planning follows the user's preferred workflow."
+description: "MUST USE when planning, designing. TRIGGER when: entering plan mode, designing implementation approach, creating specs, or discussing architecture decisions. Loads ecoologic-architecture alongside. Ensures planning follows the user's preferred workflow."
 ---
 
 # Ecoologic Plan
 
 Planning rules that shape how implementation is designed and communicated.
+
+## When NOT to use
+
+- NEVER use for questions and investigations
+- NEVER use to commit work
 
 ## Pair with
 
