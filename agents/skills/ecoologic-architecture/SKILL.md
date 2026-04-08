@@ -1,15 +1,9 @@
 ---
 name: ecoologic-architecture
-description: "MUST load alongside ecoologic-code and ecoologic-plan. TRIGGER when: designing features, planning implementation, refactoring modules, reviewing PRs, or writing application code. Shared rules between planning and implementation"
+description: "Use alongside ecoologic-code or ecoologic-plan when designing features, refactoring module boundaries, or reviewing application structure; NOT for investigations or commits."
 ---
 
 # Ecoologic Architecture
-
-## When NOT to use
-
-- NEVER use for questions and investigations
-- NEVER use to commit work
-
 
 ## Principles
 

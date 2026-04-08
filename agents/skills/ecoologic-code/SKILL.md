@@ -1,27 +1,11 @@
 ---
 name: ecoologic-code
-description: "MUST USE, when writing or modifying application code. TRIGGER when: creating features, refactoring domain logic, reviewing PRs, or building UI. Takes precedence over other coding skills. Authors good code."
+description: "Use when writing or refactoring application code, reviewing business logic or UI code, or shaping new feature modules; NOT for infra, docs-only, investigations, commits, or one-off scripts."
 allowed-tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
 
 # Ecoologic Code
-
-## When to use
-
-- Writing or modifying application/domain code
-- Designing new features, modules, or services
-- Refactoring existing code toward domain alignment
-- Any PR or code review involving business logic
-- Building or reviewing user-facing interfaces
-
-## When NOT to use
-
-- NEVER use for Pure infrastructure/DevOps (Dockerfiles, CI pipelines)
-- NEVER use for One-off scripts with no domain model
-- NEVER use for Documentation-only changes
-- NEVER use for questions and investigations
-- NEVER use to commit work
 
 ## Pair with other skills
 
@@ -103,3 +87,4 @@ Always load relevant companion skills alongside:
 
 1. **Build only what is needed now.** No speculative features, no "might need later" abstractions
 2. **YAGNI does NOT restrict refactoring or extractions.** Making code clearer and defining the correct specific abstractions makes for easier maintenance and it's always allowed
+3. **YAGNI has nothing to do with how to organise the code**. Put the code where it belongs (domain scoped) from the start

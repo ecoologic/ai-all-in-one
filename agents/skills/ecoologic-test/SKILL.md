@@ -1,6 +1,6 @@
 ---
 name: ecoologic-test
-description: "MUST use when writing, reviewing, or refactoring automated tests."
+description: "Use when writing, reviewing, or refactoring automated tests"
 ---
 
 # Ecoologic Test
