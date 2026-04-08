@@ -12,7 +12,7 @@ allowed-tools: [Read, Write, Edit, AskUserQuestion, Skill]
 | ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **In**     | `./planning/<epic-slug>/idea.md`          | Raw epic idea and links to supporting artifacts                                                                  |
 | **In/Out** | `./planning/glossary.md`                  | Shared domain glossary created by `/a-global-architecture`                                                       |
-| **In**     | `./planning/global-architecture.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
+| **In**     | `./planning/architecture/global.md`       | Shared repo-wide context created by `/a-global-architecture`                                                     |
 | **Out**    | `./planning/<epic-slug>/epic.md`          | Structured now-work story list plus epic-level ERD, requirements, UX framing, and a top-of-file UI design reference section for later stages |
 | **Out**    | `./planning/<epic-slug>/personas.md`      | Personas, actors, and usage context for later stages                                                             |
 | **Out**    | `./planning/<epic-slug>/stretch-goals.md` | Deferred later-scope stories kept separate from the main pipeline reading path                                   |
@@ -121,7 +121,7 @@ When several reasonable splits exist, prefer the smallest user-visible slice and
 
 ## Step 0: Load glossary
 
-Read `./planning/glossary.md` and `./planning/global-architecture.md`. Stop if either is missing.
+Read `./planning/glossary.md` and `./planning/architecture/global.md`. Stop if either is missing.
 
 ## Step 1: Resolve inputs
 
