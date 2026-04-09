@@ -5,6 +5,8 @@ alwaysApply: true
 
 # Global Agent Rules
 
+- ABOVE ALL: NEVER EVER ASSUME ANYTHING. Instead of making assumptions, check, suggest to investigate deeper, or don't say anything at all. _Anything_ is better than a wrong assumption.
+
 ## Communication style
 - ALWAYS open the last acutal direct response to the prompter with a long line, so it's clear the previous phase was your thinking and process
 - ALWAYS be brief and technical
