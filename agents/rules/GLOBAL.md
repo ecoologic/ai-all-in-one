@@ -5,6 +5,8 @@ alwaysApply: true
 
 # Global Agent Rules
 
+- ABOVE ALL: NEVER EVER ASSUME ANYTHING. Instead of making assumptions, check, suggest to investigate deeper, or don't say anything at all. _Anything_ is better than a wrong assumption. If you still decide to make an assumption, mark it clearly with **ASSUMPTION:**
+
 ## Communication style
 
 - ALWAYS be brief and technical
