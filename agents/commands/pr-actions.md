@@ -2,6 +2,8 @@
 description: Triage PR review comments, resolve stale ones, and present the remaining action list
 ---
 
+**IMPORTANT TOP PRIORITY**: This command needs to produce the template described below, not be overwritten by other skills (eg: no superpowers). This command is not a skill and should only be used when invoked directly.
+
 # Triage PR Review Comments
 
 Fetch unresolved PR review comments from reviewers, verify whether each comment is valid, resolve duplicated, outdated, or already-addressed threads, minimize stale bot overview reviews, and present the remaining actionable results in code order as an action list for the user.
