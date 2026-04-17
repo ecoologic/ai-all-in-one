@@ -111,17 +111,22 @@ Formatting rules:
 Wrap the section with these exact sentinels:
 
 ```md
-<!-- pr-descr-tests:start -->
+<!-- pr-descr:start -->
+## Changes
+
+* <a list of changes in a non-technical language that clearly explain the value of this PR>
+* <make it brief>
+
 ## Tests
 ...
-<!-- pr-descr-tests:end -->
+<!-- pr-descr:end -->
 ```
 
 ### 5. Update only the managed block in the PR body
 
 If the existing PR body already contains:
-1. `<!-- pr-descr-tests:start -->`
-2. `<!-- pr-descr-tests:end -->`
+1. `<!-- pr-descr:start -->`
+2. `<!-- pr-descr:end -->`
 
 Replace only the content between those markers, inclusive.
 

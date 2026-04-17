@@ -1,0 +1,16 @@
+# Claude Superpowers Skills
+
+1. [brainstorming](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/SKILL.md)
+2. [dispatching-parallel-agents](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/dispatching-parallel-agents/SKILL.md)
+3. [executing-plans](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/executing-plans/SKILL.md)
+4. [finishing-a-development-branch](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/finishing-a-development-branch/SKILL.md)
+5. [receiving-code-review](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/receiving-code-review/SKILL.md)
+6. [requesting-code-review](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/requesting-code-review/SKILL.md)
+7. [subagent-driven-development](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/subagent-driven-development/SKILL.md)
+8. [systematic-debugging](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/systematic-debugging/SKILL.md)
+9. [test-driven-development](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/test-driven-development/SKILL.md)
+10. [using-git-worktrees](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/using-git-worktrees/SKILL.md)
+11. [using-superpowers](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/using-superpowers/SKILL.md)
+12. [verification-before-completion](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/verification-before-completion/SKILL.md)
+13. [writing-plans](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/writing-plans/SKILL.md)
+14. [writing-skills](file:///Users/erik/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/writing-skills/SKILL.md)

@@ -1,6 +1,12 @@
 # TODOs
 
-- script folder finish?
+## Sup
+
+* `/sup-plan` force call `/sup-code`
+* `/qa` and qa from `/sup-x`
+  * see 2026-04-15-agent-credit-purchase-qa.md
+    * no docker instructions, prep db etc, step-by-step, my user...
+* store plans in `./planning/`
 
 ## Meta
 

@@ -41,6 +41,7 @@ Always load relevant companion skills alongside:
 
 - Once a concept is set, do not shorten it when used as pre/postfixes eg: `DataPartner -> DataPartnerExtractionConfig` not just `PartnerExtractionConfig`
 - ALWAYS use the domain's exact terms. If the business says "Shipment", code `Shipment`, not `Delivery`
+- ALWAYS use explicit accurate long names over concise ones, even when composing multiple concepts
 - The name depends and indicates what the value is. So, for example, `billingChoice` is always the object, NEVER the id, that would be `billingChoiceId` and `company` is a terrible name for `companyName`, eg: `DOMAIN -> DOMAIN_URL`
 - One word in English, one word in code: `separateEachWord`, NEVER `jamwordstogether`
 - NEVER use synonyms, don't cheat when: you already have a name and you need a new one, the solution might be to make the older name more specific, and use the same level of specificity for the new name

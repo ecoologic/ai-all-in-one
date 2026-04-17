@@ -1,10 +1,22 @@
 ---
 description: Execute a written implementation plan
-argument-hint: [plan file path]
+argument-hint: [priority instructions or file ref to read fully]
 ---
 
-Invoke `superpowers:executing-plans`, `ecoologic-architecture` and `ecoologic-code`.
+Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` for all paths below.
 
-Pass $ARGUMENTS as the plan reference.
+`$ARGUMENTS`: optional extra instructions or file refs (not a slug; the slug is the branch).
 
-When done, suggest the user run `/sup-verify` to verify the work.
+Read the plan at `./planning/{branch}/super-plan.md`
+
+**PARALLELIZE TASK EXECUTION IN MULTIPLE NON-CONFLICTING AGENTS!!**
+**DO NOT** write any test! We'll do that at in another process, with different skills.
+
+Invoke `superpowers:executing-plans`, `ecoologic-architecture` and `ecoologic-code` in every agent.
+
+If, at any point, you find bugs, invoke `ecoologic-debug` and `superpowers:systematic-debugging`.
+
+## When done
+
+* DO NOT use user interaction tools like questions. It's OK before completing the work, but don't ask: "Ready to proceed?"
+* Suggest the user run `/clear` and `/sup-finish` to verify the work

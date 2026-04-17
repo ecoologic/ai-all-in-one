@@ -25,6 +25,7 @@ This skill covers only these four rules:
 - If a test feels hard to write without poking internals, the test is probably violating black-box style
 - If a test title cannot be mapped back to a symbol or endpoint, rename the title to the real code element
 - The title should always reflect outside observable behaviour (`it "returns <x>"`, `it "throws <e>"`)
+- ALWAYS express domain logic and UX in tests, even unit tests
 - NEVER test endpoints return 500 error, if you found a bug, raise the issue, and we'll fix it separately
 
 ## Review checklist
