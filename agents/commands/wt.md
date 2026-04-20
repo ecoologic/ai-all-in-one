@@ -1,76 +1,103 @@
 ---
-description: Create a git worktree following naming and symlink conventions
-argument-hint: <branch-suffix>
+description: Create a sibling git worktree named <project-folder>-<branch>
+argument-hint: <branch-name>
 ---
 
 # Create Git Worktree
 
-Create an isolated git worktree as a sibling of the current project, following project conventions.
+Create a git worktree as a sibling of the current project using the exact folder name `{project-folder}-{branch}`. After creation, continue work from that new folder.
+
+## What This Command Does
+
+1. Resolve the current repository root and project folder name.
+2. Build the sibling worktree path as `{project-folder}-{branch}` using the exact branch name passed to the command.
+3. Create the worktree for the existing branch, or create the branch during worktree creation if it does not already exist.
+4. Report the new path and treat that folder as the working directory from that point on.
+
+## Usage
+
+```bash
+/wt my-feature-branch
+```
 
 ## Implementation Steps
 
-When this command is invoked with `<branch-suffix>`:
+When this command is invoked with `<branch-name>`:
 
-### 1. Resolve project root and names
+### 1. Validate arguments and repository state
+
+1. Require exactly one argument: `<branch-name>`.
+2. If no branch name is provided, stop and ask for it.
+3. Run:
 
 ```bash
 git rev-parse --show-toplevel
 ```
 
-Extract:
-- `PROJECT_DIR` — the full path (e.g. `/Users/erik/dev/my-app`)
-- `PROJECT_NAME` — basename of `PROJECT_DIR` (e.g. `my-app`)
+4. If that command fails, report that the current directory is not inside a git repository and stop.
 
-Derive:
-- `WORKTREE_DIR` — `PROJECT_DIR`-`<branch-suffix>` (e.g. `/Users/erik/dev/my-app-auth-flow`)
-- `BRANCH` — `<branch-suffix>` (e.g. `auth-flow`)
+### 2. Resolve the sibling worktree path
 
-### 2. Validate
+1. Treat the `git rev-parse --show-toplevel` result as `PROJECT_DIR`.
+2. Compute `PROJECT_NAME` as the basename of `PROJECT_DIR`.
+3. Treat the command argument as `BRANCH` exactly as passed. Do not shorten it. Do not rewrite it. Do not prefix it.
+4. Compute the worktree path as a sibling of `PROJECT_DIR`:
 
-- Confirm `WORKTREE_DIR` does not already exist
-- Confirm branch `BRANCH` does not already exist (unless user wants to check out an existing branch)
+```bash
+WORKTREE_DIR="$(dirname "$PROJECT_DIR")/${PROJECT_NAME}-${BRANCH}"
+```
 
-If either exists, report and ask how to proceed — do NOT overwrite.
+5. If `WORKTREE_DIR` already exists, report the path and stop. Do not overwrite it.
 
 ### 3. Create the worktree
 
-```bash
-git worktree add -b <BRANCH> <WORKTREE_DIR>
-```
-
-This creates the worktree directory and the new branch in one step.
-
-### 4. Symlink shared directories
-
-From inside `WORKTREE_DIR`, symlink `planning/` and `tmp/` back to the original project so all branches share them:
+1. Check whether the branch already exists:
 
 ```bash
-ln -s <PROJECT_DIR>/planning <WORKTREE_DIR>/planning
-ln -s <PROJECT_DIR>/tmp <WORKTREE_DIR>/tmp
+git show-ref --verify --quiet "refs/heads/$BRANCH"
 ```
 
-Only symlink directories that exist in `PROJECT_DIR`. Skip silently if they don't.
+2. If the branch already exists, run:
 
-### 5. Report
-
-Output:
+```bash
+git worktree add -f "$WORKTREE_DIR" "$BRANCH"
 ```
+
+3. Otherwise, create the branch while creating the worktree:
+
+```bash
+git worktree add -b "$BRANCH" "$WORKTREE_DIR"
+```
+
+4. Use `-f` for existing branches so the command also works when `BRANCH` is the current branch or is already checked out in another worktree.
+
+### 4. Report the result and continue from the new folder
+
+1. Report:
+
+```text
 Worktree created:
   dir:    <WORKTREE_DIR>
   branch: <BRANCH>
-  symlinks: planning/ tmp/ (if created)
 ```
+
+2. State that subsequent work should happen from `WORKTREE_DIR`.
+3. Do not perform any other setup.
 
 ## Important Notes
 
-- **NEVER** create the worktree inside the project — always as a sibling directory
-- Branch name is just the suffix, NOT prefixed with the project name
-- Worktree folder IS prefixed with the full project path
-- Only symlink `planning/` and `tmp/` — nothing else
+1. **NEVER** create the worktree inside the repository. Always create it as a sibling directory.
+2. **ALWAYS** use the exact branch name passed by the user in the folder name.
+3. **DO NOT** shorten, slugify, sanitize, or otherwise rewrite the branch name.
+4. **USE** `git worktree add -f` for existing branches so the current branch is supported.
+5. **DO NOT** create symlinks, copy files, run setup steps, or clean anything up.
+6. **DO NOT** do anything beyond creating the sibling worktree and reporting the resulting directory.
 
 ## Error Handling
 
-If `git worktree add` fails:
-- Show the error
-- Check if branch or directory already exists
-- Report findings and stop
+If any step fails:
+
+1. Report the specific command that failed.
+2. Show the error message.
+3. Stop immediately.
+4. Do not retry automatically.

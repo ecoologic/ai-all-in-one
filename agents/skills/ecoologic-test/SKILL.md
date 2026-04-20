@@ -16,15 +16,17 @@ This skill covers only these four rules:
 3. Use spec format (module -> function -> context (optional) -> `it returns`)
 4. In unit tests, ALWAYS describe actual code elements, NEVER humanize the code element
 5. STOP and notify the user if the test is run in CI
+6. DO NOT write tests _solely_ to validate logging, skip if nothing more important
 
 ## Good practices derived from these rules
 
-- Let the description follow the real code structure
+- Tests should basically document the behavior of code elements
+- Let the structure follow the real code structure
 - Name the condition in the `when ...` block, not in the top-level subject
 - Assert outcomes that a caller can observe
 - If a test feels hard to write without poking internals, the test is probably violating black-box style
 - If a test title cannot be mapped back to a symbol or endpoint, rename the title to the real code element
-- The title should always reflect outside observable behaviour (`it "returns <x>"`, `it "throws <e>"`)
+- The title should always reflect outside observable behavior (`it "returns <x>"`, `it "throws <e>"`)
 - ALWAYS express domain logic and UX in tests, even unit tests
 - NEVER test endpoints return 500 error, if you found a bug, raise the issue, and we'll fix it separately
 

@@ -2,13 +2,13 @@
 
 ## Sup
 
-* `/sup-plan` force call `/sup-code`
-* `/qa` and qa from `/sup-x`
-  * see 2026-04-15-agent-credit-purchase-qa.md
-    * no docker instructions, prep db etc, step-by-step, my user...
-* store plans in `./planning/`
+* `ln -s dev-docs` in prj
+* `qa` as a subagent in plan
+  * no docker instructions, prep db etc, step-by-step, my user...
 
 ## Meta
+
+- `/qk` quick subagent refactor in light model
 
 - Subagents??
 - Use extended thinking in skills and commands
@@ -21,7 +21,7 @@
 
 ## Agile plan
 
-- The process needs to be way more inteactive
+- The process needs to be way more interactive
 - The process needs more "self-review"
 - Stories need "when shit happens" ACs
 - Consider extra architecture docs in `./planning/architecture/`

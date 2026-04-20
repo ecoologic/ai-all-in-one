@@ -3,6 +3,12 @@ description: Execute a written implementation plan
 argument-hint: [priority instructions or file ref to read fully]
 ---
 
+Never reference development tools, development documents (design, plan), or Superpowers materials in the produced code, comments or commit messages.
+
+**Precedence**
+
+This command's rules take precedence over conflicting Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
+
 Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` for all paths below.
 
 `$ARGUMENTS`: optional extra instructions or file refs (not a slug; the slug is the branch).

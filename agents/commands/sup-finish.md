@@ -3,6 +3,10 @@ description: Verify work with evidence before claiming completion
 argument-hint: [priority instructions, file ref, or alternate super-plan.md path]
 ---
 
+**Precedence**
+
+This command's rules take precedence over conflicting Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
+
 Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` when you need the planning folder (e.g. `./planning/{branch}/`).
 
 If `$ARGUMENTS` contains a path ending in `super-plan.md`, use that path (and its parent dir as the planning dir) instead of the branch-derived one. This enables retroactive checkpoints on already-shipped branches without checking them out.

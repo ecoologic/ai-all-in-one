@@ -15,16 +15,17 @@ Priority and overriding arguments: `$ARGUMENTS`
 Use the current branch's PR.
 
 ```bash
-gh pr view --json number,url,body,baseRefName
+gh pr view --json id,number,url,body,baseRefName
 ```
 
 If no PR is found for the current branch, report the error and stop.
 
 Capture:
-1. `number`
-2. `url`
-3. `body`
-4. `baseRefName`
+1. `id`
+2. `number`
+3. `url`
+4. `body`
+5. `baseRefName`
 
 ### 2. Identify changed test files
 
@@ -114,8 +115,11 @@ Wrap the section with these exact sentinels:
 <!-- pr-descr:start -->
 ## Changes
 
-* <a list of changes in a non-technical language that clearly explain the value of this PR>
-* <make it brief>
+* List only the changes a CEO would care about, _in a language they understand_
+* In the format: "**Short Title**: _Before:_ xx; _After:_ yy"
+* Focus on customer impact, business impact, risk, or launch readiness
+* Keep it brief: 2-4 bullets max, if you have more, pick the ones with highest customer or business impact
+* Skip refactors, internal tooling, tests, and technical details unless they materially affect revenue, cost, compliance, support load, performance, risk, or launch readiness
 
 ## Tests
 ...
@@ -152,14 +156,38 @@ gh pr edit <number> --body-file "<temp-file>"
 
 Do not pass large multiline content inline on the command line.
 
-### 7. Report the result
+### 7. Mark changed test files as viewed
 
-After updating the PR description, report:
+After the PR body update succeeds, mark every changed test file from step 2 as viewed on the current PR.
+
+If no changed test files were detected, skip this step.
+
+Use the PR node id from step 1 with GitHub GraphQL:
+
+```bash
+gh api graphql -f query='
+mutation($pullRequestId: ID!, $path: String!) {
+  markFileAsViewed(input: {pullRequestId: $pullRequestId, path: $path}) {
+    clientMutationId
+  }
+}' -f pullRequestId='<id>' -f path='<path>'
+```
+
+Requirements:
+1. Mark only the changed test files used by this command.
+2. Run the mutation once per file path.
+3. Treat already-viewed files as non-fatal only if GitHub accepts the request without error.
+4. If any `markFileAsViewed` call fails, report the failing command and stop.
+
+### 8. Report the result
+
+After updating the PR description and marking test files as viewed, report:
 1. PR number
 2. PR URL
 3. whether the Tests block was inserted or replaced
 4. how many changed test files were used
 5. how many new or changed test cases were summarized
+6. how many test files were marked as viewed
 
 ## Important Notes
 
@@ -175,6 +203,6 @@ After updating the PR description, report:
 If any step fails:
 1. Report the exact command that failed.
 2. Report the relevant error output.
-3. Explain whether failure happened during PR detection, test discovery, diff analysis, block replacement, or `gh pr edit`.
+3. Explain whether failure happened during PR detection, test discovery, diff analysis, block replacement, `gh pr edit`, or `markFileAsViewed`.
 4. Stop and ask how to proceed.
 5. DO NOT retry automatically.

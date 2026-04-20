@@ -2,7 +2,9 @@
 description: Triage PR review comments, resolve stale ones, and present the remaining action list
 ---
 
-**IMPORTANT TOP PRIORITY**: This command needs to produce the template described below, not be overwritten by other skills (eg: no superpowers). This command is not a skill and should only be used when invoked directly.
+**Precedence**
+
+This command owns the workflow and output format. Its triage template, numbering rules, and cleanup rules take precedence over unrelated skills. Use `superpowers:dispatching-parallel-agents` only where this file explicitly allows it. Keep all GitHub writes and the final user-facing triage document in the main agent.
 
 # Triage PR Review Comments
 
@@ -40,6 +42,7 @@ The fetched data must include every identifier needed for later cleanup writes:
 - each review thread `id` for `resolveReviewThread`
 - each top-level review comment's `fullDatabaseId`, falling back to `databaseId` only if `fullDatabaseId` is absent
 - each review comment's `replyTo { id }` so top-level comments can be identified without parsing URLs
+- each substantive top-level human review's author login and body so general review comments can be validated too
 
 Only process threads where `isResolved: false`.
 
@@ -53,7 +56,43 @@ When building links for the final output, convert review comment URLs to the Cha
 
 ### 3. Expand the Review Set
 
-For each remaining reviewer comment:
+Before analysis, build one combined review-input set:
+
+1. unresolved threaded reviewer comments
+2. substantive human top-level general review comments, including suggestion-style comments that appear as general review comments without a diff line attachment
+
+Number every raw review input before analysis and keep those raw numbers stable for the rest of the run:
+
+- Number threaded reviewer comments first, in code order
+- Then number substantive human general review comments, in review order after the threaded comments
+
+When there are 2 or more independent validation domains, invoke `superpowers:dispatching-parallel-agents` and dispatch multiple `Agent` calls in parallel in a single assistant message.
+
+Use a high bar for independence. Good split boundaries:
+
+- Separate files or subsystems with unrelated logic
+- Separate broad claims that require unrelated repo searches
+- Separate review clusters whose reasoning and likely fixes do not overlap
+
+Do not parallelize when comments are tightly related, likely duplicates of each other, or require shared reasoning to classify correctly.
+
+When dispatching parallel agents:
+
+- Keep likely duplicates in the same agent so dedupe signals are not lost
+- Pass each agent only its assigned raw comment numbers, comment text, author replies, relevant file paths, and the minimum repo context needed
+- Require each agent to stay read-only: no file edits, no GitHub writes, no final triage formatting, no numbering changes
+- Require each agent to return, for every assigned raw comment:
+  - a short issue summary
+  - classification recommendation
+  - effort and severity recommendation
+  - likely duplicate relationships inside that agent's scope
+  - cleanup recommendation, if any
+  - concise code-based evidence and any ambiguity
+- Require each agent to check recent commits for the affected LoCs and related tests so "going in circles" signals are surfaced early
+
+If the review set is small or strongly coupled, do the validation in the main agent instead of spawning subagents.
+
+For each remaining threaded reviewer comment:
 
 1. Read the referenced file and the surrounding code near `line` or `startLine`.
 2. If needed, inspect nearby symbols, related files, or tests.
@@ -61,6 +100,16 @@ For each remaining reviewer comment:
 4. Keep notes on what the comment is asking for, whether it is actually correct, and roughly how much work it would take to address within this PR.
 
 Be skeptical but fair. Verify against the code before deciding.
+
+For each substantive human general review comment:
+
+1. Read the body carefully and split it into concrete claims only when the claims are actually separable
+2. If the body points to specific files, symbols, behaviors, or tests, inspect those directly
+3. If the body raises a broader architectural, correctness, or maintainability concern, search the repo and nearby commits to verify whether the concern is real in this PR
+4. If the body is useful but too broad to become a single fix item, keep it in `General comments summary`
+5. If the body contains one concrete actionable issue, or a small set of tightly related actionable issues, convert it into a numbered triage item instead of summary-only text
+
+Do not assume a general review comment is non-actionable just because it is not attached to a diff line. This includes suggestion-formatted review text that appears as a general comment rather than a diff-thread comment.
 
 ### 4. Classify Each Comment
 
@@ -89,6 +138,14 @@ For that later follow-up:
 #### Process
 
 Before proceeding, check all the recent commits for the affected LoCs and relative tests. Answer the question: "Are we going in circles? Are we applying a change that undoes a previous fix?". In that case, think deeper about the solution that fixes both issues raised. Sometimes it will mean undoing the latest change, sometimes we shouldn't do anything, and sometimes it will mean finding a solution that fixes both issues.
+
+If parallel agents were used, do the final classification in the main agent after all agent results return:
+
+- Reconcile disagreements before deciding
+- Re-check any suspected cross-agent duplicate before deduping
+- Re-check any comment whose validity depends on shared context across domains
+- Treat agent output as analysis input, not as final truth
+- Do not let any subagent print the final triage document or perform cleanup writes
 
 Each comment must end up in exactly one category:
 
@@ -132,17 +189,20 @@ For each deduped issue:
 - Keep the first comment as the canonical entry
 - Record every display number that belongs to that repeated issue
 - Preserve only the first comment's text in the final output
-- Use the canonical comment's GitHub review comment URL to derive a Changes tab link as the display link target
+- Use the canonical threaded comment's GitHub review comment URL to derive a Changes tab link as the display link target when the canonical issue came from a review thread
+- If the canonical issue came from a general review comment, keep it as a general review issue and do not fabricate a diff anchor
 - Mention all matching numbers together, like `2, 5, 8.`
 - Mark every non-canonical duplicate thread for resolution after classification is complete
 
 ### 6. Order Issues by Code Position
 
-Present issues in the order they appear in the PR diff:
+Present issues in this order:
 
-1. Use `pullRequest.files.nodes[].path` to determine file order.
-2. Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
-3. For deduped issues, use the canonical comment's position.
+1. All canonical issues with concrete PR diff positions, in PR diff order:
+   - Use `pullRequest.files.nodes[].path` to determine file order.
+   - Within a file, sort by the earliest available line: `startLine`, else `line`, else push to the end of that file.
+   - For deduped issues, use the canonical comment's position.
+2. Then all remaining canonical issues whose canonical source is a general review comment without a concrete diff position
 
 ### 7. Print the Final Triage Document Before Cleanup
 
@@ -165,7 +225,7 @@ Resolved automatically:
 - <author> overview review hidden
 ```
 
-Then, if there are any substantive human general review comments, include this unnumbered section before the actionable issue list:
+Then, if there are any substantive but non-actionable human general review comments, include this unnumbered section before the actionable issue list:
 
 ```text
 General comments summary:
@@ -196,18 +256,43 @@ INVALID
 <telegraphic sentence explaining why>
 ```
 
+If the canonical issue came from a general review comment rather than a diff thread, use this shape instead:
+
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+General review comment
+> <comment text truncated to one paragraph>
+
+VALID[e:quick|mid|long][s:low|mid|high]
+<brief paragraph with a tailored example of how this could go wrong in practice>
+
+<brief paragraph with the suggested fix>
+```
+
+Or:
+
+```text
+<n>[, <n2>, <n3>]. @<reviewer login>
+General review comment
+> <comment text truncated to one paragraph>
+
+INVALID
+<telegraphic sentence explaining why>
+```
+
 Presentation rules:
 
-- Number every raw reviewer comment first, in code order, before deduping. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
+- Number every raw review input first, before deduping. Threaded reviewer comments come first in code order; substantive human general review comments come after them in review order. If comments 4 and 7 are duplicates of comment 2, the canonical entry should render as `2, 4, 7.`
 - Do not include auto-resolved duplicate, outdated, or already-addressed threads in the actionable issue list. Mention them only in `Resolved automatically`.
 - Do not include minimized top-level bot overview reviews in the numbered issue list. Mention them only in `Resolved automatically`.
-- Do include substantive human general review comments in `General comments summary`, but never number them as issues.
+- Do include substantive but non-actionable human general review comments in `General comments summary`.
+- Do include actionable human general review comments in the numbered issue list.
 - Render `path:line` as a markdown link to the canonical PR review comment's Changes tab URL, for example `https://github.com/owner/repo/pull/326/changes#r2929596414`.
+- For actionable general review issues without a concrete diff anchor, render `General review comment` as plain text, not as a fake `path:line`.
 - Truncate the quoted reviewer text to a single paragraph. Remove extra blank lines and shorten if needed, but preserve the substance.
 - For `VALID[...]` items, write exactly two short paragraphs: first the tailored failure mode example, then the suggested fix.
 - Do not include planned GitHub reply text.
 - Do not include storage paths or persistence details in the main triage list itself.
-- Do not include general PR comments outside review threads as actionable issues; summarize substantive human ones separately instead.
 - Keep explanations concise but specific to the code.
 - The `Resolved automatically` section is the cleanup plan that will be executed immediately after this document is printed. Do not wait until after cleanup to print the document.
 
@@ -220,6 +305,8 @@ After classification and dedupe are complete, resolve review threads in GitHub w
 - The thread is classified `INVALID` because it is outdated or already addressed
 
 In those cases, leave a short explanation reply before closing.
+
+Do not use parallel agents for cleanup. Cleanup is stateful GitHub mutation work and must run only in the main agent, serially, using the exact cleanup set that was already printed to the user.
 
 Before any cleanup write:
 
@@ -279,7 +366,7 @@ Track which raw comment numbers were resolved automatically and why:
 - `already addressed`
 - `author reviewed`
 
-Also clean up stale top-level bot overview reviews and separately summarize substantive human general review comments. Use a separate pass over `pullRequest.reviews`:
+Also clean up stale top-level bot overview reviews and separately analyze substantive human general review comments. Use a separate pass over `pullRequest.reviews`:
 
 - Consider only reviews from `cursor` and `copilot-pull-request-reviewer`
 - Consider only reviews that are general overview reviews, for example:
@@ -295,10 +382,12 @@ For human general review comments:
 - Consider only reviews whose author is not `cursor` or `copilot-pull-request-reviewer`
 - Consider only reviews with a non-empty `body`
 - Ignore pure approval boilerplate with no actionable substance
-- Summarize the substance of those bodies into a short `General comments summary` section
-- Keep this section unnumbered
-- Do not turn these general comments into actionable issue items unless the same concern also appears in a review thread
-- If there are no substantive human general review comments, omit the section
+- Validate the substance of those bodies against the code just like review-thread comments
+- Treat suggestion-style review text in those bodies as substantive general comments when it is not attached to a diff line
+- If a body contains one concrete actionable issue, or a small tightly-related actionable cluster, turn it into a numbered issue item
+- If a body is substantive but too broad, too vague, or too high-level to map to one actionable issue item, summarize it in `General comments summary`
+- If a general comment duplicates an existing threaded issue, dedupe it into that canonical issue instead of printing it twice
+- If there are no substantive human general review comments left after this split, omit `General comments summary`
 
 Use this GraphQL mutation once per stale top-level review that should be hidden:
 
@@ -333,6 +422,8 @@ After the numbered list, close with:
 2. Offer to address the valid comments in order only if the user explicitly asks in a follow-up message.
    - Make it explicit that the follow-up will revalidate each selected comment against the updated code before any fix starts.
    - Make it explicit that numbered shorthand like `3. <comment with reason>` will be sanity-checked against the triaged issue before any fix starts.
+   - Make it explicit that the later fix follow-up may use multiple agents when the selected comments split into independent implementation domains.
+   - Make it explicit that tightly related comments, duplicate fixes, or changes touching the same code path should stay in one implementation stream instead of being parallelized.
 3. If any valid comment would require code changes in that later follow-up, mention the relevant skills loaded from the section above.
 4. Offer to store the triage result in `./tmp/pr-<number>.md` for a clean follow-up agent, and make it clear that a simple reply of `write` should trigger that storage.
 5. If all valid comments have already been addressed and all duplicate, outdated, or already-addressed threads were resolved, say the branch may be ready to push, but do not push anything as part of this command until told.
@@ -342,7 +433,7 @@ Example closing line:
 ```text
 This command triages the unresolved review comments, may resolve duplicate, outdated, or already-addressed review threads, and may minimize stale bot overview reviews. It does not start fixes, post GitHub replies beyond cleanup notes, or push the branch.
 
-If you want, I can address the valid items in order in a follow-up message, starting with #<first-valid-comment-number>. I will revalidate each selected comment against the updated code before fixing it, and I will sanity-check numbered shorthand like `3. <comment with reason>` before acting on it.
+If you want, I can address the valid items in order in a follow-up message, starting with #<first-valid-comment-number>. I will revalidate each selected comment against the updated code before fixing it, and I will sanity-check numbered shorthand like `3. <comment with reason>` before acting on it. If the selected items split into independent implementation domains, that later fix pass may use multiple agents; if they touch the same code path or are coupled, it will stay in one implementation stream.
 
 Loaded relevant skills: `ecoologic-code`, `typescript-best-practices`
 
@@ -374,6 +465,9 @@ Requirements for that file:
 - Explicitly instruct the next agent to use those skills while revalidating and addressing the valid comments.
 - Explicitly instruct the next agent to sanity-check numbered follow-up requests like `3. <comment with reason>` against the actual triaged item before editing.
 - Explicitly instruct the next agent to revalidate each valid comment against the current code before editing, and to stop and ask the user if the underlying issue became invalid or the important details changed.
+- Explicitly instruct the next agent to use multiple agents only when the selected fix items are truly independent implementation domains with low conflict risk.
+- Explicitly instruct the next agent to keep coupled fixes, same-file clusters, and likely overlapping refactors in one implementation stream.
+- Explicitly instruct the next agent to run `/simplify` only on the final user-facing response from that later fix follow-up, not on the triage report and not on the handoff file contents.
 - End with a short instruction that the next agent should address the valid comments in numeric order unless told otherwise.
 
 When writing this file:
@@ -383,11 +477,51 @@ When writing this file:
 - Overwrite any existing `./tmp/pr-<number>.md` file with the latest triage output.
 - After writing, tell the user the exact file path that was created.
 
+### 11. Later Fix Follow-Up Rules
+
+If the user later asks to fix selected items, for example with a message like `fix this shit`, treat that as a separate implementation pass guided by the triage output above.
+
+For that later fix follow-up:
+
+- Revalidate each selected item against the current code before editing anything
+- If the user request is broad, default to addressing valid items in numeric order
+- If the selected items split into 2 or more independent implementation domains, invoke `superpowers:dispatching-parallel-agents` and dispatch multiple agents in parallel
+- Give each fix agent a narrow, self-contained scope with:
+  - the selected comment numbers
+  - the relevant files or symbols
+  - the current triage reasoning
+  - the requirement to revalidate before editing
+  - explicit boundaries to avoid unrelated changes
+- Keep related fixes together in one agent when:
+  - they touch the same file or symbol cluster
+  - one fix may invalidate or subsume another
+  - they are likely duplicates with one shared implementation
+  - they need shared architectural reasoning
+- Keep final coordination in the main agent:
+  - reconcile agent outputs
+  - resolve conflicts
+  - run verification
+  - present the final fix summary to the user
+- Do not let subagents produce the authoritative final user-facing fix report on their own
+
+Run `/simplify` only at the very end of that later fix follow-up response, not during the triage report creation above and not when writing `./tmp/pr-<number>.md`.
+
+Treat that `/simplify` pass as wording cleanup only. Preserve all required substance exactly:
+
+- Keep the selected issue numbers and their mapping to the implemented fixes
+- Keep any validation notes about items that changed or became invalid
+- Keep any verification results, remaining risks, and skipped items
+- Keep any required mention of loaded skills
+- Do not remove ambiguity notes, caveats, or error details that affect correctness
+- Do not rewrite the response into a different structure that obscures which triaged items were addressed
+
 ## Reply Guidelines
 
 - Validate comments against the actual code before deciding.
 - Do not invent certainty. If the code is ambiguous, say why, then choose the most defensible classification.
 - Use the response you already produced.
+- Parallelize only independent read-only validation work. Keep dedupe, final classification reconciliation, final formatting, and all GitHub writes in the main agent.
+- Do not run `/simplify` on the triage report itself. Use it only on the later fix follow-up response, if such a follow-up happens.
 - Treat repeated comments as one issue only when they genuinely share the same fix and reasoning.
 - Resolve duplicate and outdated threads only after validation and dedupe are complete.
 - Minimize stale top-level bot overview reviews only after the active latest review for that author is identified.
