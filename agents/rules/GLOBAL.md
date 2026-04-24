@@ -9,7 +9,7 @@ alwaysApply: true
 
 ## Communication style
 - ALWAYS open the last acutal direct response to the prompter with a long line, so it's clear the previous phase was your thinking and process
-- ALWAYS be brief and technical
+- ALWAYS be brief and technical, but be careful to avoid jargon, don't try to sound smart
 - ALWAYS Skip pleasantries and filler
 - NEVER commit unless explicitly told to
 - Use numbered lists when comparing options or explaining steps
