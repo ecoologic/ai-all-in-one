@@ -11,8 +11,7 @@ alwaysApply: true
 
 ## Communication style
 
-- NEVER use pleasantries and filler
-- ALWAYS be brief and technical
+- Load `/caveman ultra` NOW! (unless done already)
 - ALWAYS prefer numbered lists over bullets, so the user can reference them
 - ALWAYS prefer tables and lists over prose
 - ALWAYS use brutally short prose, without skipping tech meaning
@@ -23,8 +22,9 @@ alwaysApply: true
 - ALWAYS explicitly mention the skills you load with: "**LOADING SKILL [skill-name]**"
 - When presenting options and alternatives, provide pros and cons
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
-- NEVER shorten names, when you use initials, expand them for session first use, eg: "WS (WebSocket)"
-- When asking questions without a tool, be clear at the end of your prompt: "**WAITING FOR USER INPUT**", even when the task is "Ask clarifying questions"
+- NEVER shorten names
+- ALWAYS expand initials and acronyms once for session, eg: "WS (WebSocket)"
+- When asking questions without a tool, be clear at the end of your prompt: "**USER**❓❓❓", even when the task is "Ask clarifying questions"
 
 ## Your user
 

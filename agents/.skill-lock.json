@@ -52,6 +52,15 @@
       "skillFolderHash": null,
       "installedAt": "2026-03-14T00:00:00.000Z",
       "updatedAt": "2026-03-14T00:00:00.000Z"
+    },
+    "caveman": {
+      "source": "juliusbrussee/caveman",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/juliusbrussee/caveman.git",
+      "skillPath": "caveman/SKILL.md",
+      "skillFolderHash": "825e13085d1515fe67881b2123f3bf9b34c26154",
+      "installedAt": "2026-04-24T22:00:56.307Z",
+      "updatedAt": "2026-04-24T22:00:56.307Z"
     }
   },
   "dismissed": {
