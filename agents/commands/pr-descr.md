@@ -77,7 +77,7 @@ Interpret "new or changed test cases" broadly enough to include:
 3. changed expectations
 4. changed contexts or nesting that materially change meaning
 
-Do not mention deleted or previous wording. Output only the current test structure as it exists now.
+Do not mention deleted or previous wording. Output only the current test structure as it exists now. For bug-fix PRs leave all tests, but for features, filter to only display happy path.
 
 ### 4. Format the Tests section
 
@@ -86,7 +86,7 @@ Render the managed section in spec-documentation style using nested markdown bul
 Example:
 
 ```md
-## Tests
+## Happy Tests
 
 - `api/src/tests/endpoints/admin/get-data-partner-billing.test.ts`
   - PATCH /admin/data-partners/:dataPartnerId
@@ -109,17 +109,22 @@ Formatting rules:
    2. feature, page, component, or exported symbol heading
    3. file-derived fallback only when no better code element exists
 
-Wrap the section with these exact sentinels:
+Generate a `## Changes` section before `## Tests`.
+
+`## Changes` rules:
+1. List only the changes a CEO would care about, in language they understand.
+2. Use this format: `**Short Title**: _Before:_ xx; _After:_ yy`
+3. Focus on customer impact, business impact, risk, or launch readiness.
+4. Keep it brief: 2-4 bullets max. If there are more, pick the ones with the highest customer or business impact.
+5. Skip refactors, internal tooling, tests, and technical details unless they materially affect revenue, cost, compliance, support load, performance, risk, or launch readiness.
+
+Wrap the managed block with these exact sentinels. The sentinels and headings are literal. The bullet under `## Changes` and the content under `## Tests` are generated content, not literal text to copy:
 
 ```md
 <!-- pr-descr:start -->
 ## Changes
 
-* List only the changes a CEO would care about, _in a language they understand_
-* In the format: "**Short Title**: _Before:_ xx; _After:_ yy"
-* Focus on customer impact, business impact, risk, or launch readiness
-* Keep it brief: 2-4 bullets max, if you have more, pick the ones with highest customer or business impact
-* Skip refactors, internal tooling, tests, and technical details unless they materially affect revenue, cost, compliance, support load, performance, risk, or launch readiness
+- **Short Title**: _Before:_ xx; _After:_ yy
 
 ## Tests
 ...

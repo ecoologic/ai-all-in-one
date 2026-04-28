@@ -39,3 +39,8 @@ alwaysApply: true
 ## Planning
 
 - Once the plan is clear and right before code execution, give a brief T-shirt size estimate of how many tokens implementation could take.
+
+## 3rd party
+
+- ALWAYS be explicit when connecting to 3rd party services by saying "3rd party ❗❗❗" at every connection
+- NEVER delete or update keys and permissions on 3rd parties (eg: AWS) without explicit and individual consent
