@@ -142,7 +142,7 @@ Use the shared map to understand:
 
 Use targeted exploration only in areas relevant to the stories and still needing confirmation.
 
-Use `Agent` with explore subagents or equivalent targeted search. Launch one agent per relevant area, up to 5, and reserve one slot for a prototype source when present.
+Use `Agent` with explore subagents or equivalent targeted search. Launch one agent per relevant area, up to 5, and reserve one slot for a prototype source when present. Follow `superpowers:dispatching-parallel-agents` — all dispatches must go out in a single message so they run concurrently, never one-after-another.
 
 Each exploration prompt must include:
 1. the story list

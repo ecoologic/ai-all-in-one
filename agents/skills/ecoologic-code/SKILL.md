@@ -1,8 +1,6 @@
 ---
 name: ecoologic-code
 description: "Use when writing or refactoring application code, reviewing business logic or UI code, or shaping new feature modules; NOT for infra, docs-only, investigations, commits, or one-off scripts."
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: sonnet
 ---
 
 # Ecoologic Code
@@ -26,7 +24,9 @@ Always load relevant companion skills alongside:
 
 ## Tests
 
-- ALWAYS write a test after fixing a bug when none existed that was failing
+When writing tests is required (see trigger below), invoke `ecoologic-test` for the actual testing rules. This skill only declares **when** a test is required, not how to write one.
+
+- ALWAYS write a test after fixing a bug when none existed that was failing (except for migrations) — invoke `ecoologic-test`
 
 ## Code Style
 

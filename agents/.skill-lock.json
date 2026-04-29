@@ -61,13 +61,34 @@
       "skillFolderHash": "825e13085d1515fe67881b2123f3bf9b34c26154",
       "installedAt": "2026-04-24T22:00:56.307Z",
       "updatedAt": "2026-04-24T22:00:56.307Z"
+    },
+    "typescript-best-practices": {
+      "source": "0xbigboss/claude-code",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/0xbigboss/claude-code.git",
+      "skillPath": ".claude/skills/typescript-best-practices/SKILL.md",
+      "skillFolderHash": "ddfe7d6738caa866df1275a9f55ea30300f916ee",
+      "installedAt": "2026-04-29T08:17:15.845Z",
+      "updatedAt": "2026-04-29T08:17:15.845Z"
     }
   },
   "dismissed": {
     "findSkillsPrompt": true
   },
   "lastSelectedAgents": [
+    "amp",
+    "antigravity",
+    "cline",
+    "codex",
     "cursor",
+    "deepagents",
+    "dexto",
+    "firebender",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode",
+    "warp",
     "claude-code"
   ]
 }

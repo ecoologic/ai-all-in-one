@@ -202,6 +202,7 @@ After updating the PR description and marking test files as viewed, report:
 4. DO NOT describe old test names or deleted cases.
 5. DO NOT include a diagrams section in this command.
 6. If test intent is ambiguous, stop and ask instead of inventing structure.
+7. NEVER mention skills, Superpowers, `ecoologic-*`, `sup-*`/`a-*` commands, planning docs, or any process scaffolding in the PR body. PR description is a shipped artifact — keep it product-facing.
 
 ## Follow-up Fixes
 

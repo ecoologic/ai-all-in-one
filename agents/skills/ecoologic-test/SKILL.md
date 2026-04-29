@@ -7,7 +7,7 @@ description: "Use when writing, reviewing, or refactoring automated tests"
 
 ## Scope
 
-This skill covers only these four rules:
+This skill covers only these six rules:
 
 1. Do not change the implementation of the subject under test just to make a test pass
   - except to temporarily break the code to verify the test failure

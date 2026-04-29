@@ -1,8 +1,6 @@
 ---
 name: ux-laws
 description: "Must use when building or reviewing user-facing interfaces. TRIGGER when: creating UI components, reviewing UX, designing flows, or laying out screens. Applies Laws of UX (Hick's, Fitts's, Miller's, Jakob's, etc.) to ensure usable, intuitive interfaces."
-allowed-tools: Read, Grep, Glob, Edit, Write
-model: sonnet
 ---
 
 # UX Laws
@@ -11,16 +9,16 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 ## When to use
 
-- Building or modifying UI components
-- Reviewing user-facing interfaces
-- Designing multi-step flows, forms, or navigation
-- Any PR or code review involving UI/UX decisions
+1. Building or modifying UI components
+2. Reviewing user-facing interfaces
+3. Designing multi-step flows, forms, or navigation
+4. Any PR or code review involving UI/UX decisions
 
 ## When NOT to use
 
-- Pure backend or API-only code
-- DevOps, CI/CD, infrastructure
-- Design system audits against external checklists (use `web-design-guidelines`)
+1. Pure backend or API-only code
+2. DevOps, CI/CD, infrastructure
+3. Design system audits against external checklists (use `web-design-guidelines`)
 
 ## Precedence
 
@@ -30,10 +28,10 @@ Practical UX laws for building user-facing interfaces. Based on [Laws of UX](htt
 
 ## Quick rules
 
-- ALWAYS Order lists
-- ALWAYS Update the URL when using: tabs, accordions, widgets etc
-- NEVER use dark patterns
-- NEVER show code and internal errors to users, always
+1. **Order lists** — predictable order (alpha, recency, priority) lets users scan w/ Serial Position Effect; random order forces re-reading every time
+2. **Update the URL** when using tabs, accordions, expandable widgets etc — without it, users can't deep-link, share state, or use browser back; breaks Jakob's Law (web pages remember where you are)
+3. **Never use dark patterns** — short-term conversion gain, long-term trust loss; also illegal in many jurisdictions (EU Digital Services Act, FTC)
+4. **Never show code or internal errors to users** — leaks implementation, scares non-technical users, signals broken product; map to friendly messages at API boundary
 
 ## Cognitive Load & Complexity
 

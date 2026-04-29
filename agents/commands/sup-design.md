@@ -19,7 +19,7 @@ Pass `$ARGUMENTS` as context for the brainstorming session only after the check 
 
 ## Parallelisation
 
-Dispatch **2–3 Agent calls in parallel** (single assistant message, multiple tool calls) to brainstorm distinct sub-problems. Each agent MUST invoke `superpowers:brainstorming` at the top of its prompt and MUST return a design fragment, not just research. **Verification / code-exploration agents are additional and do NOT count toward this quota.**
+Follow `superpowers:dispatching-parallel-agents`. Dispatch **2–3 Agent calls in parallel** (single assistant message, multiple tool calls) to brainstorm distinct sub-problems. Each agent MUST invoke `superpowers:brainstorming` at the top of its prompt and MUST return a design fragment, not just research. **Verification / code-exploration agents are additional and do NOT count toward this quota.**
 
 ## When done
 

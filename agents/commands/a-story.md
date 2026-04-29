@@ -117,7 +117,8 @@ Immediately compare the locked list against `architecture.md` and note any epic-
 
 Use `global-architecture.md` and `architecture.md` to scope targeted code exploration to achieve the story acceptance criteria.
 
-Use targeted search and explore agents to gather:
+The four axes below are **independent** — dispatch them in parallel via `superpowers:dispatching-parallel-agents` (one agent per axis, all in a single message). Don't run them sequentially.
+
 1. related existing code
 2. patterns and conventions
 3. reuse opportunities

@@ -5,7 +5,7 @@ argument-hint: [priority instructions or file ref to read fully]
 
 ## Precedence
 
-This command's rules take precedence over conflicting Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
+Order: **`ecoologic-*` > this command > `superpowers:*`**. `ecoologic-*` skills override this file; this file overrides Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
 
 Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` for all paths below.
 
@@ -17,8 +17,8 @@ Work in plan mode, you are allowed to write any file inside `./planning/` withou
 
 ## Rules
 
-- **PARALLELIZE THE WORK IN MULTIPLE AGENTS WHEN POSSIBLE!!**
-- **PLAN FOR PARALLELIZATION OF TASKS**
+- Invoke `superpowers:dispatching-parallel-agents` for the planning work itself: split investigation into non-conflicting domains and dispatch one agent per domain in a single assistant message
+- The produced plan MUST mark each task with the parallelisation domains it belongs to, so `/sup-code` can fan out via `superpowers:dispatching-parallel-agents` without re-deriving the grouping
 - Plan to use scripts (your choice of language) to implement the solution for repetitive tasks, rather than using tokens
 - Invoke `superpowers:writing-plans`, `ecoologic-architecture` and `ecoologic-plan` in every agent.
 

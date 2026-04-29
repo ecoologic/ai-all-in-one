@@ -3,11 +3,13 @@ description: Execute a written implementation plan
 argument-hint: [priority instructions or file ref to read fully]
 ---
 
-Never reference development tools, development documents (design, plan), or Superpowers materials in the produced code, comments or commit messages.
+## Output hygiene
 
-**Precedence**
+Invoke skills (`superpowers:*`, `ecoologic-*`) freely as part of your workflow — that's how the work gets done. But **never mention** development tools, design/plan documents, or Superpowers materials in **artifacts the user ships**: produced code, comments, commit messages, or PR descriptions. Internal invocation = yes; visible attribution in shipped output = no.
 
-This command's rules take precedence over conflicting Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
+## Precedence
+
+Order: **`ecoologic-*` > this command > `superpowers:*`**. `ecoologic-*` skills override this file; this file overrides Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
 
 Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` for all paths below.
 
@@ -15,7 +17,10 @@ Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{bran
 
 Read the plan at `./planning/{branch}/super-plan.md`
 
-**PARALLELIZE TASK EXECUTION IN MULTIPLE NON-CONFLICTING AGENTS!!**
+## Parallelisation
+
+Invoke `superpowers:dispatching-parallel-agents`. Group plan tasks into non-conflicting domains (different files, different subsystems, no shared state) and dispatch one agent per domain in a single assistant message. Tasks that touch the same files or depend on each other run sequentially.
+
 **DO NOT** write any test! We'll do that at in another process, with different skills.
 
 Invoke `superpowers:executing-plans`, `ecoologic-architecture` and `ecoologic-code` in every agent.
