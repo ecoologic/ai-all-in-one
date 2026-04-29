@@ -37,7 +37,7 @@ Invoke the same skills the owner command would have used when the revision touch
 Common examples:
 - `explore` for targeted codebase investigation when revising `architecture` or `story`
 - `ux-laws` when revising user-facing story or epic framing
-- `react-best-practices` and `typescript-best-practices` only when the owner contract requires code-informed UI investigation
+- `react-best-practices` only when the owner contract requires code-informed UI investigation
 - `mermaid-diagrams` when a diagram change materially improves the revised artifact
 
 ## Purpose

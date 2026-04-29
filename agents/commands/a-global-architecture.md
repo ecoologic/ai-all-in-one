@@ -31,9 +31,7 @@ The architecture map must explicitly call out the shared reuse surface of the re
 
 Use these skills when relevant:
 - `explore` for repo-wide discovery
-- `architecture-blueprint-generator` for structural mapping
 - `ecoologic-code` for naming and convention alignment
-- `software-architecture-design` when summarizing durable system boundaries
 - `mermaid-diagrams` if diagrams materially improve the repo map
 
 ## Rules

@@ -21,9 +21,7 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, Ski
 Invoke when relevant:
 - `ecoologic-code` before writing or modifying application code
 - `react-best-practices` for React components
-- `typescript-best-practices` for TypeScript or JavaScript
 - `ux-laws` for user-facing interaction flows
-- `web-design-guidelines` for web UI
 - `explore` for tightly scoped discovery in multiple code areas
 - All relevant project-specific rules and skills
 

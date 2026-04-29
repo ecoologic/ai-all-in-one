@@ -51,10 +51,8 @@ For every inconsistency:
 
 Use these skills when relevant:
 - `explore` for targeted multi-area codebase exploration
-- `architecture-blueprint-generator` when `global-architecture.md` is stale or too weak to guide targeted exploration
 - `ecoologic-code` to validate naming and pattern alignment
 - `mermaid-diagrams` for epic class diagrams, sequence diagrams, and optional ERD review artifacts
-- `lovable` when input artifacts reference a Lovable prototype
 
 ## Rules
 
@@ -131,7 +129,7 @@ If a contradiction materially changes the architecture recommendation, stop, sur
 Read `./planning/global-architecture.md` and use it to narrow exploration.
 
 If it is stale or too weak:
-- do targeted structural exploration or invoke `architecture-blueprint-generator`
+- do targeted structural exploration
 - refresh `global-architecture.md` only with durable cross-epic structure
 
 Use the shared map to understand:

@@ -22,8 +22,6 @@ allowed-tools: [Read, Glob, Grep, Write, Edit, Agent, AskUserQuestion, Skill]
 Invoke these skills when relevant:
 - `ux-laws` for stories with UI
 - `react-best-practices` when the project uses React
-- `typescript-best-practices` when the project uses TypeScript
-- `web-design-guidelines` when the story includes web UI
 - All relevant project specific rules and skills
 
 ## Purpose
