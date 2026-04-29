@@ -26,7 +26,7 @@ If no PR is found, report the error and stop.
 
 ### 2. Fetch Review Data (GraphQL)
 
-Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, and top-level PR reviews.
+Use GraphQL to fetch the PR author, PR number, file order, unresolved review threads, top-level PR reviews, and PR-level issue comments.
 
 ```bash
 bash ~/.agents/commands/scripts/pr-fetch-reviews.sh {owner} {repo} {number}
@@ -43,6 +43,7 @@ The fetched data must include every identifier needed for later cleanup writes:
 - each top-level review comment's `fullDatabaseId`, falling back to `databaseId` only if `fullDatabaseId` is absent
 - each review comment's `replyTo { id }` so top-level comments can be identified without parsing URLs
 - each substantive top-level human review's author login and body so general review comments can be validated too
+- each PR-level issue comment's author login, body, `createdAt`, `updatedAt`, and `url` from `pullRequest.comments` — bots like `greptile-apps` post their overview here, not in `pullRequest.reviews`, and they typically edit a single comment in place rather than reposting
 
 Only process threads where `isResolved: false`.
 
@@ -60,11 +61,13 @@ Before analysis, build one combined review-input set:
 
 1. unresolved threaded reviewer comments
 2. substantive human top-level general review comments, including suggestion-style comments that appear as general review comments without a diff line attachment
+3. substantive bot overview content from `pullRequest.comments` (issue-level), notably `greptile-apps` summaries
 
 Number every raw review input before analysis and keep those raw numbers stable for the rest of the run:
 
 - Number threaded reviewer comments first, in code order
 - Then number substantive human general review comments, in review order after the threaded comments
+- Bot overview comments from `pullRequest.comments` (e.g. greptile-apps) are not numbered as actionable inputs; their substance is summarized in `General comments summary` and any concrete claims they make are cross-checked against the threaded set and the current code (see "Issue-level bot overview comments" below)
 
 When there are 2 or more independent validation domains, invoke `superpowers:dispatching-parallel-agents` and dispatch multiple `Agent` calls in parallel in a single assistant message.
 
@@ -110,6 +113,19 @@ For each substantive human general review comment:
 5. If the body contains one concrete actionable issue, or a small set of tightly related actionable issues, convert it into a numbered triage item instead of summary-only text
 
 Do not assume a general review comment is non-actionable just because it is not attached to a diff line. This includes suggestion-formatted review text that appears as a general comment rather than a diff-thread comment.
+
+#### Issue-level bot overview comments (greptile and similar)
+
+Some bots — `greptile-apps` is the canonical case — post their overview as a PR-level issue comment in `pullRequest.comments`, not as a review in `pullRequest.reviews`. Treat these specifically:
+
+- Match by author. Greptile is `greptile-apps`. Body usually starts with a `<details><summary><h3>Greptile Summary</h3></summary>` block and may include `Confidence Score: N/5` and a `Prompt To Fix All With AI` block with concrete code snippets.
+- These bots typically edit a single comment in place (`updatedAt > createdAt`) instead of reposting. Do not minimize earlier copies — there are usually none. Only the latest body matters.
+- The overview commonly references **prior review threads** (some of which may already be resolved) and re-asserts P1/P2 findings. Do not promote these claims to numbered actionable items on trust. For each concrete claim:
+  1. Find any matching threaded review comment in `pullRequest.reviewThreads` (resolved or not) — if it exists and is resolved, the bot's claim is most likely stale.
+  2. Revalidate against current code on the branch. If the issue is actually fixed, mark the claim stale; if it is genuinely open, treat it like a substantive general comment per the rules above (numbered triage item if it maps to one concrete fix; summary-only otherwise).
+  3. Concrete code snippets inside `Prompt To Fix All With AI` (or equivalent) blocks should be revalidated the same way before being numbered.
+- Summarize the high-level body (summary + confidence score) in `General comments summary` so the user still sees the bot's read of the PR even when no claim survives revalidation.
+- Do not post replies on issue-level bot comments as part of cleanup. The reply endpoint used by this command targets review-thread comments; issue comments are a different surface and bots like greptile do not consume replies there.
 
 ### 4. Classify Each Comment
 
@@ -376,6 +392,11 @@ Also clean up stale top-level bot overview reviews and separately analyze substa
 - Keep only the latest matching review per author
 - For every older matching review that is not already minimized and `viewerCanMinimize` is true, minimize it with classifier `OUTDATED`
 - Do not include these internal groups in the user-facing numbering or actionable list
+
+Issue-level bot overview comments in `pullRequest.comments` (e.g. `greptile-apps`) are handled differently:
+
+- Do not minimize them and do not post replies. They are typically a single comment edited in place — there are no older copies to hide, and the reply endpoint used elsewhere in this command targets review-thread comments, not issue comments.
+- Their content is summarized in `General comments summary` and revalidated per the "Issue-level bot overview comments" rules in step 3.
 
 For human general review comments:
 

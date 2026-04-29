@@ -1,5 +1,5 @@
 #!/bin/bash
-# Fetch PR review data (threads, reviews, files) via GitHub GraphQL API.
+# Fetch PR review data (threads, reviews, issue comments, files) via GitHub GraphQL API.
 # Usage: pr-fetch-reviews.sh <owner> <repo> <pr-number>
 set -euo pipefail
 
@@ -57,6 +57,20 @@ query($owner: String!, $repo: String!, $pr: Int!) {
           comments(first: 1) {
             totalCount
           }
+        }
+      }
+      comments(first: 100) {
+        nodes {
+          id
+          databaseId
+          fullDatabaseId
+          url
+          body
+          createdAt
+          updatedAt
+          isMinimized
+          viewerCanMinimize
+          author { login }
         }
       }
     }
