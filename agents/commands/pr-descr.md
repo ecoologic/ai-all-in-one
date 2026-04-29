@@ -203,6 +203,17 @@ After updating the PR description and marking test files as viewed, report:
 5. DO NOT include a diagrams section in this command.
 6. If test intent is ambiguous, stop and ask instead of inventing structure.
 
+## Follow-up Fixes
+
+If the user later asks to fix issues related to this PR work, first split the work into independent domains and use `dispatching-parallel-agents` when safe.
+
+Examples of independent work that should be parallelized:
+1. replying to PR comments in one thread while making unrelated code changes elsewhere
+2. multiple unrelated code changes in separate files or subsystems
+3. documentation or PR-body edits that do not depend on code edits still in flight
+
+Do not parallelize when edits are related, share state, touch the same code paths, or require one fix to understand another first.
+
 ## Error Handling
 
 If any step fails:

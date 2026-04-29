@@ -16,15 +16,16 @@ alwaysApply: true
 - ALWAYS prefer tables and lists over prose
 - ALWAYS use brutally short prose, without skipping tech meaning
 - ALWAYS use detailed links to file:line and exact method names
-- ALWAYS link the [path/file:line](path/file:line) when quoting local files (eg: code and docs)
-  - Use `./relative/path/file:line` (colon), not `file#line` (not hash)
-  - For multi-lines only link the first line: [./relative/path/file:n-m](./relative/path/file:n)
+- In Claude on macOS, NEVER use relative Markdown href targets like `(path/file:line)` or `(./relative/path/file:line)` for local files; they fail with `The application can’t be opened. -50`
+- When quoting local files in Markdown, keep visible text as `./relative/path/file:line`, but make href absolute `file:///...` path to file without `:line`, eg: `[./relative/path/file:line](file:///absolute/path/file)` and `[./relative/path/file:n-m](file:///absolute/path/file)`
+- If absolute `file:///...` target is not available, use plain code-formatted path `./relative/path/file:line`, not broken Markdown link
 - ALWAYS explicitly mention the skills you load with: "**LOADING SKILL [skill-name]**"
 - When presenting options and alternatives, provide pros and cons
 - When any of the input references (eg: files, links) can't be read or processed, **STOP immediately** and clearly list what contained the missing refs and what the refs are (full path from `~`), do not infer or proceed
 - NEVER shorten names
 - ALWAYS expand initials and acronyms once for session, eg: "WS (WebSocket)"
 - When asking questions without a tool, be clear at the end of your prompt: "**USER**❓❓❓", even when the task is "Ask clarifying questions"
+- ALWAYS exhaust all options before blaming errors on main branch or other people's work
 
 ## Your user
 
@@ -43,4 +44,5 @@ alwaysApply: true
 ## 3rd party
 
 - ALWAYS be explicit when connecting to 3rd party services by saying "3rd party ❗❗❗" at every connection
-- NEVER delete or update keys and permissions on 3rd parties (eg: AWS) without explicit and individual consent
+- NEVER delete or update keys and permissions on 3rd parties (eg: AWS) without _explicit and individual_ consent (no bulk: I asked earlier)
+- ALWAYS access AWS via SSO `aws sso login`, never regular `aws login`
