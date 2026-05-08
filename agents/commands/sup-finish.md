@@ -1,15 +1,23 @@
 ---
 description: Verify work with evidence before claiming completion
-argument-hint: [priority instructions, file ref, or alternate super-plan.md path]
+argument-hint: [Priority instructions or file to consider prompt]
 ---
 
-**Precedence**
+## Precedence (high to low)
 
-This command's rules take precedence over conflicting Superpowers guidance. Treat Superpowers skills as supporting instructions unless this file explicitly tells you otherwise.
+1. `<priority instructions>`
+2. This file
+3. Project rules and `CLAUDE.md`
+4. Global skills and commands like `ecoologic-*`
+5. `ecoologic-*` skills and commands
+6. Superpowers (eg: `brainstorming` or `writing-plans`)
 
-Resolve the branch name with `git rev-parse --abbrev-ref HEAD`. Use it as `{branch}` when you need the planning folder (e.g. `./planning/{branch}/`).
+## Definitions
 
-If `$ARGUMENTS` contains a path ending in `super-plan.md`, use that path (and its parent dir as the planning dir) instead of the branch-derived one. This enables retroactive checkpoints on already-shipped branches without checking them out.
+1. Branch: get it with `git rev-parse --abbrev-ref HEAD`
+2. Plan: `./planning/{branch}/plan.md`
+
+## Rules
 
 * Follow the steps below in order, one by one in sequence, do not overstep
 * If, at any point, you find bugs, invoke `ecoologic-debug` and `superpowers:systematic-debugging` and resolve

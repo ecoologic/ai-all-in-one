@@ -1,5 +1,10 @@
 # TODOs
 
+## Commands
+
+- `/progress` to handle checklists
+- `/accurate` no assumptions, every claim has reference, question my statements, code > docs, ignore planning, why you coudln't verify (?maybe, it might stop telling me?), only answer the specific question in the merit, to the point, no extra context nobody asked
+
 ## Sup
 
 * `ln -s dev-docs` in prj
